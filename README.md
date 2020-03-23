@@ -231,6 +231,7 @@ MultiQC is released under the GPL v3 or later licence.
 [hisat2]:         http://multiqc.info/docs/#hisat2
 [homer]:          http://multiqc.info/docs/#homer
 [htseq]:          http://multiqc.info/docs/#htseq
+[htstream]:       http://multiqc.info/docs/#htstream
 [interop]:        http://multiqc.info/docs/#interop
 [jellyfish]:      http://multiqc.info/docs/#jellyfish
 [kallisto]:       http://multiqc.info/docs/#kallisto
