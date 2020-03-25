@@ -76,6 +76,7 @@ class MultiqcModule(BaseMultiqcModule):
             'SeqScreener': stats.SeqScreener(),
             'SuperDeduper': stats.SuperDeduper(),
             'Primers': stats.Primers(),
+            'Stats': stats.Stats(),
     		}
 
 

@@ -85,7 +85,15 @@ class Primers():
 
 	def execute(self, json):
 
+		categories = ["totalFragmentsInput", "totalFragmentsOutput"]
+		plot = bargraph.plot(json, categories)
+		return plot 
+
+class Stats():
+
+	def execute(self, json):
 
 		categories = ["totalFragmentsInput", "totalFragmentsOutput"]
 		plot = bargraph.plot(json, categories)
 		return plot 
+
