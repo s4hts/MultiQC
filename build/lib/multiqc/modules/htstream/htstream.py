@@ -7,7 +7,8 @@ from collections import OrderedDict
 import logging
 import re, json
 
-from . import stats
+from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer
+from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats
 from multiqc import config
 from multiqc.modules.base_module import BaseMultiqcModule
 
@@ -67,17 +68,17 @@ class MultiqcModule(BaseMultiqcModule):
 	def parse_stats(self, json):
 
 		self.apps = {
-            'AdapterTrimmer': stats.AdapterTrimmer(),
-            'CutTrim': stats.CutTrim(),
-            'Overlapper': stats.Overlapper(),
-            'QWindowTrim': stats.QWindowTrim(),
-            'NTrimmer':stats.NTrimmer(),
-            'PolyATTrim': stats.PolyATTrim(),
-            'SeqScreener': stats.SeqScreener(),
-            'SuperDeduper': stats.SuperDeduper(),
-            'Primers': stats.Primers(),
-    		}
-
+            'AdapterTrimmer': AdapterTrimmer.AdapterTrimmer(),
+            'CutTrim': CutTrim.CutTrim(),
+            'Overlapper': Overlapper.Overlapper(),
+            'QWindowTrim': QWindowTrim.QWindowTrim(),
+            'NTrimmer': NTrimmer.NTrimmer(),
+            'PolyATTrim': PolyATTrim.PolyATTrim(),
+            'SeqScreener': SeqScreener.SeqScreener(),
+            'SuperDeduper': SuperDeduper.SuperDeduper(),
+            'Primers': Primers.Primers(),
+            'Stats': Stats.Stats()
+            }
 
 		for app in self.apps.keys():
 
@@ -85,20 +86,38 @@ class MultiqcModule(BaseMultiqcModule):
 
 			for key in json.keys():
 
-				for subkey in json[key].keys():
+				stats_boolean = False
 
-					if app in subkey:
+				for subkey in json[key].keys():	
+
+					if app == 'Stats' and app in subkey:
+							if stats_boolean == False:
+								stats_boolean = True
+							else:
+								stats_dict[key] = json[key][subkey]
+								break
+
+					elif app in subkey:
 						stats_dict[key] = json[key][subkey]
 						break
 
 			if len(stats_dict.keys()) != 0:
 
-				plot = self.apps[app].execute(stats_dict)
+				section_dict = self.apps[app].execute(stats_dict)
 
-				section = "hts_" + app
+				if section_dict != None:
 
-				self.add_section(name = section,
-								 plot = plot)
+					section = "hts_" + app
+
+					for key, value in section_dict.items():
+
+						try:
+
+							self.add_section(name = str(section + ": " + key),
+											 plot = section_dict[key])
+
+						except:
+							pass
 
 
 				# Possibly will be of use when more is known about what to include 
