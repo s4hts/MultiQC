@@ -53,18 +53,18 @@ class NTrimmer():
 
 		for key in json.keys():
 
-			discarded_reads = json[key]["Single_end"]["SE_discarded"] + json[key]["Paired_end"]["R1_discarded"] + json[key]["Paired_end"]["R2_discarded"]  
-
-			lefttrimmed_reads = json[key]["Paired_end"]["R1_leftTrim"] + json[key]["Paired_end"]["R2_leftTrim"] + json[key]["Single_end"]["SE_leftTrim"]
-			rightrimmed_reads = json[key]["Paired_end"]["R1_rightTrim"] + json[key]["Paired_end"]["R2_rightTrim"] + json[key]["Single_end"]["SE_rightTrim"]
+			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["Read1"]["discarded"] + json[key]["Paired_end"]["Read2"]["discarded"]  
+			
+			lefttrimmed_reads = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
+			rightrimmed_reads = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
 
 			trimmed_reads += (lefttrimmed_reads + rightrimmed_reads)
 
 			stats_json[key] = {
-			 				   "Reads in": json[key]["totalFragmentsInput"],
-							   "Reads out": json[key]["totalFragmentsOutput"],
-							   "% Discarded" : (discarded_reads / json[key]["totalFragmentsInput"]) * 100,
-							   "Notes": json[key]["Notes"],
+			 				   "Reads in": json[key]["Fragment"]["in"],
+							   "Reads out": json[key]["Fragment"]["out"],
+							   "% Discarded" : (discarded_reads / json[key]["Fragment"]["in"]) * 100,
+							   "Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Left Trimmed Reads": lefttrimmed_reads,
 							   "Right Trimmed Reads": rightrimmed_reads,
 							  }

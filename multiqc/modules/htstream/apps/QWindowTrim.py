@@ -46,17 +46,17 @@ class QWindowTrim():
 
 		for key in json.keys():
 
-			lefttrimmed_reads = json[key]["Paired_end"]["R1_leftTrim"] + json[key]["Paired_end"]["R2_leftTrim"] + json[key]["Single_end"]["SE_leftTrim"]
-			rightrimmed_reads = json[key]["Paired_end"]["R1_rightTrim"] + json[key]["Paired_end"]["R2_rightTrim"] + json[key]["Single_end"]["SE_rightTrim"]
+			lefttrimmed_reads = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
+			rightrimmed_reads = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
 
 			trimmed_reads += (lefttrimmed_reads + rightrimmed_reads)
 
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["PE_in"],
-							   "PE out": json[key]["Paired_end"]["PE_out"],
-							   "SE in" : json[key]["Single_end"]["SE_in"],
-							   "SE out": json[key]["Single_end"]["SE_out"],
-							   "Notes": json[key]["Notes"],
+			 				   "PE in": json[key]["Paired_end"]["in"],
+							   "PE out": json[key]["Paired_end"]["out"],
+							   "SE in" : json[key]["Single_end"]["in"],
+							   "SE out": json[key]["Single_end"]["out"],
+							   "Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Left Trimmed Reads": lefttrimmed_reads,
 							   "Right Trimmed Reads": rightrimmed_reads
 						 	  }

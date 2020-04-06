@@ -33,13 +33,13 @@ class SeqScreener():
 		for key in json.keys():
 
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["PE_in"],
-							   "PE out": json[key]["Paired_end"]["PE_out"],
-							   "PE hits": json[key]["Paired_end"]["PE_hits"],
-							   "SE in" : json[key]["Single_end"]["SE_in"],
-							   "SE out": json[key]["Single_end"]["SE_out"],
-							   "SE hits": json[key]["Single_end"]["SE_hits"],
-							   "Notes": json[key]["Notes"],
+			 				   "PE in": json[key]["Paired_end"]["in"],
+							   "PE out": json[key]["Paired_end"]["out"],
+							   "PE hits": json[key]["Paired_end"]["hits"],
+							   "SE in" : json[key]["Single_end"]["in"],
+							   "SE out": json[key]["Single_end"]["out"],
+							   "SE hits": json[key]["Single_end"]["hits"],
+							   "Notes": json[key]["Program_details"]["options"]["notes"],
 						 	  }
 
 		section = {

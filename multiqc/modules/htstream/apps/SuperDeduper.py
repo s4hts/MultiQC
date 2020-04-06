@@ -66,16 +66,16 @@ class SuperDeduper():
 
 		for key in json.keys():
 
-			duplicates = (json[key]["duplicate"] / json[key]["totalFragmentsInput"]) * 100
+			duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
 
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["PE_in"],
-							   "PE out": json[key]["Paired_end"]["PE_out"],
-							   "SE in": json[key]["Single_end"]["SE_in"],
-							   "SE out": json[key]["Single_end"]["SE_out"],
+			 				   "PE in": json[key]["Paired_end"]["in"],
+							   "PE out": json[key]["Paired_end"]["out"],
+							   "SE in": json[key]["Single_end"]["in"],
+							   "SE out": json[key]["Single_end"]["out"],
 							   "% Duplicates": duplicates,
-							   "Notes": json[key]["Notes"],
-							   "Saturation": json[key]["duplicate_saturation"]
+							   "Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Saturation": json[key]["Fragment"]["duplicate_saturation"]
 						 	  }
 
 		section = {

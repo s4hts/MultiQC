@@ -60,6 +60,9 @@ class Primers():
 				elif item[0] != "None" and item[1] != "None" :
 					data[sample]["Both Primers"] = item[2]
 
+			if data[sample] == {}:
+				return 
+
 
 		return bargraph.plot(data, categories)
 
@@ -68,17 +71,19 @@ class Primers():
 
 		stats_json = OrderedDict()
 
+
 		for key in json.keys():
 
+
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["PE_in"],
-							   "PE out": json[key]["Paired_end"]["PE_out"],
-							   "SE in" : json[key]["Single_end"]["SE_in"],
-							   "SE out": json[key]["Single_end"]["SE_out"],
-							   "Reads Flipped": json[key]["Flipped"],
-							   "Notes": json[key]["Notes"],
-							   "Primers": json[key]["Primers"],
-							   "Primer Counts": json[key]["Primers_counts"]
+			 				   "PE in": json[key]["Paired_end"]["in"],
+							   "PE out": json[key]["Paired_end"]["out"],
+							   "SE in" : json[key]["Single_end"]["in"],
+							   "SE out": json[key]["Single_end"]["out"],
+							   "Reads Flipped": json[key]["Fragment"]["flipped"],
+							   "Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Primers": json[key]["Program_details"]["primers"],
+							   "Primer Counts": json[key]["Fragment"]["primers_counts"]
 						 	  }
 
 		section = {

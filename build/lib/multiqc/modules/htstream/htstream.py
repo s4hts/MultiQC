@@ -42,13 +42,12 @@ class MultiqcModule(BaseMultiqcModule):
 
 			self.data[self.s_name] = self.file_data # add sample and stats to OrderedDict
 
-			
-		# remove excluded samples 
-		self.data = self.ignore_samples(self.data)
-
 		# make sure samples are being processed 
 		if len(self.data) == 0:
 			raise UserWarning
+
+		# remove excluded samples 
+		self.data = self.ignore_samples(self.data)
 
 		# parse json containing stats on each sample
 		self.parse_stats(self.data) 
@@ -62,7 +61,28 @@ class MultiqcModule(BaseMultiqcModule):
 
 	def parse_json(self, f):
 
-		return json.loads(f)
+		def resolve(pairs):
+
+			resolved_dict = {}
+
+			for k, v in pairs:
+
+				if k == "hts_Stats":
+
+					try:
+						resolved_dict[k].append(v)
+
+					except:
+						resolved_dict[k] = []
+						resolved_dict[k].append(v)
+
+				else:
+					resolved_dict[k] = v
+
+			return  resolved_dict
+
+
+		return json.loads(f, object_pairs_hook=resolve)
 
 
 	def parse_stats(self, json):
@@ -86,18 +106,9 @@ class MultiqcModule(BaseMultiqcModule):
 
 			for key in json.keys():
 
-				stats_boolean = False
-
 				for subkey in json[key].keys():	
 
-					if app == 'Stats' and app in subkey:
-							if stats_boolean == False:
-								stats_boolean = True
-							else:
-								stats_dict[key] = json[key][subkey]
-								break
-
-					elif app in subkey:
+					if app in subkey:
 						stats_dict[key] = json[key][subkey]
 						break
 

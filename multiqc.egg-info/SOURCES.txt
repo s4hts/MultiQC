@@ -124,6 +124,7 @@ multiqc/modules/homer/homer.py
 multiqc/modules/homer/tagdirectory.py
 multiqc/modules/htseq/__init__.py
 multiqc/modules/htseq/htseq.py
+multiqc/modules/htstream/.DS_Store
 multiqc/modules/htstream/__init__.py
 multiqc/modules/htstream/htstream.py
 multiqc/modules/htstream/apps/AdapterTrimmer.py

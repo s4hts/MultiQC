@@ -1,5 +1,7 @@
 from collections import OrderedDict
 import logging
+from scipy.stats import gaussian_kde
+import statistics, math
 import numpy as np
 
 from multiqc import config
@@ -56,21 +58,23 @@ class Overlapper():
 
 			data = {}
 			data[key] = {}
-			config_subdict = {'name': key, 'ylab': 'Frequency', 'xlab': 'Overlapping Read Lengths'}				
+			config_subdict = {'name': key, 'ylab': 'Frequency', 'xlab': 'Overlapping Read Lengths'}	
 
-			total = sum([ count[1] for count in json[key]["Histogram"]])
+			total = sum([ count[1] for count in json[key]["Histogram"] ])
+
+			sample_list = []
 
 			for item in json[key]["Histogram"]:
 
 				data[key][item[0]] = item[1] / total
 
+
 			data_list.append(data)
 			config['data_labels'].append(config_subdict)
 
-								# min             max     
-		#x = np.linspace(norm.ppf(0.01), norm.ppf(0.99), 100)
 
 		return linegraph.plot(data_list, config)
+
 
 	def execute(self, json):
 
@@ -80,19 +84,23 @@ class Overlapper():
 
 		for key in json.keys():
 
+			sins = json[key]["Fragment"]["short_inserts"]
+			mins = json[key]["Fragment"]["medium_inserts"]
+			lins = json[key]["Fragment"]["long_inserts"]
+
 			stats_json[key] = {
-			 			 	   "PE in": json[key]["Paired_end"]["PE_in"],
-							   "PE out": json[key]["Paired_end"]["PE_out"],
-							   "SE in" : json[key]["Single_end"]["SE_in"],
-							   "SE out": json[key]["Single_end"]["SE_out"],
-						 	   "Notes": json[key]["Notes"],
-							   "Sins": json[key]["sins"],
-							   "Mins": json[key]["mins"],
-							   "Lins": json[key]["lins"],
-							   "Histogram": json[key]["readlength_histogram"]
+			 			 	   "PE in": json[key]["Paired_end"]["in"],
+							   "PE out": json[key]["Paired_end"]["out"],
+							   "SE in" : json[key]["Single_end"]["in"],
+							   "SE out": json[key]["Single_end"]["out"],
+						 	   "Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Sins": sins,
+							   "Mins": mins,
+							   "Lins": lins,
+							   "Histogram": json[key]["Fragment"]["readlength_histogram"]
 							  }
 
-			inserts += (json[key]["sins"] + json[key]["mins"] + json[key]["lins"])
+			inserts += ( sins + mins + lins ) 
 
 		section = {
 				   "Table": self.table(stats_json),

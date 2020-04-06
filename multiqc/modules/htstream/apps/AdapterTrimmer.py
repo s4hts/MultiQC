@@ -38,15 +38,16 @@ class AdapterTrimmer():
 
 		for key in json.keys():
 			
-			adapter_reads = json[key]["Single_end"]["SE_adapterTrim"] + json[key]["Paired_end"]["PE_adapterTrim"]  
+			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["adapterTrim"]  
 
 			stats_json[key] = {
-							   "Reads in": json[key]["totalFragmentsInput"],
-							   "Reads out": json[key]["totalFragmentsOutput"],
-							   "% Adapters" : (adapter_reads / json[key]["totalFragmentsInput"]) * 100,
-							   "Notes": json[key]["Notes"]
+							   "Reads in": json[key]["Fragment"]["in"],
+							   "Reads out": json[key]["Fragment"]["out"],
+							   "% Adapters" : (adapter_reads / json[key]["Fragment"]["in"]) * 100,
+							   "Notes": json[key]["Program_details"]["options"]["notes"]
 							  }
 
 		section = {"Table": self.table(stats_json)}
+
 
 		return section
