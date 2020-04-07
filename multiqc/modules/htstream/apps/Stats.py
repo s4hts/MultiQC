@@ -12,7 +12,7 @@ from multiqc.plots import linegraph, heatmap
 
 class Stats():
 
-	def base_by_cycle_R1(self, json, read):
+	def base_by_cycle(self, json, read):
 
 		config = {'data_labels': [],
 				  'extra_series': []}
@@ -35,7 +35,6 @@ class Stats():
 
 			data = {"A": {}}
 			total = []
-
 
 			for pos in range(json[key][read]["shape"][-1]):
 				total.append(sum(json[key][read]["data"][sublist][pos] for sublist in range(5)) / 100)
@@ -89,11 +88,16 @@ class Stats():
 			quality_scores = json[key][read]["shape"][0]
 			cycles = json[key][read]["shape"][-1]
 
+			total = []
+
+			for pos in range(cycles):
+				total.append(sum([ score_list[pos] for score_list in json[key][read]["data"] ]))
+
 			for score in range(quality_scores - 1, -1, -1):
 				data.append([])
 
 				for pos in range(cycles):
-					data[-1].append(json[key][read]["data"][score][pos] / cycles)
+					data[-1].append(json[key][read]["data"][score][pos] / total[pos])
 
 			if first == True:
 				active = "active"
@@ -141,6 +145,8 @@ class Stats():
 
 		return html
 
+
+
 	def graph(self, json):
 
 		histograms = ["R1 histogram", "R2 histogram", "SE histogram"]
@@ -160,10 +166,17 @@ class Stats():
 
 			for key in json.keys():
 
+
+
+				try: 
+					json[key][histograms[i]]
+				except:
+					break
+
 				if len(data.keys()) == 0:
 					data[key] = {}
 
-					total = sum([ count[1] for count in json[key][histograms[i]] ])
+					total = sum([ count[1] for count in json[key][histograms[i]]])
 
 					for item in json[key][histograms[i]]:
 
@@ -186,34 +199,48 @@ class Stats():
 		return linegraph.plot(data_list, config)
 
 
+
 	def execute(self, json):
 
 		stats_json = OrderedDict()
 
 		for key in json.keys():
 
-			stats_json[key] = {
-			 				   "R1 histogram": json[key][1]["Single_end"]["readlength_histogram"],
-			 				   "R2 histogram": json[key][1]["Paired_end"]["Read1"]["readlength_histogram"],
-			 				   "SE histogram": json[key][1]["Paired_end"]["Read2"]["readlength_histogram"],
-			 				   "Read 1 Base by Cycle": json[key][1]["Paired_end"]["Read1"]["base_by_cycle"],
-			 				   "Read 2 Base by Cycle": json[key][1]["Paired_end"]["Read2"]["base_by_cycle"],
-			 				   "Single Base by Cycle": json[key][1]["Single_end"]["base_by_cycle"],
-			 				   "Read 1 Quality by Cycle": json[key][1]["Paired_end"]["Read1"]["qualities_by_cycle"],
-			 				   "Read 2 Quality by Cycle": json[key][1]["Paired_end"]["Read2"]["qualities_by_cycle"],
-			 				   "Single Quality by Cycle": json[key][1]["Single_end"]["qualities_by_cycle"]
-						 	  }
+			stats_json[key] = {}
+
+			try:
+
+				stats_json[key]["SE histogram"] = json[key][-1]["Single_end"]["readlength_histogram"]
+				stats_json[key]["Single Base by Cycle"] = json[key][-1]["Single_end"]["base_by_cycle"]
+				stats_json[key]["Single Quality by Cycle"] = json[key][-1]["Single_end"]["qualities_by_cycle"]
+							   
+				SE_presence = True
+
+			except:
+
+				SE_presence = False
+				pass
+
+			stats_json[key]["R1 histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
+			stats_json[key]["R2 histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
+			stats_json[key]["Read 1 Base by Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
+			stats_json[key]["Read 2 Base by Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
+			stats_json[key]["Read 1 Quality by Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
+			stats_json[key]["Read 2 Quality by Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
 
 
 		section = {
-				   "Base by Cycle (Read 1)": self.base_by_cycle_R1(stats_json, "Read 1 Base by Cycle"),
-				   "Base by Cycle (Read 2)": self.base_by_cycle_R1(stats_json, "Read 2 Base by Cycle"),
-				   "Base by Cycle (Single End)": self.base_by_cycle_R1(stats_json, "Single Base by Cycle"),
+				   "Density Plots": self.graph(stats_json), 
+				   "Base by Cycle (Read 1)": self.base_by_cycle(stats_json, "Read 1 Base by Cycle"),
 				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "Read 1 Quality by Cycle"),
-				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "Read 2 Quality by Cycle"),
-				   "Quality by Cycle (Single End)": self.quality_by_cycle(stats_json, "Single Quality by Cycle"),
-				   "Density Plots": self.graph(stats_json)
+				   "Base by Cycle (Read 2)": self.base_by_cycle(stats_json, "Read 2 Base by Cycle"),
+				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "Read 2 Quality by Cycle")
 				   }
 
+		if SE_presence == True:
+			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "Single Base by Cycle")
+			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "Single Quality by Cycle")
+
+	
 		return section 
 
