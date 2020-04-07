@@ -60,6 +60,8 @@ class Stats():
 
 	def quality_by_cycle(self, json, read):
 
+		plot_list = []
+
 		pconfig = {'yTitle': 'Q Score',
 				   'xTitle': 'Cycle',
 				   'square' : False,
@@ -72,6 +74,11 @@ class Stats():
 					        [1, '#E70808']
 					           ]
     			  }
+
+		html = '<div class="btn-group hc_switch_group">\n'
+
+		first = True
+		pid = ""
 
 		for key in json.keys():
 
@@ -88,12 +95,51 @@ class Stats():
 				for pos in range(cycles):
 					data[-1].append(json[key][read]["data"][score][pos] / cycles)
 
+			if first == True:
+				active = "active"
+				hidediv = ""
+				first = False
+				plot_html = heatmap.plot(data, x_lab, y_lab, pconfig)
+			else:
+				active = ""
+				hidediv = 'style="display: none;"'
+				heatmap.plot(data, x_lab, y_lab, pconfig)
 
-			break
+			name = key
+
+			plot_list.append(plot_html)
+
+			html += '<button class="btn btn-default btn-sm {a}" onclick="show_div(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name)
+			
+			pid += "-1"
+
+		html += '</div>\n\n'
 
 
-		return heatmap.plot(data, x_lab, y_lab, pconfig)
+		# PROOF OF CONCEPT: javascript code for framework limitations. Could it be cleaner? yes.
+		html += '''<script type="text/javascript">
+				   function show_div(ele) {
 
+				   var descendent = ele.parentNode.parentNode.querySelector('.mqc_hcplot_plotgroup').querySelector('.hc-plot-wrapper');
+				   var plot = descendent.querySelector('.hc-plot');
+
+				   var plot_id = plot.id.split("-")[0];
+				   var temp = ele.id;
+				   var plot_id = plot_id.concat(temp);
+
+				   plot.id = plot_id;
+				   plot.className = "hc-plot not_rendered hc-heatmap"; 
+				   plot.style = "height: auto; top: 0px; bottom: 10px; position: absolute;";
+
+				   plot_graph(plot_id);
+				   }
+    			</script>\n'''
+
+		html += '<br></br>\n\n'
+
+		html += plot_html 
+
+		return html
 
 	def graph(self, json):
 
@@ -163,7 +209,9 @@ class Stats():
 				   "Base by Cycle (Read 1)": self.base_by_cycle_R1(stats_json, "Read 1 Base by Cycle"),
 				   "Base by Cycle (Read 2)": self.base_by_cycle_R1(stats_json, "Read 2 Base by Cycle"),
 				   "Base by Cycle (Single End)": self.base_by_cycle_R1(stats_json, "Single Base by Cycle"),
-				   "Quality by Cycle" : self.quality_by_cycle(stats_json, "Read 1 Quality by Cycle"),
+				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "Read 1 Quality by Cycle"),
+				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "Read 2 Quality by Cycle"),
+				   "Quality by Cycle (Single End)": self.quality_by_cycle(stats_json, "Single Quality by Cycle"),
 				   "Density Plots": self.graph(stats_json)
 				   }
 
