@@ -26,7 +26,7 @@ class AdapterTrimmer():
 						   'format': '{:,.2f}',
 						   'scale': 'Blues'
 						  }
-
+		headers["Avg. BP Trimmed"] = {'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["Notes"] = {'description': 'Notes'}
 
 		return table.plot(json, headers)
@@ -38,12 +38,23 @@ class AdapterTrimmer():
 
 		for key in json.keys():
 			
-			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["adapterTrim"]  
+			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["adapterTrim"] # total reads trimmed
+			bp_reads = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["adapterBpTrim"] # total basepairs trimmed
+
+			if adapter_reads == 0:
+				perc_adapters = 0
+				avg_bp_trimmed = 0
+
+			else:
+				perc_adapters = (adapter_reads / json[key]["Fragment"]["in"]) * 100
+				avg_bp_trimmed = (bp_reads / adapter_reads)
+
 
 			stats_json[key] = {
 							   "Reads in": json[key]["Fragment"]["in"],
 							   "Reads out": json[key]["Fragment"]["out"],
-							   "% Adapters" : (adapter_reads / json[key]["Fragment"]["in"]) * 100,
+							   "% Adapters": perc_adapters,
+							   "Avg. BP Trimmed": avg_bp_trimmed,
 							   "Notes": json[key]["Program_details"]["options"]["notes"]
 							  }
 

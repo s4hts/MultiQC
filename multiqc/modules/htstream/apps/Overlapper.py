@@ -1,8 +1,6 @@
 from collections import OrderedDict
 import logging
-from scipy.stats import gaussian_kde
-import statistics, math
-import numpy as np
+import os
 
 from multiqc import config
 from multiqc.plots import table, bargraph, linegraph
@@ -12,6 +10,8 @@ from multiqc.plots import table, bargraph, linegraph
 """ Overlapper submodule for HTStream charts and graphs """
 
 #################################################
+
+log = logging.getLogger(__name__)
 
 class Overlapper():
 
@@ -23,6 +23,11 @@ class Overlapper():
 		headers["PE out"] = {'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["SE in"] = {'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["SE out"] = {'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["% Overlapped"] = {'description': 'Percentage of Reads with Overlap.',
+								   'suffix': '%',
+								   'max': 100,
+								   'format': '{:,.2f}',
+								   'scale': 'Blues'}
 		headers["Notes"] = {'description': 'Notes'}
 
 		return table.plot(json, headers)
@@ -88,11 +93,25 @@ class Overlapper():
 			mins = json[key]["Fragment"]["medium_inserts"]
 			lins = json[key]["Fragment"]["long_inserts"]
 
+			overlapped_sum = (sins + mins + lins)
+
+			if json[key]["Fragment"]["in"] == 0:
+
+				file_name = os.path.basename(__file__).split(".")[0]
+				warning_message = "No Input Reads for HTStream " + file_name + ". Check file for format errors."
+				log.warning(warning_message)
+				return
+
+			else:
+				perc_overlapped = (overlapped_sum / json[key]["Fragment"]["in"]) * 100
+				
+
 			stats_json[key] = {
 			 			 	   "PE in": json[key]["Paired_end"]["in"],
 							   "PE out": json[key]["Paired_end"]["out"],
 							   "SE in" : json[key]["Single_end"]["in"],
 							   "SE out": json[key]["Single_end"]["out"],
+							   "% Overlapped": perc_overlapped,
 						 	   "Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Sins": sins,
 							   "Mins": mins,
@@ -100,7 +119,7 @@ class Overlapper():
 							   "Histogram": json[key]["Fragment"]["readlength_histogram"]
 							  }
 
-			inserts += ( sins + mins + lins ) 
+			inserts += overlapped_sum
 
 		section = {
 				   "Table": self.table(stats_json),
