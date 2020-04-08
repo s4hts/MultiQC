@@ -138,7 +138,7 @@ multiqc/modules/htstream/apps/SeqScreener.py
 multiqc/modules/htstream/apps/Stats.py
 multiqc/modules/htstream/apps/SuperDeduper.py
 multiqc/modules/htstream/apps/stats.py
-multiqc/modules/htstream/apps/assets/js/show_div.js
+multiqc/modules/htstream/assets/js/htstream.js
 multiqc/modules/interop/__init__.py
 multiqc/modules/interop/interop.py
 multiqc/modules/jellyfish/__init__.py

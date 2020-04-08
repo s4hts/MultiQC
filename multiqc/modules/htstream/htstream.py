@@ -5,7 +5,7 @@
 from __future__ import print_function
 from collections import OrderedDict
 import logging
-import re, json
+import re, json, os
 
 from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer
 from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats
@@ -29,8 +29,13 @@ class MultiqcModule(BaseMultiqcModule):
 		anchor='htstream', href='https://ibest.github.io/HTStream/',
 		info=" quality control and processing pipeline for High Throughput Sequencing data ")
 
+
 		# Initialize ordered dictionary (key: samples, values: their respective json files)
 		self.data = OrderedDict()
+
+		# Import js functions.
+		self.js = { 'assets/js/htstream.js' : os.path.join(os.path.dirname(__file__), 'assets', 'js', 'htstream.js') }
+
 
 		 # iterates through files found by "find_log_files" (located in base_module.py, re patterns found in search_patterns.yml)
 		for file in self.find_log_files('htstream'):
@@ -42,9 +47,11 @@ class MultiqcModule(BaseMultiqcModule):
 
 			self.data[self.s_name] = self.file_data # add sample and stats to OrderedDict
 
+
 		# make sure samples are being processed 
 		if len(self.data) == 0:
 			raise UserWarning
+
 
 		# remove excluded samples 
 		self.data = self.ignore_samples(self.data)

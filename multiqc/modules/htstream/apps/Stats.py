@@ -61,7 +61,8 @@ class Stats():
 
 		plot_list = []
 
-		pconfig = {'yTitle': 'Q Score',
+		pconfig = {'id' : "",
+				   'yTitle': 'Q Score',
 				   'xTitle': 'Cycle',
 				   'square' : False,
 				   'datalabels': False,
@@ -80,6 +81,8 @@ class Stats():
 		pid = ""
 
 		for key in json.keys():
+
+			pconfig["id"] = "htstream_" + key + "_heatmap"
 
 			x_lab = json[key][read]["col_names"]
 			y_lab = json[key][read]["row_names"][::-1]
@@ -110,37 +113,13 @@ class Stats():
 				heatmap.plot(data, x_lab, y_lab, pconfig)
 
 			name = key
+			pid = "htstream_" + key + "_btn"
 
 			plot_list.append(plot_html)
 
-			html += '<button class="btn btn-default btn-sm {a}" onclick="show_div(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name)
-			
-			pid += "-1"
+			html += '<button class="btn btn-default btn-sm {a}" onclick="htstream_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name)
 
-		html += '</div>\n\n'
-
-
-		# PROOF OF CONCEPT: javascript code for framework limitations. Could it be cleaner? yes.
-		html += '''<script type="text/javascript">
-				   function show_div(ele) {
-
-				   var descendent = ele.parentNode.parentNode.querySelector('.mqc_hcplot_plotgroup').querySelector('.hc-plot-wrapper');
-				   var plot = descendent.querySelector('.hc-plot');
-
-				   var plot_id = plot.id.split("-")[0];
-				   var temp = ele.id;
-				   var plot_id = plot_id.concat(temp);
-
-				   plot.id = plot_id;
-				   plot.className = "hc-plot not_rendered hc-heatmap"; 
-				   plot.style = "height: auto; top: 0px; bottom: 10px; position: absolute;";
-
-				   plot_graph(plot_id);
-				   }
-    			</script>\n'''
-
-		html += '<br></br>\n\n'
-
+		html += '</div>\n\n<br></br>\n\n'
 		html += plot_html 
 
 		return html
@@ -166,10 +145,9 @@ class Stats():
 
 			for key in json.keys():
 
-
-
 				try: 
 					json[key][histograms[i]]
+
 				except:
 					break
 
@@ -238,6 +216,7 @@ class Stats():
 				   }
 
 		if SE_presence == True:
+
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "Single Base by Cycle")
 			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "Single Quality by Cycle")
 
