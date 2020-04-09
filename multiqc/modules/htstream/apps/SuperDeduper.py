@@ -35,29 +35,37 @@ class SuperDeduper():
 
 		config = {'xlab': "Reads", 'ylab': "Duplicates",
 				  'extra_series': []}
+
 		data = {}
+		invariant_saturatiot_list = []
+
+		html = ""
 
 		for key in json.keys():
 
-			if len(data.keys()) == 0:
+			if len(json[key]["Saturation"]) == 1:
+				info = key.strip() + ": [" + str(json[key]["Saturation"][0][0]) + " Reads, " + str(json[key]["Saturation"][0][1]) + " Dups ]"
+				invariant_saturatiot_list.append(info)
+
+			else:
+
 				data[key] = {}
 
 				for item in json[key]["Saturation"]:
 
 					data[key][item[0]] = item[1] 
 
-			else:
-				series_dict = {
-							   'name': key,
-        					   'data': []
-        					  }
+		if len(invariant_saturatiot_list) != 0:
+			
+			# to include when more is known about handling invariance.
+			notice = "<br />".join(invariant_saturatiot_list)
+			html += str("<p>" + "TEMPORARY PLACE HOLDER FOR INVARIANT SATURATION PLOTS <br />" + notice + "</p>")
+			
 
-				for item in json[key]["Saturation"]:
-					series_dict['data'].append(item)
+		if data != {}:
+			html += linegraph.plot(data, config)
 
-				config['extra_series'].append(series_dict)
-
-		return linegraph.plot(data, config)
+		return html
 
 
 	def execute(self, json):
@@ -80,7 +88,7 @@ class SuperDeduper():
 
 		section = {
 				   "Table": self.table(stats_json),
-				   "Saturation Plot": self.linegraph(stats_json)
+				   "Duplicate Saturation": self.linegraph(stats_json)
 				   }
 
 		return section
