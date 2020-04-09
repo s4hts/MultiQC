@@ -15,47 +15,40 @@ class Stats():
 	def base_by_cycle(self, json, read):
 
 		config = {'data_labels': [],
-				  'extra_series': []}
+				  'smooth_points_sumcounts': False,
+				  'yCeiling': 100,
+				  'categories': True,
+				  #'extra_series': []
+				  }
 
 		data_list = []
 
 		for key in json.keys():
 
-			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 'xlab': 'Cycle'})
-			config["extra_series"].append([])
-
-			series_list = []
-
-			C_series_dict = {'name': "C", 'data': []}
-			G_series_dict = {'name': "G", 'data': []}
-			T_series_dict = {'name': "T", 'data': []}
-			N_series_dict = {'name': "N", 'data': []}
-
-			series_list = [C_series_dict, G_series_dict, T_series_dict, N_series_dict]
-
-			data = {"A": {}}
-			total = []
-
-			for pos in range(json[key][read]["shape"][-1]):
-				total.append(sum(json[key][read]["data"][sublist][pos] for sublist in range(5)) / 100)
+			data = {"A": {},
+					"C": {},
+					"G": {},
+					"T": {},
+					"N": {}}
 
 			bases = json[key][read]["data"]
 			positions = json[key][read]["col_names"]
 
 			for i in range(len(positions)):
 
-				data["A"][positions[i]] = bases[0][i] / total[i]
-				C_series_dict['data'].append([positions[i], bases[1][i] / total[i] ])
-				G_series_dict['data'].append([positions[i], bases[2][i] / total[i] ])
-				T_series_dict['data'].append([positions[i], bases[3][i] / total[i] ])
-				N_series_dict['data'].append([positions[i], bases[4][i] / total[i] ])
+				total = bases[0][i] + bases[1][i] + bases[2][i] + bases[3][i] + bases[4][i]
 
+				data["A"][i] = (bases[0][i] / total) * 100
+				data["C"][i] = (bases[1][i] / total) * 100
+				data["G"][i] = (bases[2][i] / total) * 100
+				data["T"][i] = (bases[3][i] / total) * 100
+				data["N"][i] = (bases[4][i] / total) * 100
 
+			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 'xlab': 'Cycle', 'categories': True, 'smooth_points_sumcounts': False})
 			data_list.append(data)
-			config['extra_series'][-1] = series_list
-
 
 		return linegraph.plot(data_list, config)
+
 
 	def quality_by_cycle(self, json, read):
 
