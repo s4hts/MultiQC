@@ -18,7 +18,6 @@ class Stats():
 				  'smooth_points_sumcounts': False,
 				  'yCeiling': 100,
 				  'categories': True,
-				  #'extra_series': []
 				  }
 
 		data_list = []
@@ -44,7 +43,7 @@ class Stats():
 				data["T"][i] = (bases[3][i] / total) * 100
 				data["N"][i] = (bases[4][i] / total) * 100
 
-			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 'xlab': 'Cycle', 'categories': True, 'smooth_points_sumcounts': False})
+			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 'smooth_points_sumcounts': False})
 			data_list.append(data)
 
 		return linegraph.plot(data_list, config)
