@@ -126,8 +126,8 @@ class Stats():
 								  {'name': "R1 histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'},
 								  {'name': "R2 histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'},
 								  {'name': "SE histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'},
-								 ],
-				  'extra_series': [[], [], []]}
+								 ]
+				  }
 
 		data_list = []
 
@@ -143,28 +143,16 @@ class Stats():
 				except:
 					break
 
-				if len(data.keys()) == 0:
-					data[key] = {}
+				data[key] = {}
 
-					total = sum([ count[1] for count in json[key][histograms[i]]])
+				total = sum([ count[1] for count in json[key][histograms[i]]])
 
-					for item in json[key][histograms[i]]:
+				for item in json[key][histograms[i]]:
 
-						data[key][item[0]] = item[1] / total
+					data[key][item[0]] = item[1] / total
 
-					data_list.append(data)
+			data_list.append(data)
 
-				else:
-					series_dict = {
-								   'name': key,
-	        					   'data': []
-	        					  }
-
-					for item in json[key][histograms[i]]:
-						temp = [item[0], (item[1] / total)]
-						series_dict['data'].append(temp)
-
-					config['extra_series'][i].append(series_dict)
 
 		return linegraph.plot(data_list, config)
 
