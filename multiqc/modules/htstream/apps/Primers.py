@@ -27,6 +27,8 @@ class Primers():
 
 	def bargraph(self, json):
 
+		config = {'title': "HTStream: Reads with Primers Bargraph"}
+
 		categories  = OrderedDict()
 
 		categories['Primer 1 Only'] = {

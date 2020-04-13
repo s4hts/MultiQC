@@ -19,9 +19,9 @@ class QWindowTrim():
 
 		headers["PE in"] = {'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
 		headers["PE out"] = {'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["R1 L/R Ratio"] = {'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 1. Pseudocounting applied if R = 0 occurs.', 
+		headers["R1 L/R Ratio"] = {'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 1. Pseudocounting applied if right = 0 occurs.', 
 								   'format': '{:,.2f}', 'scale': 'Blues'}
-		headers["R2 L/R Ratio"] = {'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 2. Pseudocounting applied if R = 0 occurs.', 
+		headers["R2 L/R Ratio"] = {'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 2. Pseudocounting applied if right = 0 occurs.', 
 								   'format': '{:,.2f}', 'scale': 'YlOrRd'}
 		headers["SE in"] = {'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["SE out"] = {'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
@@ -33,6 +33,8 @@ class QWindowTrim():
 
 	def bargraph(self, json, reads):
 
+		config = {'title': "HTStream: Trimmed Reads Bargraph"}
+
 		if reads == 0:
 			return
 
@@ -41,7 +43,7 @@ class QWindowTrim():
 		categories['Left Trimmed Reads'] = {'name': 'Left Trimmed Reads'}
 		categories['Right Trimmed Reads'] = {'name': 'Right Trimmed Reads'}
 
-		return bargraph.plot(json, categories)
+		return bargraph.plot(json, categories, config)
 
 	def execute(self, json):
 

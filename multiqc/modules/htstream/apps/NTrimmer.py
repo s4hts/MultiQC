@@ -19,6 +19,7 @@ class NTrimmer():
 
 		headers["Reads in"] = {'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
 		headers["Reads out"] = {'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Avg. BP Trimmed"] = {'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["% Discarded"] = {
 						   'description': 'Percentage of Reads (SE and PE) Discarded',
 						   'suffix': '%',
@@ -34,6 +35,8 @@ class NTrimmer():
 
 	def bargraph(self, json, reads):
 
+		config = {"title": "HTStream: Trimmed Reads Bargraph"}
+
 		if reads == 0:
 			return
 
@@ -42,7 +45,7 @@ class NTrimmer():
 		categories['Left Trimmed Reads'] = {'name': 'Left Trimmed Reads'}
 		categories['Right Trimmed Reads'] = {'name': 'Right Trimmed Reads'}
 
-		return bargraph.plot(json, categories)
+		return bargraph.plot(json, categories, config)
 
 
 	def execute(self, json):
@@ -63,6 +66,7 @@ class NTrimmer():
 			stats_json[key] = {
 			 				   "Reads in": json[key]["Fragment"]["in"],
 							   "Reads out": json[key]["Fragment"]["out"],
+							   "Avg. BP Trimmed": trimmed_reads / json[key]["Fragment"]["in"],
 							   "% Discarded" : (discarded_reads / json[key]["Fragment"]["in"]) * 100,
 							   "Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Left Trimmed Reads": lefttrimmed_reads,

@@ -33,11 +33,12 @@ class SuperDeduper():
 
 	def linegraph(self, json):
 
-		config = {'xlab': "Reads", 'ylab': "Duplicates",
+		config = {'title': "HTStream: Duplicate Saturation",
+				  'xlab': "Reads", 'ylab': "Duplicates",
 				  'extra_series': []}
 
 		data = {}
-		invariant_saturatiot_list = []
+		invariant_saturation_list = []
 
 		html = ""
 
@@ -45,7 +46,7 @@ class SuperDeduper():
 
 			if len(json[key]["Saturation"]) == 1:
 				info = key.strip() + ": [" + str(json[key]["Saturation"][0][0]) + " Reads, " + str(json[key]["Saturation"][0][1]) + " Dups ]"
-				invariant_saturatiot_list.append(info)
+				invariant_saturation_list.append(info)
 
 			else:
 
@@ -55,10 +56,11 @@ class SuperDeduper():
 
 					data[key][item[0]] = item[1] 
 
-		if len(invariant_saturatiot_list) != 0:
+
+		if len(invariant_saturation_list) != 0:
 			
 			# to include when more is known about handling invariance.
-			notice = "<br />".join(invariant_saturatiot_list)
+			notice = "<br />".join(invariant_saturation_list)
 			html += str("<p>" + "TEMPORARY PLACE HOLDER FOR INVARIANT SATURATION PLOTS <br />" + notice + "</p>")
 			
 

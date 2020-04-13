@@ -34,6 +34,8 @@ class Overlapper():
 
 	def bargraph(self, json, inserts):
 
+		config = {'title': "HTStream: Overlap Composition Bargraph"}
+
 		if inserts == 0:
 			return
 
@@ -52,12 +54,13 @@ class Overlapper():
 							  'color': '#33a02c'
 							 }
 
-		return bargraph.plot(json, categories)
+		return bargraph.plot(json, categories, config)
 
 	def linegraph(self, json):
 
 		data_list = [] 
-		config = {'data_labels': []}
+		config = {'title': "HTStream: Overlapped Lengths Density Plots",
+				  'data_labels': []}
 
 		for key in json.keys():
 
@@ -123,7 +126,7 @@ class Overlapper():
 
 		section = {
 				   "Table": self.table(stats_json),
-				   "Reads with Insertions": self.bargraph(stats_json, inserts),
+				   "Overlap Composition": self.bargraph(stats_json, inserts),
 				   "Overlapped Lengths Density Plots": self.linegraph(stats_json)
 				   }
 
