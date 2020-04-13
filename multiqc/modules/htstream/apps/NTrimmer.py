@@ -17,10 +17,11 @@ class NTrimmer():
 
 		headers = OrderedDict()
 
-		headers["Reads in"] = {'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Reads out"] = {'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Avg. BP Trimmed"] = {'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["Reads in"] = {'namespace': "Reads in", 'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Reads out"] = {'namespace': "Reads out", 'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Avg. BP Trimmed"] = {'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["% Discarded"] = {
+						   'namespace': "% Discarded",
 						   'description': 'Percentage of Reads (SE and PE) Discarded',
 						   'suffix': '%',
 						   'max': 100,
@@ -28,7 +29,7 @@ class NTrimmer():
 						   'scale': 'Oranges'
 						  }
 
-		headers["Notes"] = {'description': 'Notes'}
+		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 

@@ -16,18 +16,19 @@ class SuperDeduper():
 
 		headers = OrderedDict()
 
-		headers["PE in"] = {'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["PE out"] = {'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["SE in"] = {'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["SE out"] = {'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["PE in"] = {'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["PE out"] = {'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["SE in"] = {'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["SE out"] = {'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["% Duplicates"] = {
+						   'namespace': "% Duplicates", 
 						   'description': 'Percentage of Duplicate Reads (SE and PE)',
 						   'suffix': '%',
 						   'max': 100,
 						   'format': '{:,.2f}',
 						   'scale': 'Oranges'
 						  }
-		headers["Notes"] = {'description': 'Notes'}
+		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 

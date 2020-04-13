@@ -17,17 +17,18 @@ class AdapterTrimmer():
 
 		headers = OrderedDict()
 
-		headers["Reads in"] = {'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Reads out"] = {'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Reads in"] = {'namespace': "Reads in", 'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Reads out"] = {'namespace': "Reads out", 'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["% Adapters"] = {
+						   'namespace': "% Adapters",
 						   'description': 'Percentage of Reads (SE and PE) with an Adapter',
 						   'suffix': '%',
 						   'max': 100,
 						   'format': '{:,.2f}',
 						   'scale': 'Blues'
 						  }
-		headers["Avg. BP Trimmed"] = {'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
-		headers["Notes"] = {'description': 'Notes'}
+		headers["Avg. BP Trimmed"] = {'namespace': "Avg. BP Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 

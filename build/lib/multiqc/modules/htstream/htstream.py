@@ -33,9 +33,9 @@ class MultiqcModule(BaseMultiqcModule):
 		# Initialize ordered dictionary (key: samples, values: their respective json files)
 		self.data = OrderedDict()
 
-		# Import js functions.
+		# Import js and css functions.
 		self.js = { 'assets/js/htstream.js' : os.path.join(os.path.dirname(__file__), 'assets', 'js', 'htstream.js') }
-
+		self.css = { 'assets/css/htstream.css' : os.path.join(os.path.dirname(__file__), 'assets', 'css', 'htstream.css') }
 
 		 # iterates through files found by "find_log_files" (located in base_module.py, re patterns found in search_patterns.yml)
 		for file in self.find_log_files('htstream'):

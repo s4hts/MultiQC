@@ -1,6 +1,7 @@
 from collections import OrderedDict
 import logging, statistics
 
+from . import htstream_utils
 from multiqc import config
 from multiqc.plots import linegraph, heatmap
 
@@ -34,6 +35,9 @@ class Stats():
 				  }
 
 		data_list = []
+		color_dict = {}
+
+		html = ""
 
 		for key in json.keys():
 
@@ -57,7 +61,7 @@ class Stats():
 								(bases[2][i] / total) * 100, (bases[3][i] / total) * 100,
 								(bases[4][i] / total) * 100]
 
-				sample_max = max(y_value_list)
+				sample_max = max([sample_max, max(y_value_list)])
 
 				data["A"][i] = y_value_list[0]
 				data["C"][i] = y_value_list[1]
@@ -65,21 +69,25 @@ class Stats():
 				data["T"][i] = y_value_list[3]
 				data["N"][i] = y_value_list[4]
 
-			if sample_max >= 0.6:
+			if sample_max >= 60:
 				sample_color = '#e6c3c3'
-			elif sample_max >= 0.4:
+			elif sample_max >= 40:
 				sample_color = '#e6dcc3'
 			else:
 				sample_color = '#c3e6c3'
 
+			color_dict[key] = sample_color
 
 			config["data_labels"].append({'name': key,'ylab': 'Percentage', 
 										  'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 
 										  'smooth_points_sumcounts': False})
 			data_list.append(data)
 
+		html += htstream_utils.sample_status(color_dict)
 
-		return linegraph.plot(data_list, config)
+		html += linegraph.plot(data_list, config)
+
+		return html
 
 
 	def quality_by_cycle(self, json, read):

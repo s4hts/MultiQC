@@ -137,7 +137,9 @@ multiqc/modules/htstream/apps/QWindowTrim.py
 multiqc/modules/htstream/apps/SeqScreener.py
 multiqc/modules/htstream/apps/Stats.py
 multiqc/modules/htstream/apps/SuperDeduper.py
+multiqc/modules/htstream/apps/htstream_utils.py
 multiqc/modules/htstream/apps/stats.py
+multiqc/modules/htstream/assets/css/htstream.css
 multiqc/modules/htstream/assets/js/htstream.js
 multiqc/modules/interop/__init__.py
 multiqc/modules/interop/interop.py
