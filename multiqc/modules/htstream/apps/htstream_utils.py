@@ -14,7 +14,10 @@ def sample_status(samples):
 	for sample, color in samples.items():
 
 		if index == 0:
-			style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px;'
+			if index == lim:
+				style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;'
+			else:
+				style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px;'
 		elif index == lim:
 			style = 'border-top-right-radius: 5px; border-bottom-right-radius: 5px; margin-left: -4px;'
 		else:

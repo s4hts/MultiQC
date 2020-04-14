@@ -107,7 +107,7 @@ class Overlapper():
 				return
 
 			else:
-				perc_overlapped = (overlapped_sum / json[key]["Fragment"]["in"]) * 100
+				perc_overlapped = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]) * 100
 				
 
 			stats_json[key] = {
