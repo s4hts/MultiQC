@@ -12,7 +12,6 @@ from multiqc.plots import table
 
 class AdapterTrimmer():
 
-
 	def table(self, json):
 
 		# Table constructor. Just like the MultiQC docs.

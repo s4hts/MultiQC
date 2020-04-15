@@ -43,7 +43,7 @@ class Overlapper():
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
-			return
+			return ""
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.
 		categories  = OrderedDict()
@@ -122,7 +122,7 @@ class Overlapper():
 				file_name = os.path.basename(__file__).split(".")[0]
 				warning_message = "No Input Reads for HTStream " + file_name + ". Check file for format errors."
 				log.warning(warning_message)
-				return
+				return ""
 
 			# the INFAMOUS percent overlapped 
 			perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100

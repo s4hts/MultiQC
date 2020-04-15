@@ -37,9 +37,13 @@ class Stats():
 
 		# initalize data structures and important variables
 		data_list = []
-		color_dict = {}
-		html = ""
+		status_dict = {}
 
+		# header read type
+		read_header = read.split(" Base")[0]
+
+		# section header
+		html = '<h4> Base by Cycle: ' + read_header + '</h4>'
 
 		for key in json.keys():
 
@@ -56,7 +60,7 @@ class Stats():
 
 			# vairables containing max percentage reached by any nucleotide in the sample
 			#	This data is stored so it can be correctly marked in the sample check div.
-			sample_color = None
+			sample_status = None
 			sample_max = 0
 
 			# iterates through every position
@@ -84,14 +88,14 @@ class Stats():
 
 			# selects color to mark sample if a read has a region of low complextity
 			if sample_max >= 60:
-				sample_color = '#e6c3c3'
+				sample_status = 'FAIL'
 			elif sample_max >= 40:
-				sample_color = '#e6dcc3'
+				sample_status = 'QUESTIONABLE'
 			else:
-				sample_color = '#c3e6c3'
+				sample_status = 'PASS'
 
 			# adds color to sample in color dictionary
-			color_dict[key] = sample_color
+			status_dict[key] = sample_status
 
 			# this config file is for the individual line of the multiline graph
 			config["data_labels"].append({'name': key,'ylab': 'Percentage', 
@@ -102,7 +106,7 @@ class Stats():
 			data_list.append(data)
 
 		# this adds the html output of sample status. This function colors samples
-		html += htstream_utils.sample_status(color_dict)
+		html += htstream_utils.sample_status(status_dict)
 
 		# add line graphs
 		html += linegraph.plot(data_list, config)
@@ -145,9 +149,16 @@ class Stats():
     	# id of switch buttun, named after read type.
 		btn_id = "-".join(read.split(" ")[:2]).lower()
 
+		# header read type
+		read_header = read.split(" Quality")[0]
+
+		# section header
+		wrapper_html = '<h4> Quality by Cycle: ' + read_header + '</h4>'
+
+
 		# In order to be able to switch back and forth between different graph types, we need to add MultiQC's button divs that 
 		#	have an onclick attribute for javascript that can switch between graphs.
-		wrapper_html = '<div class="btn-group hc_switch_group">\n'
+		wrapper_html += '<div class="btn-group hc_switch_group">\n'
 		wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{r}_btn">Linegraph</button>\n'.format(r=btn_id)
 		wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{r}_btn">Heatmaps</button></div>\n'.format(r=btn_id)
 		wrapper_html += "<hr>"
@@ -319,7 +330,7 @@ class Stats():
 		if len(invariant_dict.keys()) != 0:
 
 			# notice
-			notice = 'Samples with uniform read lengths identified. <br />'
+			notice = 'Samples with uniform read lengths identified (displayed below). <br />'
 
 			# table
 			headers = OrderedDict()

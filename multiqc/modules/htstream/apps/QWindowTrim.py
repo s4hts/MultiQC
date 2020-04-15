@@ -36,7 +36,7 @@ class QWindowTrim():
 
 		# returns nothing if no basepairs were trimmed.
 		if bp == 0:
-			return
+			return ""
 
 		# standard bar graph construction. See MultiQC docs.
 		categories  = OrderedDict()

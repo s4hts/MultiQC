@@ -44,7 +44,7 @@ class NTrimmer():
 
 		# returns nothing if no reads were trimmed.
 		if reads == 0:
-			return
+			return ""
 
 		# Bar graph constructor. See MultiQC docs.
 		categories  = OrderedDict()

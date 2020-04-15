@@ -74,7 +74,7 @@ class Primers():
 					data[sample]["Both Primers"] = item[2]
 
 			if data[sample] == {}:
-				return 
+				return ""
 
 
 		return bargraph.plot(data, categories)

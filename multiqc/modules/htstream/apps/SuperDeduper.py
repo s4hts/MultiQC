@@ -70,7 +70,7 @@ class SuperDeduper():
 		# checks for any invariant samples and creates an alert div and table to  hold the data.
 		if len(invariant_saturation_dict.keys()) != 0:
 			# notice
-			notice = 'Samples with uniform duplication numbers identified. <br />'
+			notice = 'Samples with uniform duplication numbers identified (displayed below). <br />'
 
 			# table
 			headers = OrderedDict()
