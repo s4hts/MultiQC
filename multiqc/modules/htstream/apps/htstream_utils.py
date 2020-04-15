@@ -4,6 +4,8 @@
 
 #################################################
 
+# sample status div creator
+
 def sample_status(samples):
 
 	html = '<br><div class="hts_status_header">Sample Status:</div>'
@@ -31,3 +33,27 @@ def sample_status(samples):
 	html += "<br><hr>\n"
 
 	return html
+
+#######################################
+
+# json key collision resolving function
+
+def resolve(pairs):
+
+	resolved_dict = {}
+
+	for k, v in pairs:
+
+		if k == "hts_Stats":
+
+			try:
+				resolved_dict[k].append(v)
+
+			except:
+				resolved_dict[k] = []
+				resolved_dict[k].append(v)
+
+		else:
+			resolved_dict[k] = v
+
+	return  resolved_dict

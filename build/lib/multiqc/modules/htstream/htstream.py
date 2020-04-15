@@ -8,7 +8,7 @@ import logging
 import re, json, os
 
 from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer
-from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats
+from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats, htstream_utils
 from multiqc import config
 from multiqc.modules.base_module import BaseMultiqcModule
 
@@ -52,7 +52,6 @@ class MultiqcModule(BaseMultiqcModule):
 		if len(self.data) == 0:
 			raise UserWarning
 
-
 		# remove excluded samples 
 		self.data = self.ignore_samples(self.data)
 
@@ -68,32 +67,12 @@ class MultiqcModule(BaseMultiqcModule):
 
 	def parse_json(self, f):
 
-		def resolve(pairs):
-
-			resolved_dict = {}
-
-			for k, v in pairs:
-
-				if k == "hts_Stats":
-
-					try:
-						resolved_dict[k].append(v)
-
-					except:
-						resolved_dict[k] = []
-						resolved_dict[k].append(v)
-
-				else:
-					resolved_dict[k] = v
-
-			return  resolved_dict
-
-
-		return json.loads(f, object_pairs_hook=resolve)
+		return json.loads(f, object_pairs_hook=htstream_utils.resolve)
 
 
 	def parse_stats(self, json):
 
+		# preserves order of apps in report
 		self.apps = {
             'AdapterTrimmer': AdapterTrimmer.AdapterTrimmer(),
             'CutTrim': CutTrim.CutTrim(),
@@ -107,33 +86,36 @@ class MultiqcModule(BaseMultiqcModule):
             'Stats': Stats.Stats()
             }
 
+        # iterate through apps
 		for app in self.apps.keys():
 
+			# creat stat specific dictionary, each entry will be a sample
 			stats_dict = OrderedDict()
 
 			for key in json.keys():
 
-				for subkey in json[key].keys():	
+				if str("hts_" + app) in json[key].keys():
+					stats_dict[key] = json[key]["hts_" + app]
 
-					if app in subkey:
-						stats_dict[key] = json[key][subkey]
-						break
 
+			# if data exists for app, execute app specific stats processing
 			if len(stats_dict.keys()) != 0:
 
+				# dictionary of subsections
 				section_dict = self.apps[app].execute(stats_dict)
 
+				# if dictionary is not empty
 				if section_dict != None:
 
-					section = "hts_" + app
 
+					section = app
+
+					# for every subection ins section_dict, create subsection.
 					for key, value in section_dict.items():
 
 						try:
-
 							self.add_section(name = str(section + ": " + key),
 											 plot = section_dict[key])
-
 						except:
 							pass
 
