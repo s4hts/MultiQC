@@ -14,6 +14,7 @@ class Primers():
 
 	def table(self, json):
 
+		# standard table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
 		headers["PE in"] = {'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
@@ -25,10 +26,14 @@ class Primers():
 
 		return table.plot(json, headers)
 
+
+
 	def bargraph(self, json):
 
+		# bar graph config dict
 		config = {'title': "HTStream: Reads with Primers Bargraph"}
 
+		# bar graph constuctor
 		categories  = OrderedDict()
 
 		categories['Primer 1 Only'] = {
@@ -43,10 +48,16 @@ class Primers():
 									   'name': 'Both Primers',
 									   'color': '#33a02c'
 									  }
-		
 
+		# data dictionary for bar graph
 		data  = OrderedDict()
 
+
+		'''
+		##################
+		This tool is currently a work in progress 
+		##################
+		'''
 		for sample in json.keys():
 
 			data[sample] = {}
@@ -76,7 +87,7 @@ class Primers():
 
 		for key in json.keys():
 
-
+			# dictionary entry for sample
 			stats_json[key] = {
 			 				   "PE in": json[key]["Paired_end"]["in"],
 							   "PE out": json[key]["Paired_end"]["out"],
@@ -88,6 +99,7 @@ class Primers():
 							   "Primer Counts": json[key]["Fragment"]["primers_counts"]
 						 	  }
 
+		# dictionary for sections and figure function calls
 		section = {
 				   "Table": self.table(stats_json),
 				   "Reads with Primers": self.bargraph(stats_json)

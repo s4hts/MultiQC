@@ -15,14 +15,11 @@ class QWindowTrim():
 
 	def table(self, json):
 
+		# Standard table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
 		headers["PE in"] = {'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
 		headers["PE out"] = {'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["R1 L/R Ratio"] = {'namespace': "R1 L/R Ratio", 'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 1. Pseudocounting applied if right = 0 occurs.', 
-								   'format': '{:,.2f}', 'scale': 'Blues'}
-		headers["R2 L/R Ratio"] = {'namespace': "R2 L/R Ratio", 'description': 'Ratio of basepairs trimmed from left to basepairs trimmed from right for Read 2. Pseudocounting applied if right = 0 occurs.', 
-								   'format': '{:,.2f}', 'scale': 'YlOrRd'}
 		headers["SE in"] = {'namespace': "SE in",'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["SE out"] = {'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Avg. BP Trimmed"] = {'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
@@ -31,62 +28,62 @@ class QWindowTrim():
 		return table.plot(json, headers)
 
 
-	def bargraph(self, json, reads):
 
-		config = {'title': "HTStream: Trimmed Reads Bargraph"}
+	def bargraph(self, json, bp):
 
-		if reads == 0:
+		# config dictionary for bar graph
+		config = {'title': "HTStream: Trimmed Basepairs Bargraph"}
+
+		# returns nothing if no basepairs were trimmed.
+		if bp == 0:
 			return
 
+		# standard bar graph construction. See MultiQC docs.
 		categories  = OrderedDict()
 
-		categories['Left Trimmed Reads'] = {'name': 'Left Trimmed Reads'}
-		categories['Right Trimmed Reads'] = {'name': 'Right Trimmed Reads'}
+		categories['Left Trimmed Basepairs'] = {'name': 'Left Trimmed Basepairs'}
+		categories['Right Trimmed Basepairs'] = {'name': 'Right Trimmed Basepairs'}
 
 		return bargraph.plot(json, categories, config)
+
+
 
 	def execute(self, json):
 
 		stats_json = OrderedDict()
 
-		total_trimmed_reads = 0
+		# accumular variable that prevents empty bar graphs
+		total_trimmed_bp = 0
 
 		for key in json.keys():
 
-			lefttrimmed_reads = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
-			rightrimmed_reads = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
+			# trimmed reads by side
+			lefttrimmed_bp = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
+			rightrimmed_bp = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
 
-			trimmed_reads = (lefttrimmed_reads + rightrimmed_reads)
+			# total trimmed reads
+			trimmed_bp = (lefttrimmed_bp + rightrimmed_bp)
 
-			# Potential creative solution or potential issue, let's see how sam takes it.
-			if json[key]["Paired_end"]["Read1"]["rightTrim"] == 0:
-				r1_bp_ratio = (json[key]["Paired_end"]["Read1"]["leftTrim"] + 1) / (json[key]["Paired_end"]["Read1"]["rightTrim"] + 1)
-			else:
-				r1_bp_ratio = json[key]["Paired_end"]["Read1"]["leftTrim"] / json[key]["Paired_end"]["Read1"]["rightTrim"]
-
-			if json[key]["Paired_end"]["Read2"]["rightTrim"] == 0:
-				r2_bp_ratio = (json[key]["Paired_end"]["Read2"]["leftTrim"] + 1) / (json[key]["Paired_end"]["Read2"]["rightTrim"] + 1)
-			else:
-				r2_bp_ratio = json[key]["Paired_end"]["Read2"]["leftTrim"] / json[key]["Paired_end"]["Read2"]["rightTrim"]
-
+			# sample dictionary entry
 			stats_json[key] = {
 			 				   "PE in": json[key]["Paired_end"]["in"],
 							   "PE out": json[key]["Paired_end"]["out"],
-							   "R1 L/R Ratio": r1_bp_ratio,
-							   "R2 L/R Ratio": r2_bp_ratio,
 							   "SE in" : json[key]["Single_end"]["in"],
 							   "SE out": json[key]["Single_end"]["out"],
-							   "Avg. BP Trimmed": trimmed_reads / json[key]["Fragment"]["in"],
+							   "Avg. BP Trimmed": trimmed_bp / json[key]["Fragment"]["in"],
 							   "Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Left Trimmed Reads": lefttrimmed_reads,
-							   "Right Trimmed Reads": rightrimmed_reads
+							   "Left Trimmed Basepairs": lefttrimmed_bp,
+							   "Right Trimmed Basepairs": rightrimmed_bp
 						 	  }
 
-			total_trimmed_reads += trimmed_reads 
+			# total basepairs accumlation 
+			total_trimmed_bp += trimmed_bp
 
+
+		# sections and figure function calls
 		section = {
 				   "Table": self.table(stats_json),
-				   "Trimmed Reads": self.bargraph(stats_json, total_trimmed_reads)
+				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp)
 				   }
 
 		return section

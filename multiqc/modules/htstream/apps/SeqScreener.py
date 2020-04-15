@@ -14,6 +14,7 @@ class SeqScreener():
 
 	def table(self, json):
 
+		# Basic table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
 		headers["PE in"] = {'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
@@ -26,12 +27,15 @@ class SeqScreener():
 
 		return table.plot(json, headers)
 
+
+
 	def execute(self, json):
 
 		stats_json = OrderedDict()
 
 		for key in json.keys():
 
+			# sample entry for stats dictionary
 			stats_json[key] = {
 			 				   "PE in": json[key]["Paired_end"]["in"],
 							   "PE out": json[key]["Paired_end"]["out"],
@@ -42,6 +46,7 @@ class SeqScreener():
 							   "Notes": json[key]["Program_details"]["options"]["notes"],
 						 	  }
 
+		# sections and figure function calls
 		section = {
 				   "Table": self.table(stats_json)
 				   }

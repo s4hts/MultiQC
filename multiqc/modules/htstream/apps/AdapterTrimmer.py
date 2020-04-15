@@ -15,6 +15,8 @@ class AdapterTrimmer():
 
 	def table(self, json):
 
+		# Table constructor. Just like the MultiQC docs.
+		
 		headers = OrderedDict()
 
 		headers["Reads in"] = {'namespace': "Reads in", 'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
@@ -33,15 +35,18 @@ class AdapterTrimmer():
 		return table.plot(json, headers)
 
 
+
 	def execute(self, json):
 
 		stats_json = OrderedDict()
 
 		for key in json.keys():
 			
+			# calculations for reads with adapters and bps trimmed
 			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["adapterTrim"] # total reads trimmed
 			bp_reads = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["adapterBpTrim"] # total basepairs trimmed
 
+			# if adapter trim is zero, so is the percentage and the avg basepair trimmed. This prevents division by zero error
 			if adapter_reads == 0:
 				perc_adapters = 0
 				avg_bp_trimmed = 0
@@ -50,7 +55,7 @@ class AdapterTrimmer():
 				perc_adapters = (adapter_reads / json[key]["Fragment"]["in"]) * 100
 				avg_bp_trimmed = (bp_reads / adapter_reads)
 
-
+			# sample dictionary entry
 			stats_json[key] = {
 							   "Reads in": json[key]["Fragment"]["in"],
 							   "Reads out": json[key]["Fragment"]["out"],
@@ -59,6 +64,7 @@ class AdapterTrimmer():
 							   "Notes": json[key]["Program_details"]["options"]["notes"]
 							  }
 
+		# sections and figure function calls
 		section = {"Table": self.table(stats_json)}
 
 
