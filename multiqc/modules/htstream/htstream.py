@@ -131,7 +131,7 @@ class MultiqcModule(BaseMultiqcModule):
 					for title, section in section_dict.items():
 
 						if section != "":
-							html += section + '<br>\n' #  '<hr>\n<h4>' + title + '</h4>' +
+							html += section + '<br>\n'
 
 					# remove trailing space
 					html = html[:-5]
@@ -143,8 +143,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 					self.add_section(name = str(app),
 									 description = description,
-									 content = html) #section_dict[key]
-
+									 content = html) 
 
 				# Possibly will be of use when more is known about what to include 
 

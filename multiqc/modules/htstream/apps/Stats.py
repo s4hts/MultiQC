@@ -170,6 +170,7 @@ class Stats():
 
 		# initiate important variables and data structures
 		line_data = {}
+		status_dict = {}
 		first = True
 		pid = ""
 
@@ -185,11 +186,18 @@ class Stats():
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = json[key][read]["col_names"]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
+
 			data = []
 
 			# create variables for range functions in loops. Represents shape of data
 			quality_scores = json[key][read]["shape"][0]
 			cycles = json[key][read]["shape"][-1]
+
+
+			if read == "Single End Quality by Cycle":
+				input_reads = json[key]["SE in"]
+			else:
+				input_reads = json[key]["PE in"]
 
 			# temp total list 
 			total = []
@@ -197,10 +205,36 @@ class Stats():
 			# iterates through positions, creates a list of the sum of scores at each position to be used
 			#	to calculated frequency for heatmap. Also, calculates avg. Q score for linegraph.
 			#	This chunk of code is very ugly, but is a necessary evil. 
+
+			num_above_q30 = 0
+
 			for pos in range(cycles):
 				temp = [ score_list[pos] for score_list in json[key][read]["data"] ]
-				total.append(sum(temp))
-				line_data[key][pos] = statistics.mean(temp)
+				temp_sum = sum(temp)
+				total.append(temp_sum)
+
+				# multiples count at poistion by Q Score.
+				total_score = sum([(int(p) * int(s)) for p, s in zip(temp, y_lab[::-1])])
+
+				# divides sum of total score by the number of cycles for avg fragments
+				line_data[key][pos] = total_score / input_reads 
+
+				if line_data[key][pos] > 30:
+					num_above_q30 += 1
+
+
+			# check to see what percent of bases have a mean Q score of at least 30
+			q30_gate = (num_above_q30 / cycles) 
+
+			if q30_gate < 0.6:
+				status_dict[key] = "FAIL"
+
+			elif q30_gate < 0.8:
+				status_dict[key] = "QUESTIONABLE"
+
+			else:
+				status_dict[key] = 'PASS'
+
 
 			# populates data dictionaries for heatmap
 			for score in range(quality_scores - 1, -1, -1):
@@ -241,8 +275,10 @@ class Stats():
 		html += '</div>\n\n<br></br>\n\n'
 		html += plot_html 
 
-		# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
+		# sample status check function
+		wrapper_html += htstream_utils.sample_status(status_dict)
 
+		# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 		# line graph div
 		wrapper_html += '<div id="htstream_qbc_line_{r}">'.format(r=btn_id)
 		wrapper_html += linegraph.plot(line_data, line_config) + "</div>"
