@@ -334,7 +334,7 @@ class Stats():
 				#	this data is added to a secondary table as to avoid ugly line graphs.
 				if len(json[key][histograms[i]]) == 1:
 
-					# format read name
+					# format read name for dictionary
 					read_name = "St_" + histograms[i].split("_")[1] + "_Length"
 
 					# try appending dictionary, if key doesn't exist, create the instance.
