@@ -5,15 +5,6 @@ import random
 
 #################################################
 
-# create random id for tables and plots
-
-# def random_id():
-
-# 	lettes = 'abcdefghijklmnopqrstuvwxyz'
-
-	
-
-
 # sample status div creator
 
 def sample_status(samples):
