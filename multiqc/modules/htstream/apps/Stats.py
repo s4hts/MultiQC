@@ -40,7 +40,7 @@ class Stats():
 		status_dict = {}
 
 		# header read type
-		read_header = read.split(" Base")[0]
+		read_header = read.split("_Base")[0]
 
 		# section header
 		html = '<h4> Base by Cycle: ' + read_header + '</h4>'
@@ -53,6 +53,7 @@ class Stats():
 					"G": {},
 					"T": {},
 					"N": {}}
+
 
 			# lists to iterate through
 			bases = json[key][read]["data"]
@@ -147,7 +148,7 @@ class Stats():
     			  }
 
     	# id of switch buttun, named after read type.
-		btn_id = "-".join(read.split(" ")[:2]).lower()
+		btn_id = "-".join(read.split("_")[:3]).lower()
 
 		# header read type
 		read_header = read.split(" Quality")[0]
@@ -181,7 +182,7 @@ class Stats():
 			line_data[key] = {}
 
 			# creates unique heatmap id that can be queired later by js.
-			heat_pconfig["id"] = "htstream_" + key + "_heatmap"
+			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_heatmap"
 
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = json[key][read]["col_names"]
@@ -195,9 +196,9 @@ class Stats():
 
 
 			if read == "Single End Quality by Cycle":
-				input_reads = json[key]["SE in"]
+				input_reads = json[key]["St_SE_in"]
 			else:
-				input_reads = json[key]["PE in"]
+				input_reads = json[key]["St_PE_in"]
 
 			# temp total list 
 			total = []
@@ -265,7 +266,7 @@ class Stats():
 
 			# html div attributes and text
 			name = key
-			pid = "htstream_" + key + "_btn"
+			pid = "htstream_" + btn_id + "_" + key + "_btn"
 
 			# add html div for button. Occurs for every sample.
 			html += '<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name)
@@ -305,9 +306,11 @@ class Stats():
 
 		# if single end read data is present, this data will be appended to the data set and config dicts.
 		if SE_presence == False:
-			histograms = ["R1 histogram", "R2 histogram"]
+			histograms = ["St_R1_histogram", "St_R2_histogram"]
+			reads = ["St_R1_Length", "St_R2_Length"]
 		else:
-			histograms = ["R1 histogram", "R2 histogram", "SE histogram"]
+			histograms = ["St_R1_histogram", "St_R2_histogram", "St_SE_histogram"]
+			reads = ["St_R1_Length", "St_R2_Length", "St_SE_Length"]
 			config["data_labels"].append({'name': "SE histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'})
 
 
@@ -315,6 +318,7 @@ class Stats():
 		data_list = []
 		invariant_dict = {}
 		html = ""
+		reads = []
 
 		# iterates of all types of read data available (R1, R2, & SE (sometimes))
 		for i in range(len(histograms)):
@@ -331,7 +335,7 @@ class Stats():
 				if len(json[key][histograms[i]]) == 1:
 
 					# format read name
-					read_name = histograms[i].split(" ")[0] + " Length"
+					read_name = "St_" + histograms[i].split("_")[1] + "_Length"
 
 					# try appending dictionary, if key doesn't exist, create the instance.
 					try:
@@ -348,9 +352,9 @@ class Stats():
 
 					# sums the total number of reads 
 					if histograms[i] == "SE histogram":
-						total = json[key]["SE in"]
+						total = json[key]["St_SE_in"]
 					else:
-						total = json[key]["PE in"]
+						total = json[key]["St_PE_in"]
 					
 					# populate smaple dictionary with read length and its frequency
 					for item in json[key][histograms[i]]:
@@ -372,8 +376,6 @@ class Stats():
 			headers = OrderedDict()
 			table_config = {'table_title': "Length of Uniform Reads"}
 
-			reads = ["R1 Length", "R2 Length", "SE Length"]
-
 			# iterates samples and through possible reads, checks for presenc in dictionary
 			for key  in invariant_dict.keys():
 
@@ -384,9 +386,9 @@ class Stats():
 						invariant_dict[key][read_type] = "NA"
 
 			# instantiates table columns
-			headers["R1 Length"] = {'namespace': "Read 1 Length",'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Greens' }
-			headers["R2 Length"] = {'namespace': "Read 2 Length",'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Oranges' }
-			headers["SE Length"] = {'namespace': "Single End Length",'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Blues' }
+			headers["St_R1_Length"] = {'title': "Read 1 Length", 'namespace': "Read 1 Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Greens' }
+			headers["St_R2_Length"] = {'title': "Read 2 Length", 'namespace': "Read 2 Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Oranges' }
+			headers["St_SE_Length"] = {'title': "Single End Length", 'namespace': "Single End Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Blues' }
 			
 			# add to output html
 			html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -412,10 +414,10 @@ class Stats():
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
-				stats_json[key]["SE histogram"] = json[key][-1]["Single_end"]["readlength_histogram"]
-				stats_json[key]["Single End Base by Cycle"] = json[key][-1]["Single_end"]["base_by_cycle"]
-				stats_json[key]["Single End Quality by Cycle"] = json[key][-1]["Single_end"]["qualities_by_cycle"]
-				stats_json[key]["SE in"] = json[key][-1]["Single_end"]["in"]
+				stats_json[key]["St_SE_histogram"] = json[key][-1]["Single_end"]["readlength_histogram"]
+				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key][-1]["Single_end"]["base_by_cycle"]
+				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key][-1]["Single_end"]["qualities_by_cycle"]
+				stats_json[key]["St_SE_in"] = json[key][-1]["Single_end"]["in"]
 							   
 				SE_presence = True
 
@@ -423,28 +425,28 @@ class Stats():
 				SE_presence = False
 
 			# sample instance in ordered dict
-			stats_json[key]["R1 histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
-			stats_json[key]["R2 histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
-			stats_json[key]["Read 1 Base by Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
-			stats_json[key]["Read 2 Base by Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
-			stats_json[key]["Read 1 Quality by Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
-			stats_json[key]["Read 2 Quality by Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
-			stats_json[key]["PE in"] = json[key][-1]["Paired_end"]["in"]
+			stats_json[key]["St_R1_histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
+			stats_json[key]["St_R2_histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
+			stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
+			stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
+			stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
+			stats_json[key]["St_Read_2_Quality_by_Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
+			stats_json[key]["St_PE_in"] = json[key][-1]["Paired_end"]["in"]
 
 
 		# output dictionary, keys are section, value is function called for figure generation
 		section = {
 				   "Density Plots": self.linegraph(stats_json, SE_presence), 
-				   "Base by Cycle (Read 1)": self.base_by_cycle(stats_json, "Read 1 Base by Cycle"),
-				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "Read 1 Quality by Cycle"),
-				   "Base by Cycle (Read 2)": self.base_by_cycle(stats_json, "Read 2 Base by Cycle"),
-				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "Read 2 Quality by Cycle")
+				   "Base by Cycle (Read 1)": self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle"),
+				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle"),
+				   "Base by Cycle (Read 2)": self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle"),
+				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
 				   }
 
 		# only executres if single read data is detected
 		if SE_presence == True:
-			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "Single End Base by Cycle")
-			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "Single End Quality by Cycle")
+			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle")
+			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle")
 
 	
 		return section 

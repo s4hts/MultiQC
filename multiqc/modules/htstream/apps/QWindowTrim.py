@@ -18,12 +18,12 @@ class QWindowTrim():
 		# Standard table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
-		headers["PE in"] = {'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["PE out"] = {'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["SE in"] = {'namespace': "SE in",'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["SE out"] = {'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Avg. BP Trimmed"] = {'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
-		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
+		headers["Qt_PE_in"] = {'title': "PE in", 'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Qt_PE_out"] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Qt_SE_in"] = {'title': "SE in", 'namespace': "SE in",'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Qt_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Qt_Avg_BP_Trimmed"] = {'title': "Avg. BP Trimmed", 'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["Qt_Notes"] = {'title': "Avg. BP Trimmed", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -32,17 +32,20 @@ class QWindowTrim():
 	def bargraph(self, json, bp):
 
 		# config dictionary for bar graph
-		config = {'title': "HTStream: Trimmed Basepairs Bargraph"}
+		config = {'title': "HTStream: Trimmed Basepairs Bargraph",
+				  'id': "htstream_qwindowtrimmer_bargraph",
+				  'ylab' : "Samples"}
 
 		# returns nothing if no basepairs were trimmed.
 		if bp == 0:
-			return ""
+			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			return html
 
 		# standard bar graph construction. See MultiQC docs.
 		categories  = OrderedDict()
 
-		categories['Left Trimmed Basepairs'] = {'name': 'Left Trimmed Basepairs'}
-		categories['Right Trimmed Basepairs'] = {'name': 'Right Trimmed Basepairs'}
+		categories["Qt_Left_Trimmed_Basepairs"] = {'name': 'Left Trimmed Basepairs'}
+		categories["Qt_Right_Trimmed_Basepairs"] = {'name': 'Right Trimmed Basepairs'}
 
 		return bargraph.plot(json, categories, config)
 
@@ -66,14 +69,14 @@ class QWindowTrim():
 
 			# sample dictionary entry
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["in"],
-							   "PE out": json[key]["Paired_end"]["out"],
-							   "SE in" : json[key]["Single_end"]["in"],
-							   "SE out": json[key]["Single_end"]["out"],
-							   "Avg. BP Trimmed": trimmed_bp / json[key]["Fragment"]["in"],
-							   "Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Left Trimmed Basepairs": lefttrimmed_bp,
-							   "Right Trimmed Basepairs": rightrimmed_bp
+			 				   "Qt_PE_in": json[key]["Paired_end"]["in"],
+							   "Qt_PE_out": json[key]["Paired_end"]["out"],
+							   "Qt_SE_in" : json[key]["Single_end"]["in"],
+							   "Qt_SE_out": json[key]["Single_end"]["out"],
+							   "Qt_Avg_BP_Trimmed": trimmed_bp / json[key]["Fragment"]["in"],
+							   "Qt_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Qt_Left_Trimmed_Basepairs": lefttrimmed_bp,
+							   "Qt_Right_Trimmed_Basepairs": rightrimmed_bp
 						 	  }
 
 			# total basepairs accumlation 

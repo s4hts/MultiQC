@@ -17,20 +17,23 @@ class Overlapper():
 
 	def table(self, json):
 
+		config = {'namespace': 'overlapper'}
+
 		# straight forward table construction.
 		headers = OrderedDict()
 
-		headers["PE in"] = {'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["PE out"] = {'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["SE in"] = {'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["SE out"] = {'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["% Overlapped"] = {'namespace': "% Overlapped", 
-								   'description': 'Percentage of Reads with Overlap.',
-								   'suffix': '%',
-								   'max': 100,
-								   'format': '{:,.2f}',
-								   'scale': 'Blues'}
-		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
+		headers["Ov_PE_in"] = {'title': "PE in", 'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Ov_PE_out"] = {'title': "PE out", 'namespace': "PE out",'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Ov_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Ov_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Ov_%_Overlapped"] = {'title': "% Overlapped", 
+									  'namespace': "% Overlapped",
+									  'description': 'Percentage of Reads with Overlap.',
+									  'suffix': '%',
+									  'max': 100,
+									  'format': '{:,.2f}',
+									  'scale': 'Blues'}
+		headers["Ov_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -39,24 +42,27 @@ class Overlapper():
 	def bargraph(self, json, inserts):
 
 		# configuration dictionary for bar graph
-		config = {'title': "HTStream: Overlap Composition Bargraph"}
+		config = {'title': "HTStream: Overlap Composition Bargraph",
+				  'id': "htstream_overlapper_bargraph",
+				  'ylab' : "Samples"}
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
-			return ""
+			html = '<div class="alert alert-info"> No overlaps present in samples. </div>'	
+			return html
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.
 		categories  = OrderedDict()
 
-		categories['Sins'] = {
+		categories['Ov_Sins'] = {
 							  'name': 'Short Inserts',
 							  'color': '#4d8de4'
 							 }
-		categories['Mins'] = {
+		categories['Ov_Mins'] = {
 							  'name': 'Medium Inserts',
 							  'color': '#e57433'
 							 }
-		categories['Lins'] = {
+		categories['Ov_Lins'] = {
 							  'name': 'Long Inserts',
 							  'color': '#33a02c'
 							 }
@@ -84,10 +90,10 @@ class Overlapper():
 			config_subdict = {'name': key, 'ylab': 'Frequency', 'xlab': 'Overlapping Read Lengths'}	
 
 			# calculate totals for frequency histogran
-			total = sum([ count[1] for count in json[key]["Histogram"] ])
+			total = sum([ count[1] for count in json[key]["Ov_Histogram"] ])
 
 			# iterates over ever value in histogram and adds it to line graph
-			for item in json[key]["Histogram"]:
+			for item in json[key]["Ov_Histogram"]:
 
 				data[key][item[0]] = item[1] / total
 
@@ -129,16 +135,16 @@ class Overlapper():
 				
 			# sample instance in dictionary
 			stats_json[key] = {
-			 			 	   "PE in": json[key]["Paired_end"]["in"],
-							   "PE out": json[key]["Paired_end"]["out"],
-							   "SE in" : json[key]["Single_end"]["in"],
-							   "SE out": json[key]["Single_end"]["out"],
-							   "% Overlapped": perc_overlapped,
-						 	   "Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Sins": sins,
-							   "Mins": mins,
-							   "Lins": lins,
-							   "Histogram": json[key]["Fragment"]["readlength_histogram"]
+			 			 	   "Ov_PE_in": json[key]["Paired_end"]["in"],
+							   "Ov_PE_out": json[key]["Paired_end"]["out"],
+							   "Ov_SE_in" : json[key]["Single_end"]["in"],
+							   "Ov_SE_out": json[key]["Single_end"]["out"],
+							   "Ov_%_Overlapped": perc_overlapped,
+						 	   "Ov_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Ov_Sins": sins,
+							   "Ov_Mins": mins,
+							   "Ov_Lins": lins,
+							   "Ov_Histogram": json[key]["Fragment"]["readlength_histogram"]
 							  }
 
 			# accumulator accumlating

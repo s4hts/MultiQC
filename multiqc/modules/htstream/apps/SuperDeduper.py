@@ -18,19 +18,19 @@ class SuperDeduper():
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
-		headers["PE in"] = {'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["PE out"] = {'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["SE in"] = {'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["SE out"] = {'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["% Duplicates"] = {
-						   'namespace': "% Duplicates", 
-						   'description': 'Percentage of Duplicate Reads (SE and PE)',
-						   'suffix': '%',
-						   'max': 100,
-						   'format': '{:,.2f}',
-						   'scale': 'Oranges'
-						  }
-		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
+		headers["Sd_PE_in"] = {'title': "PE in", 'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Sd_PE_out"] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Sd_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Sd_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Sd_%_Duplicates"] = {'title': "% Duplicates", 
+								   'namespace': "% Duplicates", 
+								   'description': 'Percentage of Duplicate Reads (SE and PE)',
+								   'suffix': '%',
+								   'max': 100,
+								   'format': '{:,.2f}',
+								   'scale': 'Oranges'
+								  }
+		headers["Sd_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
 		return table.plot(json, headers)
@@ -53,8 +53,8 @@ class SuperDeduper():
 
 			# if duplicate saturation histogram has data point, it is added to 'invariant_saturation_dict', where 
 			# 	it will be represented as table instead of a hideous graph.
-			if len(json[key]["Saturation"]) == 1:
-				invariant_saturation_dict[key] = {"Total Reads": json[key]["Saturation"][0][0], "Duplicates": json[key]["Saturation"][0][1]}
+			if len(json[key]["Sd_Saturation"]) == 1:
+				invariant_saturation_dict[key] = {"Sd_Total_Reads": json[key]["Sd_Saturation"][0][0], "Sd_Duplicates": json[key]["Sd_Saturation"][0][1]}
 
 
 			# if more than one data point is identified (low bar, I know), it will be added to the graph's data
@@ -62,7 +62,7 @@ class SuperDeduper():
 			else:
 				data[key] = {}
 
-				for item in json[key]["Saturation"]:
+				for item in json[key]["Sd_Saturation"]:
 
 					data[key][item[0]] = item[1] 
 
@@ -74,8 +74,8 @@ class SuperDeduper():
 
 			# table
 			headers = OrderedDict()
-			headers["Total Reads"] = {'namespace': "Total Reads",'description': 'Number of Total Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-			headers["Duplicates"] = {'namespace': "Duplicates", 'description': 'Number of Duplicates', 'format': '{:,.0f}', 'scale': 'RdPu'}
+			headers["Sd_Total_Reads"] = {'title': "Total Reads", 'namespace': "Total Reads", 'description': 'Number of Total Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+			headers["Sd_Duplicates"] = {'title': "Duplicates", 'namespace': "Duplicates", 'description': 'Number of Duplicates', 'format': '{:,.0f}', 'scale': 'RdPu'}
 			
 			# add to output html
 			html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -100,13 +100,13 @@ class SuperDeduper():
 
 			# sample instance in ordered dict
 			stats_json[key] = {
-			 				   "PE in": json[key]["Paired_end"]["in"],
-							   "PE out": json[key]["Paired_end"]["out"],
-							   "SE in": json[key]["Single_end"]["in"],
-							   "SE out": json[key]["Single_end"]["out"],
-							   "% Duplicates": perc_duplicates,
-							   "Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Saturation": json[key]["Fragment"]["duplicate_saturation"]
+			 				   "Sd_PE_in": json[key]["Paired_end"]["in"],
+							   "Sd_PE_out": json[key]["Paired_end"]["out"],
+							   "Sd_SE_in": json[key]["Single_end"]["in"],
+							   "Sd_SE_out": json[key]["Single_end"]["out"],
+							   "Sd_%_Duplicates": perc_duplicates,
+							   "Sd_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Sd_Saturation": json[key]["Fragment"]["duplicate_saturation"]
 						 	  }
 
 		# output dictionary, keys are section, value is function called for figure generation

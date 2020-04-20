@@ -1,8 +1,18 @@
+import random
 #################################################
 
 """ Utilities for HTStream submodule """
 
 #################################################
+
+# create random id for tables and plots
+
+# def random_id():
+
+# 	lettes = 'abcdefghijklmnopqrstuvwxyz'
+
+	
+
 
 # sample status div creator
 
@@ -78,3 +88,7 @@ def resolve(pairs):
 			resolved_dict[k] = v
 
 	return  resolved_dict
+
+
+
+#######################################

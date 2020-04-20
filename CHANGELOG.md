@@ -32,6 +32,8 @@
     * fast BAM/CRAM depth calculation for WGS, exome, or targeted sequencing
 * [**SexDetErrmine**](https://github.com/TCLamnidis/Sex.DetERRmine)
     * Relative coverage and error rate of X and Y chromosomes
+* **HTStream**
+    * A quality control and processing pipeline for High Throughput Sequencing data.
 
 #### Module updates:
 * **bcl2fastq**

@@ -18,18 +18,18 @@ class AdapterTrimmer():
 		
 		headers = OrderedDict()
 
-		headers["Reads in"] = {'namespace': "Reads in", 'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Reads out"] = {'namespace': "Reads out", 'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["% Adapters"] = {
-						   'namespace': "% Adapters",
-						   'description': 'Percentage of Reads (SE and PE) with an Adapter',
-						   'suffix': '%',
-						   'max': 100,
-						   'format': '{:,.2f}',
-						   'scale': 'Blues'
-						  }
-		headers["Avg. BP Trimmed"] = {'namespace': "Avg. BP Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
-		headers["Notes"] = {'namespace': "Notes", 'description': 'Notes'}
+		headers["At_Reads_in"] = {'title': "Reads in", 'namespace': "Reads in", 'description': 'Number of Input Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["At_Reads_out"] = {'title': "Reads out", 'namespace': "Reads out", 'description': 'Number of Output Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["At_%_Adapters"] = {'title': "% Adapters",
+									'namespace': "% Adapters",
+									'description': 'Percentage of Reads (SE and PE) with an Adapter',
+									'suffix': '%',
+									'max': 100,
+									'format': '{:,.2f}',
+									'scale': 'Blues'
+									}
+		headers["At_Avg_BP_Trimmed"] = {'title': "Avg. BP Trimmed", 'namespace': "Avg. BP Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["At_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -56,11 +56,11 @@ class AdapterTrimmer():
 
 			# sample dictionary entry
 			stats_json[key] = {
-							   "Reads in": json[key]["Fragment"]["in"],
-							   "Reads out": json[key]["Fragment"]["out"],
-							   "% Adapters": perc_adapters,
-							   "Avg. BP Trimmed": avg_bp_trimmed,
-							   "Notes": json[key]["Program_details"]["options"]["notes"]
+							   "At_Reads_in": json[key]["Fragment"]["in"],
+							   "At_Reads_out": json[key]["Fragment"]["out"],
+							   "At_%_Adapters": perc_adapters,
+							   "At_Avg_BP_Trimmed": avg_bp_trimmed,
+							   "At_Notes": json[key]["Program_details"]["options"]["notes"]
 							  }
 
 		# sections and figure function calls
