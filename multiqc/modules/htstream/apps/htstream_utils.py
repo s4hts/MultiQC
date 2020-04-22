@@ -1,9 +1,35 @@
-import random
 #################################################
 
 """ Utilities for HTStream submodule """
 
 #################################################
+
+# json key collision resolving function
+
+def resolve(pairs):
+
+	resolved_dict = {}
+
+	# iterates through json key value pairs
+	for k, v in pairs:
+
+		# if key is stats, return both entries are added to list
+		if k == "hts_Stats":
+
+			try:
+				resolved_dict[k].append(v)
+
+			except:
+				resolved_dict[k] = []
+				resolved_dict[k].append(v)
+
+		# if not stats, business as usual
+		else:
+			resolved_dict[k] = v
+
+	return  resolved_dict
+
+#######################################
 
 # sample status div creator
 
@@ -52,34 +78,6 @@ def sample_status(samples):
 	notice = '<div class="alert alert-info">{n}</div>'.format(n = html)	
 
 	return notice
-
-#######################################
-
-# json key collision resolving function
-
-def resolve(pairs):
-
-	resolved_dict = {}
-
-	# iterates through json key value pairs
-	for k, v in pairs:
-
-		# if key is stats, return both entries are added to list
-		if k == "hts_Stats":
-
-			try:
-				resolved_dict[k].append(v)
-
-			except:
-				resolved_dict[k] = []
-				resolved_dict[k].append(v)
-
-		# if not stats, business as usual
-		else:
-			resolved_dict[k] = v
-
-	return  resolved_dict
-
 
 #######################################
 
