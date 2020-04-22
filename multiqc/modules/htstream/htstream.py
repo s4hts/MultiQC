@@ -7,8 +7,10 @@ from collections import OrderedDict
 import logging
 import re, json, os
 
-from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer
-from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats, htstream_utils
+# HTStream Apps
+from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer, PolyATTrim
+from .apps import  SeqScreener, SuperDeduper, Primers, Stats, OverviewStats, htstream_utils
+
 from multiqc import config
 from multiqc.modules.base_module import BaseMultiqcModule
 
@@ -107,13 +109,16 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		self.report_sections = {}
-
+		self.overview_stats = {}
 
 		# checks that order is consistent within stats files 
 		app_order = []	
 		stats_section = ""			
 
 		for key in json.keys():
+
+			# Initializes samples for overview stats
+			self.overview_stats[key] = {}
 
 			if app_order == []:
 				app_order = list(json[key].keys())
@@ -124,6 +129,23 @@ class MultiqcModule(BaseMultiqcModule):
 			else:
 				log.warning("Inconsistent order of HTStream applications.")
 
+
+		order_list = []
+		stats_pos = ""
+
+		for x in range(len(app_order)):
+
+			if app_order[x] == "hts_Stats":
+				stats_pos = x
+			else:
+				order_list.append(x)
+
+
+		temp = [app_order[x] for x in order_list]
+
+		if stats_pos != "":
+			temp.append(app_order[stats_pos])
+			app_order = temp
 
 		for i in range(len(app_order)):
 
@@ -136,6 +158,16 @@ class MultiqcModule(BaseMultiqcModule):
 			for key in json.keys():
 
 				stats_dict[key] = json[key][app]
+				
+
+				if app == "hts_Stats":
+					frags_in = json[key][app][-1]["Fragment"]["in"]
+				else:
+					frags_in = json[key][app]["Fragment"]["in"]
+
+
+				self.overview_stats[key][app + "_InputFragments"] = frags_in
+					
 
 			# if data exists for app, execute app specific stats processing
 			if len(stats_dict.keys()) != 0:
@@ -162,19 +194,36 @@ class MultiqcModule(BaseMultiqcModule):
 					description = self.programs[app]["description"]
 
 					if app == "Stats":
-						stats_section = "Summary Stats"
-						stats_description = description
-						stats_content = html
+						app = "Summary Stats"
 
-					else:
-						self.add_section(name = str(app),
-										 description = description,
-										 content = html) 
+					self.report_sections[app] = {'description': description,
+												 'html': html}
 
-		if stats_section != "":
-			self.add_section(name = stats_section,
-							 description = stats_description,
-							 content = stats_content)
+
+
+		if self.overview_stats != {}:
+
+			app = OverviewStats.OverviewStats()
+			description = "General statistics from the HTStream pipeline."
+			html = app.execute(self.overview_stats, app_order)
+			
+			self.add_section(name = "Processing Overview",
+							 description = description,
+							 content = html) 
+
+
+
+		for section, content in self.report_sections.items():
+
+				try:
+					self.add_section(name = section,
+									 description = content["description"],
+									 content = content["html"])
+
+
+				except:
+					msg = "Report Section for " + section + " Failed."
+					log.warning(msg)
 
 				# Possibly will be of use when more is known about what to include 
 

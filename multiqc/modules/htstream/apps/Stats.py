@@ -115,6 +115,7 @@ class Stats():
 		return html
 
 
+
 	def quality_by_cycle(self, json, read):
 
 		# Here is the most complicated figure implementation in this whole module.
@@ -128,8 +129,10 @@ class Stats():
 		line_config = {
 				  'smooth_points_sumcounts': False,
 				  'categories': True,
-				  'title': "HTStream: Quality by Cycle"
-				  	 }
+				  'title': "HTStream: Mean Quality by Cycle",
+				  'xlab': "Cycle",
+				  'ylab': "Mean Q Score"
+				  }
 
 		# config dictionary for heatmaps
 		heat_pconfig = {'id' : "",

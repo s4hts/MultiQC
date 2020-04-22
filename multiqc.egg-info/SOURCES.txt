@@ -131,6 +131,7 @@ multiqc/modules/htstream/apps/AdapterTrimmer.py
 multiqc/modules/htstream/apps/CutTrim.py
 multiqc/modules/htstream/apps/NTrimmer.py
 multiqc/modules/htstream/apps/Overlapper.py
+multiqc/modules/htstream/apps/OverviewStats.py
 multiqc/modules/htstream/apps/PolyATTrim.py
 multiqc/modules/htstream/apps/Primers.py
 multiqc/modules/htstream/apps/QWindowTrim.py
