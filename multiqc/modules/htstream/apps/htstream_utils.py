@@ -81,5 +81,47 @@ def resolve(pairs):
 	return  resolved_dict
 
 
-
 #######################################
+
+# Quality by Base html formatter
+
+def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap):
+
+	read_header  = " ".join(read.split("_")[1:3])
+
+	# id of switch buttun, named after read type.
+	btn_id = "-".join(read.split("_")[:3]).lower()
+
+	# section header
+	wrapper_html = '<h4> Quality by Cycle: ' + read_header + '</h4>'
+
+	wrapper_html += status_div 
+
+	wrapper_html += '<div class="btn-group hc_switch_group">\n'
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{r}_btn">Linegraph</button>\n'.format(r=btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{r}_btn">Heatmaps</button></div>\n'.format(r=btn_id)
+	wrapper_html += "<br></br>"
+
+	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
+	# line graph div
+	wrapper_html += '<div id="htstream_qbc_line_{r}">'.format(r=btn_id)
+	wrapper_html += line_plot + "</div>"
+
+	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
+	heatmap_html = '<div class="btn-group hc_switch_group">\n'
+
+	for buttons in button_list:
+		heatmap_html += buttons
+
+	heatmap_html += '</div>\n\n<br></br>\n\n'
+	heatmap_html += heatmap
+
+	# heatmap div
+	wrapper_html += '<div id="htstream_qbc_heat_{r}" style="display:none;">'.format(r=btn_id)
+	wrapper_html += heatmap_html + "</div>"
+
+	final_html = wrapper_html 
+
+	return final_html 
+
+
