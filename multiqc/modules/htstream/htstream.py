@@ -105,19 +105,42 @@ class MultiqcModule(BaseMultiqcModule):
 								  "description": "Generates a JSON formatted file containing a set of statistical measures about the input read data."}
 						}
 
-        # iterate through apps
-		for app in self.programs.keys():
 
+		self.report_sections = {}
+
+
+		# checks that order is consistent within stats files 
+		app_order = []	
+		stats_section = ""			
+
+		for key in json.keys():
+
+			if app_order == []:
+				app_order = list(json[key].keys())
+
+			elif app_order == list(json[key].keys()):
+				app_order = list(json[key].keys())
+
+			else:
+				log.warning("Inconsistent order of HTStream applications.")
+
+
+		for i in range(len(app_order)):
+
+			app = app_order[i]
+			
 			# creat stat specific dictionary, each entry will be a sample
+
 			stats_dict = OrderedDict()
 
 			for key in json.keys():
 
-				if str("hts_" + app) in json[key].keys():
-					stats_dict[key] = json[key]["hts_" + app]
+				stats_dict[key] = json[key][app]
 
 			# if data exists for app, execute app specific stats processing
 			if len(stats_dict.keys()) != 0:
+
+				app = app.split("hts_")[-1]
 
 				# dictionary of subsections
 				section_dict = self.programs[app]["app"].execute(stats_dict)
@@ -139,11 +162,19 @@ class MultiqcModule(BaseMultiqcModule):
 					description = self.programs[app]["description"]
 
 					if app == "Stats":
-						app = "Summary Stats"
+						stats_section = "Summary Stats"
+						stats_description = description
+						stats_content = html
 
-					self.add_section(name = str(app),
-									 description = description,
-									 content = html) 
+					else:
+						self.add_section(name = str(app),
+										 description = description,
+										 content = html) 
+
+		if stats_section != "":
+			self.add_section(name = stats_section,
+							 description = stats_description,
+							 content = stats_content)
 
 				# Possibly will be of use when more is known about what to include 
 

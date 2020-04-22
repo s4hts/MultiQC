@@ -40,7 +40,7 @@ class Stats():
 		status_dict = {}
 
 		# header read type
-		read_header = read.split("_Base")[0]
+		read_header = " ".join(read.split("_")[1:3])
 
 		# section header
 		html = '<h4> Base by Cycle: ' + read_header + '</h4>'
@@ -151,18 +151,13 @@ class Stats():
 		btn_id = "-".join(read.split("_")[:3]).lower()
 
 		# header read type
-		read_header = read.split(" Quality")[0]
+		read_header = read_header = " ".join(read.split("_")[1:3])
 
 		# section header
 		wrapper_html = '<h4> Quality by Cycle: ' + read_header + '</h4>'
 
 
-		# In order to be able to switch back and forth between different graph types, we need to add MultiQC's button divs that 
-		#	have an onclick attribute for javascript that can switch between graphs.
-		wrapper_html += '<div class="btn-group hc_switch_group">\n'
-		wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{r}_btn">Linegraph</button>\n'.format(r=btn_id)
-		wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{r}_btn">Heatmaps</button></div>\n'.format(r=btn_id)
-		wrapper_html += "<hr>"
+		
 
 
 		# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
@@ -276,8 +271,18 @@ class Stats():
 		html += '</div>\n\n<br></br>\n\n'
 		html += plot_html 
 
+
 		# sample status check function
 		wrapper_html += htstream_utils.sample_status(status_dict)
+
+
+		# In order to be able to switch back and forth between different graph types, we need to add MultiQC's button divs that 
+		#	have an onclick attribute for javascript that can switch between graphs.
+		wrapper_html += '<div class="btn-group hc_switch_group">\n'
+		wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{r}_btn">Linegraph</button>\n'.format(r=btn_id)
+		wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{r}_btn">Heatmaps</button></div>\n'.format(r=btn_id)
+		wrapper_html += "<br></br>"
+
 
 		# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 		# line graph div
