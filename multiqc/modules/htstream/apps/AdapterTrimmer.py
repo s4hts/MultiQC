@@ -42,8 +42,8 @@ class AdapterTrimmer():
 		for key in json.keys():
 			
 			# calculations for reads with adapters and bps trimmed
-			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["adapterTrim"] # total reads trimmed
-			bp_reads = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["adapterBpTrim"] # total basepairs trimmed
+			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"] # total reads trimmed
+			bp_reads = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"] # total basepairs trimmed
 
 			# if adapter trim is zero, so is the percentage and the avg basepair trimmed. This prevents division by zero error
 			if adapter_reads == 0:

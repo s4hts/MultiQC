@@ -1,5 +1,5 @@
 from collections import OrderedDict
-import logging, statistics
+import logging, statistics, math
 
 from . import htstream_utils
 from multiqc import config
@@ -177,11 +177,6 @@ class Stats():
 			cycles = json[key][read]["shape"][-1]
 
 
-			if read == "Single End Quality by Cycle":
-				input_reads = json[key]["St_SE_in"]
-			else:
-				input_reads = json[key]["St_PE_in"]
-
 			# temp total list 
 			total = []
 			
@@ -200,7 +195,7 @@ class Stats():
 				total_score = sum([(int(p) * int(s)) for p, s in zip(temp, y_lab[::-1])])
 
 				# divides sum of total score by the number of cycles for avg fragments
-				line_data[key][pos] = total_score / input_reads 
+				line_data[key][pos] = total_score / temp_sum # total reads
 
 				if line_data[key][pos] > 30:
 					num_above_q30 += 1
@@ -263,80 +258,88 @@ class Stats():
 
 
 
-	def linegraph(self, json, SE_presence):
+	def histogram(self, json, read):
 
-		# config dict for line graphs
-		config = {'title': "HTStream: Read Length Histogram",
-				  'data_labels': [
-								  {'name': "R1 histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'},
-								  {'name': "R2 histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'}
-								  ]}
+		read_keys = {"St_R1_histogram": "R1",
+					 "St_R2_histogram": "R2",
+					 "St_SE_histogram": "SE"}
 
 
-		# if single end read data is present, this data will be appended to the data set and config dicts.
-		if SE_presence == False:
-			histograms = ["St_R1_histogram", "St_R2_histogram"]
-			reads = ["St_R1_Length", "St_R2_Length"]
-		else:
-			histograms = ["St_R1_histogram", "St_R2_histogram", "St_SE_histogram"]
-			reads = ["St_R1_Length", "St_R2_Length", "St_SE_Length"]
-			config["data_labels"].append({'name': "SE histogram", 'ylab': 'Frequency', 'xlab': 'Read Lengths'})
+		read_code = read_keys[read]
 
-
-		# initlialize data structures and important variables
-		data_list = []
+		data = {}
 		invariant_dict = {}
-		html = ""
-		reads = []
+		button_list = []
+		first = True
+		notice_html = ""
 
-		# iterates of all types of read data available (R1, R2, & SE (sometimes))
-		for i in range(len(histograms)):
+		# iterates over all samples in input dictionary
+		for key in json.keys():
 
-			# creates new data dictionary for every sample. Dictionary contains data points
-			#	in following format: {x: y}.
-			data = {}
+			# if read length histogram has one value (ie. all samples have a uniform length),
+			#	this data is added to a secondary table as to avoid ugly line graphs.
+			if len(json[key][read]) == 1:
 
-			# iterates over all samples in input dictionary
-			for key in json.keys():
-
-				# if read length histogram has one value (ie. all samples have a uniform length),
-				#	this data is added to a secondary table as to avoid ugly line graphs.
-				if len(json[key][histograms[i]]) == 1:
-
-					# format read name for dictionary
-					read_name = "St_" + histograms[i].split("_")[1] + "_Length"
+				# format read name for dictionary
+				read_length_col = "St_" + read_code  + "_Length"
+				read_count_col = "St_" + read_code  + "_Reads"
 
 					# try appending dictionary, if key doesn't exist, create the instance.
-					try:
-						invariant_dict[key][read_name] = json[key][histograms[i]][0][0]
+				try:
+					invariant_dict[key][read_length_col] = json[key][read][0][0]
+					invariant_dict[key][read_count_col] = json[key][read][0][1]
 
-					except:
-						invariant_dict[key] = {}
-						invariant_dict[key][read_name] = json[key][histograms[i]][0][0]
+				except:
+					invariant_dict[key] = {}
+					invariant_dict[key][read_length_col] = json[key][read][0][0]
+					invariant_dict[key][read_count_col] = json[key][read][0][1]
 
-				# executes of more than one data points are found.
+			# executes of more than one data points are found.
+			else:
+
+				data[key] = {}
+				
+				max_reads = int(math.ceil(max([item[0] for item in json[key][read]]) / 10.0)) * 10
+
+				current = 0
+				bins = []
+				values = []
+
+				while current <= max_reads:
+					bins.append(current)
+					values.append(0)
+					current += 10
+
+				# populate smaple dictionary with read length and its frequency
+				for item in json[key][read]:
+
+					for x in range(1, len(bins)):
+
+						if item[0] <= bins[x]:
+							values[x - 1] += item[1]
+							break 
+
+				
+				data[key] = {"bins": bins,
+							 "vals": values}
+
+				if first == True:
+					active = "active" # button is default active
+					first = False # shuts off first gat
+
 				else:
-
-					data[key] = {}
-
-					# sums the total number of reads 
-					if histograms[i] == "SE histogram":
-						total = json[key]["St_SE_in"]
-					else:
-						total = json[key]["St_PE_in"]
-					
-					# populate smaple dictionary with read length and its frequency
-					for item in json[key][histograms[i]]:
-						data[key][item[0]] = item[1] / total
+					active = "" # button is default off 
 
 
-			# if samples are in read data, append to dataset list for multiple graphs
-			if len(data.keys()) != 0:
-				data_list.append(data)
+				# # html div attributes and text
+				pid  = "htstream_stats_" + read + "_" + key + "_btn"
+
+				button_list.append('''<button class="btn btn-default btn-sm {a}" onclick="htstream_histogram('{r}', '{s}')" id="{p}">{s}</button>\n'''.format(a=active, r=read, s=key, p=pid))
 
 
 		# if samples with uniform read length are present
 		if len(invariant_dict.keys()) != 0:
+
 
 			# notice
 			notice = 'Samples with uniform read lengths identified (displayed below). <br />'
@@ -345,28 +348,21 @@ class Stats():
 			headers = OrderedDict()
 			table_config = {'table_title': "Length of Uniform Reads"}
 
-			# iterates samples and through possible reads, checks for presenc in dictionary
-			for key  in invariant_dict.keys():
-
-				for read_type in reads:
-
-					#	assigns NA value if not present
-					if invariant_dict[key].get(read_type, "ERROR") == 'ERROR':
-						invariant_dict[key][read_type] = "NA"
 
 			# instantiates table columns
-			headers["St_R1_Length"] = {'title': "Read 1 Length", 'namespace': "Read 1 Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Greens' }
-			headers["St_R2_Length"] = {'title': "Read 2 Length", 'namespace': "Read 2 Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Oranges' }
-			headers["St_SE_Length"] = {'title': "Single End Length", 'namespace': "Single End Length", 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Blues' }
+			headers["St_{r}_Length".format(r = read_code)] = {'title': "Read Length ({r})".format(r = read_code), 
+									   						  'namespace': "Read Length ({r})".format(r = read_code), 
+									  						  'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Greens' }
+			headers["St_{r}_Reads".format(r = read_code)] = {'title': "Read Count ({r})".format(r = read_code), 
+															 'namespace': "Read Count ({r})".format(r = read_code),
+															 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Purples' }
 			
 			# add to output html
-			html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
-			html += table.plot(invariant_dict, headers, table_config)	
-			
+			notice_html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
+			notice_html += table.plot(invariant_dict, headers, table_config)	
 
-		# if data present for line graphs, make graphs
-		if len(data_list) != 0:
-			html += linegraph.plot(data_list, config)
+
+		html = htstream_utils.stats_histogram_html(read, data, button_list, notice_html)
 
 		return html
 
@@ -405,15 +401,17 @@ class Stats():
 
 		# output dictionary, keys are section, value is function called for figure generation
 		section = {
-				   "Density Plots": self.linegraph(stats_json, SE_presence), 
+				   "Read Length Histogram (Read 1)": self.histogram(stats_json, "St_R1_histogram"), 
 				   "Base by Cycle (Read 1)": self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle"),
 				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle"),
+				   "Read Length Histogram (Read 2)": self.histogram(stats_json, "St_R2_histogram"), 
 				   "Base by Cycle (Read 2)": self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle"),
 				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
 				   }
 
 		# only executres if single read data is detected
 		if SE_presence == True:
+			section["Read Length Histogram (Single End)"] = self.histogram(stats_json, "St_SE_histogram")
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle")
 			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle")
 

@@ -71,7 +71,7 @@ class NTrimmer():
 		for key in json.keys():
 
 			# number ofreads discarded
-			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["Read1"]["discarded"] + json[key]["Paired_end"]["Read2"]["discarded"]  
+			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"] 
 			
 			# number of trimmed reads by side
 			lefttrimmed_bps = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]

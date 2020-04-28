@@ -115,9 +115,9 @@ class Overlapper():
 
 		for key in json.keys():
 
-			sins = json[key]["Fragment"]["short_inserts"]
-			mins = json[key]["Fragment"]["medium_inserts"]
-			lins = json[key]["Fragment"]["long_inserts"]
+			sins = json[key]["Fragment"]["inserts"]["short"]
+			mins = json[key]["Fragment"]["inserts"]["medium"]
+			lins = json[key]["Fragment"]["inserts"]["long"]
 
 			overlapped_sum = (sins + mins + lins)
 
@@ -144,7 +144,7 @@ class Overlapper():
 							   "Ov_Sins": sins,
 							   "Ov_Mins": mins,
 							   "Ov_Lins": lins,
-							   "Ov_Histogram": json[key]["Fragment"]["readlength_histogram"]
+							   "Ov_Histogram": json[key]["Fragment"]["overlap_histogram"]
 							  }
 
 			# accumulator accumlating

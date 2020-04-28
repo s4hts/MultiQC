@@ -1,3 +1,5 @@
+import json 
+
 #################################################
 
 """ Utilities for HTStream submodule """
@@ -121,5 +123,42 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 	final_html = wrapper_html 
 
 	return final_html 
+
+
+#######################################
+
+# Quality by Base html formatter
+
+def stats_histogram_html(read, data, button_list, notice):
+
+
+	header_dict = {"R1": "Read 1",
+				   "R2": "Read 2",
+				   "SE": "Single End"}
+
+
+	read_header = header_dict[" ".join(read.split("_")[1:2])]
+
+
+	html = '<h4> Read Length Histogram: ' + read_header + '</h4>'
+
+	if data != {}:
+
+		html += '<div class="btn-group hc_switch_group">\n'
+
+		for buttons in button_list:
+			html += buttons
+
+		html += '</div>\n\n<br></br>\n\n'
+
+
+
+		html += '''<div id="htstream_histogram_{r}"></div>'''.format(r = read)
+		html += ''''<script type="text/javascript" class="htstream_histogram_content_{r}">{d}</script>'''.format(r = read, d = json.dumps(data).replace("\'", "\"")) 
+
+	html += notice
+
+	return html
+
 
 
