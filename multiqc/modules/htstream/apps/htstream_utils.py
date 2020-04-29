@@ -45,7 +45,7 @@ def sample_status(samples):
 				  }
 
 	# wrapper divs
-	html = '<div class="hts_status_header">Sample Checks:</div>'
+	html = '<div class="hts_status_header">Sample Checks: </div>'
 	html += '<div style="display: inline-block;">\n'
 
 	# initilize important variables
@@ -140,21 +140,22 @@ def stats_histogram_html(read, data, button_list, notice):
 	read_header = header_dict[" ".join(read.split("_")[1:2])]
 
 
-	html = '<h4> Read Length Histogram: ' + read_header + '</h4>'
+	html = '<h4>Read Length Histogram: '+ read_header + '</h4>'
 
 	if data != {}:
 
+		html += '''<div class="mqc_hcplot_plotgroup">'''
 		html += '<div class="btn-group hc_switch_group">\n'
 
 		for buttons in button_list:
 			html += buttons
 
-		html += '</div>\n\n<br></br>\n\n'
+		html += '</div>\n\n'
 
+		data = "["+ json.dumps(data) +"]"
 
-
-		html += '''<div id="htstream_histogram_{r}"></div>'''.format(r = read)
-		html += ''''<script type="text/javascript" class="htstream_histogram_content_{r}">{d}</script>'''.format(r = read, d = json.dumps(data).replace("\'", "\"")) 
+		html += '''<div id="htstream_histogram_{r}" class="hc-plot"></div></div>'''.format(r = read)
+		html += '''<script type="text/javascript" class="htstream_histogram_content_{r}">{d}</script>'''.format(r = read, d = data) 
 
 	html += notice
 

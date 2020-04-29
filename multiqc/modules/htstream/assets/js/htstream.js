@@ -14,7 +14,7 @@ function htstream_plot_switch(ele) {
 var plot_id = ele.id.split("_btn")[0];
 var read = plot_id.split("_").pop();
 
-if(plot_id.includes('htstream_qbc_line')) {
+if (plot_id.includes('htstream_qbc_line')) {
 
 	var on = document.getElementById(plot_id);
 	var off = document.getElementById("htstream_qbc_heat_" + read);
@@ -22,8 +22,6 @@ if(plot_id.includes('htstream_qbc_line')) {
 	off.style.display = 'none';
 
 } else {
-
-	console.log("htstream_qbc_line_" + read)
 
 	var on = document.getElementById(plot_id);
 	var off = document.getElementById("htstream_qbc_line_" + read);
@@ -34,5 +32,65 @@ if(plot_id.includes('htstream_qbc_line')) {
 	plot_graph(plot_div.id);
 
 }
+}
+
+
+function htstream_histogram(read, sample) {
+
+var text = document.getElementsByClassName("htstream_histogram_content_" + read)[0].innerText;
+var data = JSON.parse(text)[0];
+
+var container = "htstream_histogram_".concat(read);
+
+
+Highcharts.chart(container, {
+  chart: {
+    type: 'column'
+  },
+  title: {
+    text: sample
+  },
+  subtitle: {
+    text: ''
+  },
+  xAxis: {
+    categories: data[sample]["bins"],
+    crosshair: true,
+     title: {
+      text: 'Read Length'
+    }
+  },
+  yAxis: {
+    min: 0,
+    title: {
+      text: ''
+    }
+  },
+  tooltip: {
+    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+      '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+    footerFormat: '</table>',
+    shared: true,
+    useHTML: true
+  },
+  plotOptions: {
+    column: {
+      pointPadding: 0,
+      borderWidth: 0,
+      groupPadding: 0,
+      shadow: false
+    }
+  },
+  series: [{
+    name: 'Reads',
+    data: data[sample]["vals"]
+
+  }]
+});
 
 }
+
+$("document").ready(function() {
+   $('.active.hist_btn').trigger( "click" );
+});

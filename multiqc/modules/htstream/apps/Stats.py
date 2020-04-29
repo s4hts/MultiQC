@@ -231,13 +231,11 @@ class Stats():
 			#	heatmap function are simply to add the data to the internal jsons used by MultiQC.
 			if first == True:
 				active = "active" # button is default active
-				hidediv = "" # shows div
 				first = False # shuts off first gat
 				heatmap_html = heatmap.plot(data, x_lab, y_lab, heat_pconfig)
 
 			else:
 				active = "" # button is default off 
-				hidediv = 'style="display: none;"' # div is hidden
 				heatmap.plot(data, x_lab, y_lab, heat_pconfig)
 
 
@@ -334,12 +332,11 @@ class Stats():
 				# # html div attributes and text
 				pid  = "htstream_stats_" + read + "_" + key + "_btn"
 
-				button_list.append('''<button class="btn btn-default btn-sm {a}" onclick="htstream_histogram('{r}', '{s}')" id="{p}">{s}</button>\n'''.format(a=active, r=read, s=key, p=pid))
+				button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}\')" id="{p}">{s}</button>\n'.format(a=active, r=read, s=key, p=pid))
 
 
 		# if samples with uniform read length are present
 		if len(invariant_dict.keys()) != 0:
-
 
 			# notice
 			notice = 'Samples with uniform read lengths identified (displayed below). <br />'
