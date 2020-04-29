@@ -37,6 +37,13 @@ class OverviewStats():
 		return 	html
 
 
+	def hts_mds(self, json):
+
+		html = ""
+		
+		return html
+
+
 	def execute(self, json, app_list):
 
 			html = self.table(json, app_list)
