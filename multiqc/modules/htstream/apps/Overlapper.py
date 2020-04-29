@@ -87,15 +87,12 @@ class Overlapper():
 			data[key] = {}
 
 			# line graph config dictionary
-			config_subdict = {'name': key, 'ylab': 'Frequency', 'xlab': 'Overlapping Read Lengths'}	
-
-			# calculate totals for frequency histogran
-			total = sum([ count[1] for count in json[key]["Ov_Histogram"] ])
+			config_subdict = {'name': key, 'ylab': 'Counts', 'xlab': 'Overlapping Read Lengths'}	
 
 			# iterates over ever value in histogram and adds it to line graph
 			for item in json[key]["Ov_Histogram"]:
 
-				data[key][item[0]] = item[1] / total
+				data[key][item[0]] = item[1]
 
 
 			# appends data set to data list and config dictionary to data labels section of line graph config
