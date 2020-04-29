@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import logging
+from sklearn import manifold
 import numpy as np
 
 from . import htstream_utils
@@ -62,15 +63,15 @@ class OverviewStats():
 						 sample["Read_Breakdown"]["Single_end"]]
 			
 
-		data = htstream_utils.htstream_mds(data)
+		data = manifold.MDS(n_components=2).fit(data).embedding_
 
 		for x in range(length_keys):
 
 			mds_plot[keys[x]] = {"x": data[x,0] // 100000000,
 								 "y": data[x,1] // 100000000}
 
-		html = "<br></br>"
-	
+
+		html = "<hr><h4>  Random Data MDS Plot </h4>\n"
 		html += scatter.plot(mds_plot, config)
 		
 		return html

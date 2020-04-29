@@ -1,6 +1,4 @@
 import json
-from sklearn import manifold
-import numpy as np
 
 #################################################
 
@@ -164,15 +162,6 @@ def stats_histogram_html(read, data, button_list, notice):
 	return html
 
 
-#######################################
-
-# Quality by Base html formatter
-
-def htstream_mds(data):
-
-	data = manifold.MDS(n_components=2).fit(data).embedding_
-
-	return data
 
 
 

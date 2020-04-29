@@ -41,6 +41,7 @@ var text = document.getElementsByClassName("htstream_histogram_content_" + read)
 var data = JSON.parse(text)[0];
 
 var container = "htstream_histogram_".concat(read);
+var title = "Read Length Histogram: ".concat(sample);
 
 
 Highcharts.chart(container, {
@@ -48,7 +49,7 @@ Highcharts.chart(container, {
     type: 'column'
   },
   title: {
-    text: sample
+    text: title
   },
   subtitle: {
     text: ''
