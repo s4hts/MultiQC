@@ -162,6 +162,19 @@ class MultiqcModule(BaseMultiqcModule):
 
 				if app == "hts_Stats":
 					frags_in = json[key][app][-1]["Fragment"]["in"]
+
+					self.overview_stats[key]["total_Q30"] = {"Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
+															 "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]}
+
+					self.overview_stats[key]["Read_Breakdown"] = {"Paired_end": json[key][app][-1]["Paired_end"]["in"]}
+
+					try:
+						self.overview_stats[key]["total_Q30"]["Single_end"] = json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
+						self.overview_stats[key]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
+
+					except:
+						pass
+
 				else:
 					frags_in = json[key][app]["Fragment"]["in"]
 

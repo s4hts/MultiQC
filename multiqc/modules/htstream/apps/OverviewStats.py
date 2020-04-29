@@ -1,8 +1,10 @@
 from collections import OrderedDict
-import logging, statistics
+import logging
+import numpy as np
 
+from . import htstream_utils
 from multiqc import config
-from multiqc.plots import table, linegraph
+from multiqc.plots import table, scatter
 
 class OverviewStats():
 
@@ -39,7 +41,37 @@ class OverviewStats():
 
 	def hts_mds(self, json):
 
-		html = ""
+		mds_plot = {}
+
+		config = {'title': "HTStream: MDS Plot"}
+
+		keys = list(json.keys())
+		length_keys = len(json.keys())
+
+		data = np.zeros((length_keys, 5))
+
+
+		for x in range(length_keys):
+
+			sample = json[keys[x]]
+
+			data[x,:] = [sample["total_Q30"]["Read1"],
+						 sample["total_Q30"]["Read2"],
+						  sample["total_Q30"]["Single_end"],
+						 sample["Read_Breakdown"]["Paired_end"],
+						 sample["Read_Breakdown"]["Single_end"]]
+			
+
+		data = htstream_utils.htstream_mds(data)
+
+		for x in range(length_keys):
+
+			mds_plot[keys[x]] = {"x": data[x,0] // 100000000,
+								 "y": data[x,1] // 100000000}
+
+		html = "<br></br>"
+	
+		html += scatter.plot(mds_plot, config)
 		
 		return html
 
@@ -47,6 +79,7 @@ class OverviewStats():
 	def execute(self, json, app_list):
 
 			html = self.table(json, app_list)
+			html += self.hts_mds(json)
 		
 			return html
 
