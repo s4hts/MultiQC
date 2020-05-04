@@ -64,7 +64,7 @@ class Overlapper():
 							 }
 		categories['Ov_Lins'] = {
 							  'name': 'Long Inserts',
-							  'color': '#C797C6'
+							  'color': '#D1ADC3'
 							 }
 
 		return bargraph.plot(json, categories, config)

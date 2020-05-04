@@ -76,8 +76,8 @@ Highcharts.chart(container, {
   plotOptions: {
     column: {
       pointPadding: 0,
-      borderWidth: 0,
-      groupPadding: 0,
+      borderWidth: 0.10,
+      groupPadding: 0.10,
       shadow: false
     }
   },
