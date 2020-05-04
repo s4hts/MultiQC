@@ -305,7 +305,7 @@ class Stats():
 
 				while current <= max_reads:
 					bins.append(current)
-					values.append(0)
+					values.append(1) # pseudo count
 					current += 10
 
 				# populate smaple dictionary with read length and its frequency
@@ -317,7 +317,8 @@ class Stats():
 							values[x - 1] += item[1]
 							break 
 
-				
+				values = list(map(math.log10, values))
+
 				data[key] = {"bins": bins,
 							 "vals": values}
 

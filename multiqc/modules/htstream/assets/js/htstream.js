@@ -22,12 +22,10 @@ if (plot_id.includes('htstream_qbc_line')) {
 	off.style.display = 'none';
 
 } else {
-
 	var on = document.getElementById(plot_id);
 	var off = document.getElementById("htstream_qbc_line_" + read);
 	on.style.display = 'block';
 	off.style.display = 'none';
-
 	var plot_div = on.querySelector('.hc-plot');
 	plot_graph(plot_div.id);
 
@@ -70,7 +68,7 @@ Highcharts.chart(container, {
   tooltip: {
     headerFormat: '<span style="font-size:12px">{point.key} bp</span><table>',
     pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-      '<td style="padding:0"><b>{point.y:.0f}</b></td></tr>',
+      '<td style="padding:0"><b>{point.y:.3f}</b></td></tr>',
     footerFormat: '</table>',
     shared: true,
     useHTML: true
@@ -84,7 +82,7 @@ Highcharts.chart(container, {
     }
   },
   series: [{
-    name: 'Reads',
+    name: 'log10 Reads',
     data: data[sample]["vals"]
 
   }]
@@ -95,3 +93,6 @@ Highcharts.chart(container, {
 $("document").ready(function() {
    $('.active.hist_btn').trigger( "click" );
 });
+
+
+

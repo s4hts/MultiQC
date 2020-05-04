@@ -3,19 +3,32 @@
 
 /* Header Divs */
 .hts_status_header {
-display: inline-block;
-margin-right: 10px;
-font-weight: bold;
-font-size: 16px;
-transform: translate(1px, 2px);"
+	display: inline-block;
+	margin-right: 10px;
+	font-weight: bold;
+	font-size: 16px;
+	transform: translate(1px, 2px);
 }
 
 /* Status Divs */
 .htstream_status {
-font-size: 11px;
-border: solid 0.5px #7B7B7B;
-padding: 5px;
-background-color: white;
-display: inline-block;
+	font-size: 11px;
+	border: solid 0.5px #7B7B7B;
+	padding: 5px;
+	background-color: white;
+	display: inline-block;
 }
-</style>
+
+.htstream_fadein {
+	animation: fadeIn 0.75s;
+}
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+	}
+
+	to {
+		opacity: 1;
+	}
+}

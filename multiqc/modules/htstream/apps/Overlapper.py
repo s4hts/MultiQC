@@ -56,15 +56,15 @@ class Overlapper():
 
 		categories['Ov_Sins'] = {
 							  'name': 'Short Inserts',
-							  'color': '#4d8de4'
+							  'color': '#779BCC'
 							 }
 		categories['Ov_Mins'] = {
 							  'name': 'Medium Inserts',
-							  'color': '#e57433'
+							  'color': '#C3C3C3'
 							 }
 		categories['Ov_Lins'] = {
 							  'name': 'Long Inserts',
-							  'color': '#33a02c'
+							  'color': '#C797C6'
 							 }
 
 		return bargraph.plot(json, categories, config)

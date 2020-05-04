@@ -104,7 +104,7 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
-	wrapper_html += '<div id="htstream_qbc_line_{r}">'.format(r=btn_id)
+	wrapper_html += '<div id="htstream_qbc_line_{r}" class="htstream_fadein">'.format(r=btn_id)
 	wrapper_html += line_plot + "</div>"
 
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
@@ -117,7 +117,7 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 	heatmap_html += heatmap
 
 	# heatmap div
-	wrapper_html += '<div id="htstream_qbc_heat_{r}" style="display:none;">'.format(r=btn_id)
+	wrapper_html += '<div id="htstream_qbc_heat_{r}" class="htstream_fadein" style="display:none;">'.format(r=btn_id)
 	wrapper_html += heatmap_html + "</div>"
 
 	final_html = wrapper_html 
