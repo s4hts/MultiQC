@@ -299,11 +299,11 @@ class Stats():
 				
 				max_reads = int(math.ceil(max([item[0] for item in json[key][read]]) / 10.0)) * 10
 
-				current = 0
+				current = 10
 				bins = []
 				values = []
 
-				while current <= max_reads:
+				while current < max_reads:
 					bins.append(current)
 					values.append(1) # pseudo count
 					current += 10
@@ -311,10 +311,10 @@ class Stats():
 				# populate smaple dictionary with read length and its frequency
 				for item in json[key][read]:
 
-					for x in range(1, len(bins)):
+					for x in range(len(bins) - 1, -1, -1):
 
-						if item[0] <= bins[x]:
-							values[x - 1] += item[1]
+						if item[0] >= bins[x]:
+							values[x] += item[1]
 							break 
 
 				values = list(map(math.log10, values))
