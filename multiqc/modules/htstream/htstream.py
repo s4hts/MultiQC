@@ -135,23 +135,21 @@ class MultiqcModule(BaseMultiqcModule):
 		if "hts_Stats" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
 
-		temp = []
-		for app in app_order:
-			program = app.split("hts_")[-1]
 
-			if program not in self.programs.keys():
-				log.warning(app + " is currently not supported by MultiQC: HTStrean.")
-			else:
-				temp.append(app)
-
-		app_order = temp
-
-
-		overview_order = app_order
+	
+		excludes = []
+		stats_wrapper = False
 
 		for i in range(len(app_order)):
 
 			app = app_order[i]
+
+			program = app.split("hts_")[-1]
+			if program not in self.programs.keys():
+				log.warning(app + " is currently not supported by MultiQC: HTStrean.")
+				excludes.append(app)
+				continue
+
 			
 			# creat stat specific dictionary, each entry will be a sample
 
@@ -166,15 +164,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 					if len(json[key][app]) == 2:
 
-
-						# create logical order for general overview table
-						overview_order = ["Pipeline Input"]
-						for a in app_order:
-
-							if a != "hts_Stats":
-								overview_order.append(a)
-
-						overview_order.append(app)
+						stats_wrapper = True
 
 						self.overview_stats[key]["Pipeline Input"] = {
 															 "InputFragments": json[key][app][0]["Fragment"]["in"],
@@ -259,6 +249,23 @@ class MultiqcModule(BaseMultiqcModule):
 
 						self.report_sections[app] = {'description': description,
 													 'html': html}
+
+
+		# create logical order for general overview table
+
+		if stats_wrapper == True:
+
+			overview_order = ["Pipeline Input"]
+			for a in app_order:
+				if a != "hts_Stats" and a not in excludes:
+					overview_order.append(a)
+
+			overview_order.append("hts_Stats")
+
+		else:
+			for a in app_order:
+				if a not in excludes:
+					overview_order.append(a)
 
 
 		# add pipeline overview 
