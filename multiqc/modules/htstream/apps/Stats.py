@@ -15,8 +15,10 @@ class Stats():
 
 	def base_by_cycle(self, json, read):
 
+		title_read = " ".join(read.split("_")[1:3])
+
 		# config dictionary for line graph
-		config = {'title': "HTStream: Base by Cycle",
+		config = {'title': "HTStream: Base by Cycle (" + title_read + ")",
 				  'data_labels': [],
 				  'smooth_points_sumcounts': False,
 				  'yCeiling': 100,
@@ -124,12 +126,13 @@ class Stats():
 		#	back and forth between figure typs. There are workarounds, however, using
 		#	javascript and some clever organizations of javascript.
 
+		title_read = " ".join(read.split("_")[1:3])
 
 		# config dictionary for mean Q score line graph
 		line_config = {
 				  'smooth_points_sumcounts': False,
 				  'categories': True,
-				  'title': "HTStream: Mean Quality by Cycle",
+				  'title': "HTStream: Mean Quality by Cycle (" + title_read + ")",
 				  'xlab': "Cycle",
 				  'ylab': "Mean Q Score"
 				  }
@@ -297,7 +300,7 @@ class Stats():
 
 				data[key] = {}
 				
-				max_reads = int(math.ceil(max([item[0] for item in json[key][read]]) / 10.0)) * 10
+				max_reads = max([item[0] for item in json[key][read]]) + 1
 
 				current = 10
 				bins = []
@@ -306,14 +309,14 @@ class Stats():
 				while current < max_reads:
 					bins.append(current)
 					values.append(1) # pseudo count
-					current += 10
+					current += 1
 
 				# populate smaple dictionary with read length and its frequency
 				for item in json[key][read]:
 
 					for x in range(len(bins) - 1, -1, -1):
 
-						if item[0] >= bins[x]:
+						if item[0] == bins[x]:
 							values[x] += item[1]
 							break 
 

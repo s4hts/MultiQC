@@ -40,25 +40,49 @@ class NTrimmer():
 	def bargraph(self, json, bps):
 
 		# config dict for bar graph
-		config = {"title": "HTStream: Trimmed Basepairs Bargraph",
+		config = {
+				  "title": "HTStream: Trimmed Basepairs Bargraph",
 				  'id': "htstream_ntrimmer_bargraph",
-				  'ylab' : "Samples"
+				  'ylab' : "Samples",
+				  'cpswitch_c_active': False,
+				  'data_labels': [{'name': "Read 1"},
+       							 {'name': "Read 2"},
+       							 {'name': "Single End"}]
 				  }
 
 		html = ""
+
+		r1_data = {}
+		r2_data = {}
+		se_data = {}
+
+		for key in json:
+
+			r1_data[key] = {"LT_R1": json[key]["Nt_Left_Trimmed_R1"],
+						    "RT_R1": json[key]["Nt_Right_Trimmed_R1"]}
+
+			r2_data[key] = {"LT_R2": json[key]["Nt_Left_Trimmed_R2"],
+						    "RT_R2": json[key]["Nt_Right_Trimmed_R2"]}
+
+			se_data[key] = {"LT_SE": json[key]["Nt_Left_Trimmed_SE"],
+						    "RT_SE": json[key]["Nt_Right_Trimmed_SE"]}
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:
 			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
 			return html
 
-		# Bar graph constructor. See MultiQC docs.
-		categories  = OrderedDict()
 
-		categories["Nt_Left_Trimmed_bps"] = {'name': 'Left Trimmed Basepairs'}
-		categories["Nt_Right_Trimmed_bps"] = {'name': 'Right Trimmed Basepairs'}
+		cats = [OrderedDict(), OrderedDict(), OrderedDict()]
+		cats[0]["LT_R1"] =   {'name': 'Left Trimmmed'}
+		cats[0]["RT_R1"] =  {'name': 'Right Trimmmed'}
+		cats[1]["LT_R2"] =   {'name': 'Left Trimmmed'}
+		cats[1]["RT_R2"] =  {'name': 'Right Trimmmed'}
+		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
+		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
-		return bargraph.plot(json, categories, config)
+
+		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 
 	def execute(self, json):
@@ -71,7 +95,7 @@ class NTrimmer():
 		for key in json.keys():
 
 			# number ofreads discarded
-			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"] 
+			discarded_bps = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"] 
 			
 			# number of trimmed reads by side
 			lefttrimmed_bps = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
@@ -85,10 +109,14 @@ class NTrimmer():
 			 				   "Nt_Reads_in": json[key]["Fragment"]["in"],
 							   "Nt_Reads_out": json[key]["Fragment"]["out"],
 							   "Nt_Avg_BP_Trimmed": sample_trimmed_bps / json[key]["Fragment"]["in"],
-							   "Nt_%_Discarded" : (discarded_reads / json[key]["Fragment"]["in"]) * 100,
+							   "Nt_%_Discarded" : (discarded_bps / json[key]["Fragment"]["in"]) * 100,
 							   "Nt_Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Nt_Left_Trimmed_bps": lefttrimmed_bps,
-							   "Nt_Right_Trimmed_bps": rightrimmed_bps,
+							   "Nt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
+							   "Nt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
+							   "Nt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
+							   "Nt_Right_Trimmed_R2": json[key]["Paired_end"]["Read2"]["rightTrim"],
+							   "Nt_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
+							   "Nt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"]
 							  }
 
 			trimmed_bps += sample_trimmed_bps 

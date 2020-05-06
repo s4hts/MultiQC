@@ -18,8 +18,8 @@ class SuperDeduper():
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
-		headers["Sd_PE_in"] = {'title': "PE in", 'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Sd_PE_out"] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Sd_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+								 'max': 100, 'suffix': '%', 'scale': 'Greens' }
 		headers["Sd_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["Sd_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Sd_%_Duplicates"] = {'title': "% Duplicates", 
@@ -41,7 +41,7 @@ class SuperDeduper():
 
 		# plot configurations, list of options in MultiQC docs
 		config = {'title': "HTStream: Duplicate Saturation",
-				  'xlab': "Total Reads", 'ylab': "Duplicates",
+				  'xlab': "Total Reads", 'ylab': "Total Reads - Duplicates",
 				  'extra_series': []}
 
 		# initialize data structures and variabe;s 
@@ -64,7 +64,7 @@ class SuperDeduper():
 
 				for item in json[key]["Sd_Saturation"]:
 
-					data[key][item[0]] = item[1] 
+					data[key][item[0]] = item[0] - item[1] 
 
 
 		# checks for any invariant samples and creates an alert div and table to  hold the data.
@@ -75,7 +75,7 @@ class SuperDeduper():
 			# table
 			headers = OrderedDict()
 			headers["Sd_Total_Reads"] = {'title': "Total Reads", 'namespace': "Total Reads", 'description': 'Number of Total Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-			headers["Sd_Duplicates"] = {'title': "Duplicates", 'namespace': "Duplicates", 'description': 'Number of Duplicates', 'format': '{:,.0f}', 'scale': 'RdPu'}
+			headers["Sd_Duplicates"] = {'title': "Total Reads - Duplicates", 'namespace': "Duplicates", 'description': 'Number of Duplicates', 'format': '{:,.0f}', 'scale': 'RdPu'}
 			
 			# add to output html
 			html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -97,15 +97,16 @@ class SuperDeduper():
 
 			# number of duplicates reletive to input reads 
 			perc_duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
+			perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
 
 			# sample instance in ordered dict
 			stats_json[key] = {
-			 				   "Sd_PE_in": json[key]["Paired_end"]["in"],
-							   "Sd_PE_out": json[key]["Paired_end"]["out"],
+			 				   "Sd_PE_loss": perc_loss,
 							   "Sd_SE_in": json[key]["Single_end"]["in"],
 							   "Sd_SE_out": json[key]["Single_end"]["out"],
 							   "Sd_%_Duplicates": perc_duplicates,
 							   "Sd_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Sd_Duplicates": json[key]["Fragment"]["duplicate"],
 							   "Sd_Saturation": json[key]["Fragment"]["duplicate_saturation"]
 						 	  }
 

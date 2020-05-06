@@ -20,14 +20,25 @@ class OverviewStats():
 
 		html = '<h4>  Input Fragment Reduction </h4>'
 
+		for key in json.keys():
+
+			temp = {}
+
+			for app in app_list:
+
+				temp[app] = json[key][app]["InputFragments"]
+
+			json[key] = temp
+
+
 		for i in range(len(app_list)):
 
 			app = app_list[i]
-			header_title = app + "_InputFragments"
+
 			description = "Number of Input Fragments for " + app
 			color = color_rotations[i % 4]
 
-			headers[header_title] = {'title': app, 'namespace': app, 'description': description, 'format': '{:,.0f}', 'scale': color}
+			headers[app] = {'title': app, 'namespace': app, 'description': description, 'format': '{:,.0f}', 'scale': color}
 
 
 		if len(headers.keys()) < 2:
@@ -80,7 +91,7 @@ class OverviewStats():
 	def execute(self, json, app_list):
 
 			html = self.table(json, app_list)
-			html += self.hts_mds(json)
+			#html += self.hts_mds(json)
 		
 			return html
 

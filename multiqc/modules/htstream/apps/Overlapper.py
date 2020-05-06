@@ -22,8 +22,8 @@ class Overlapper():
 		# straight forward table construction.
 		headers = OrderedDict()
 
-		headers["Ov_PE_in"] = {'title': "PE in", 'namespace': "PE in",'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Ov_PE_out"] = {'title': "PE out", 'namespace': "PE out",'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Ov_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+								 'max': 100, 'suffix': '%', 'scale': 'Greens' }
 		headers["Ov_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["Ov_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Ov_%_Overlapped"] = {'title': "% Overlapped", 
@@ -44,7 +44,8 @@ class Overlapper():
 		# configuration dictionary for bar graph
 		config = {'title': "HTStream: Overlap Composition Bargraph",
 				  'id': "htstream_overlapper_bargraph",
-				  'ylab' : "Samples"}
+				  'ylab' : "Samples",
+				  'cpswitch_c_active': False}
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
@@ -74,33 +75,25 @@ class Overlapper():
 	def linegraph(self, json):
 
 		# config dictionary for "density" plots. Its a work in progress. 
-		config = {'title': "HTStream: Overlapped Lengths Density Plots",
-				  'data_labels': []}
+		config = {'title': "HTStream: Overlapped Lengths",
+				  'ylab': "Counts", "xlab": "Overlap Lengths"}
 
 		# initialize data structures
-		data_list = [] 
+		multi_line = {}
 
 		for key in json.keys():
 
 			# creates empty dictionary to hold data for line graph. 
-			data = {}
-			data[key] = {}
-
-			# line graph config dictionary
-			config_subdict = {'name': key, 'ylab': 'Counts', 'xlab': 'Overlapping Read Lengths'}	
+			multi_line[key] = {}
 
 			# iterates over ever value in histogram and adds it to line graph
 			for item in json[key]["Ov_Histogram"]:
 
-				data[key][item[0]] = item[1]
+				multi_line[key][item[0]] = item[1]
 
 
-			# appends data set to data list and config dictionary to data labels section of line graph config
-			data_list.append(data)
-			config['data_labels'].append(config_subdict)
 
-
-		return linegraph.plot(data_list, config)
+		return linegraph.plot(multi_line, config)
 
 
 	def execute(self, json):
@@ -129,11 +122,10 @@ class Overlapper():
 
 			# the INFAMOUS percent overlapped 
 			perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
+			perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]) * 100
 				
 			# sample instance in dictionary
-			stats_json[key] = {
-			 			 	   "Ov_PE_in": json[key]["Paired_end"]["in"],
-							   "Ov_PE_out": json[key]["Paired_end"]["out"],
+			stats_json[key] = {"Ov_PE_loss": perc_loss,
 							   "Ov_SE_in" : json[key]["Single_end"]["in"],
 							   "Ov_SE_out": json[key]["Single_end"]["out"],
 							   "Ov_%_Overlapped": perc_overlapped,

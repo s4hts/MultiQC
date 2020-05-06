@@ -29,26 +29,52 @@ class QWindowTrim():
 
 
 
-	def bargraph(self, json, bp):
+	def bargraph(self, json, bps):
 
-		# config dictionary for bar graph
-		config = {'title': "HTStream: Trimmed Basepairs Bargraph",
+		# config dict for bar graph
+		config = {
+				  "title": "HTStream: Trimmed Basepairs Bargraph",
 				  'id': "htstream_qwindowtrimmer_bargraph",
-				  'ylab' : "Samples"}
+				  'ylab' : "Samples",
+				  'cpswitch_c_active': False,
+				  'data_labels': [{'name': "Read 1"},
+       							 {'name': "Read 2"},
+       							 {'name': "Single End"}]
+				  }
 
-		# returns nothing if no basepairs were trimmed.
-		if bp == 0:
+		html = ""
+
+		r1_data = {}
+		r2_data = {}
+		se_data = {}
+
+		for key in json:
+
+			r1_data[key] = {"LT_R1": json[key]["Qt_Left_Trimmed_R1"],
+						    "RT_R1": json[key]["Qt_Right_Trimmed_R1"]}
+
+			r2_data[key] = {"LT_R2": json[key]["Qt_Left_Trimmed_R2"],
+						    "RT_R2": json[key]["Qt_Right_Trimmed_R2"]}
+
+			se_data[key] = {"LT_SE": json[key]["Qt_Left_Trimmed_SE"],
+						    "RT_SE": json[key]["Qt_Right_Trimmed_SE"]}
+
+		# returns nothing if no reads were trimmed.
+		if bps == 0:
 			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
 			return html
 
-		# standard bar graph construction. See MultiQC docs.
-		categories  = OrderedDict()
 
-		categories["Qt_Left_Trimmed_Basepairs"] = {'name': 'Left Trimmed Basepairs'}
-		categories["Qt_Right_Trimmed_Basepairs"] = {'name': 'Right Trimmed Basepairs'}
+		cats = [OrderedDict(), OrderedDict(), OrderedDict()]
+		cats[0]["LT_R1"] =   {'name': 'Left Trimmmed'}
+		cats[0]["RT_R1"] =  {'name': 'Right Trimmmed'}
+		cats[1]["LT_R2"] =   {'name': 'Left Trimmmed'}
+		cats[1]["RT_R2"] =  {'name': 'Right Trimmmed'}
+		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
+		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
-		return bargraph.plot(json, categories, config)
 
+		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 
 	def execute(self, json):
@@ -75,8 +101,12 @@ class QWindowTrim():
 							   "Qt_SE_out": json[key]["Single_end"]["out"],
 							   "Qt_Avg_BP_Trimmed": trimmed_bp / json[key]["Fragment"]["in"],
 							   "Qt_Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Qt_Left_Trimmed_Basepairs": lefttrimmed_bp,
-							   "Qt_Right_Trimmed_Basepairs": rightrimmed_bp
+							   "Qt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
+							   "Qt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
+							   "Qt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
+							   "Qt_Right_Trimmed_R2": json[key]["Paired_end"]["Read2"]["rightTrim"],
+							   "Qt_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
+							   "Qt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"]
 						 	  }
 
 			# total basepairs accumlation 
@@ -90,4 +120,4 @@ class QWindowTrim():
 				   }
 
 		return section
-		
+	

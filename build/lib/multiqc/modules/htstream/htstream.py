@@ -82,26 +82,26 @@ class MultiqcModule(BaseMultiqcModule):
 						'CutTrim': {"app": CutTrim.CutTrim(),
 								    "description": "Trims a fixed number of bases from the 5' and/or 3' end of each read."},
 
+						'NTrimmer': {"app": NTrimmer.NTrimmer(),
+									 "description": "Trims reads to the longest subsequence that contains no Ns."},
+						
 						'Overlapper': {"app": Overlapper.Overlapper(),
 									   "description": "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."},
 
-						'QWindowTrim': {"app": QWindowTrim.QWindowTrim(),
-										"description": "Uses a sliding window approach to remove the low quality ends of reads."},
-
-						'NTrimmer': {"app": NTrimmer.NTrimmer(),
-									 "description": "Trims reads to the longest subsequence that contains no Ns."},
-
 						'PolyATTrim': {"app": PolyATTrim.PolyATTrim(),
 									   "description": "Attempts to trim poly-A and poly-T sequences from the end of reads."},
+
+						'Primers': {"app": Primers.Primers(),
+									"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
+
+						'QWindowTrim': {"app": QWindowTrim.QWindowTrim(),
+										"description": "Uses a sliding window approach to remove the low quality ends of reads."},
 
 						'SeqScreener': {"app": SeqScreener.SeqScreener(),
 										"description": "A simple sequence screening tool which uses a kmer lookup approach to identify reads from an unwanted source."},
 
 						'SuperDeduper': {"app": SuperDeduper.SuperDeduper(),
 										 "description": "A reference free duplicate read removal tool."},
-
-						'Primers': {"app": Primers.Primers(),
-									"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
 
 						'Stats': {"app": Stats.Stats(),
 								  "description": "Generates a JSON formatted file containing a set of statistical measures about the input read data."}
@@ -110,11 +110,12 @@ class MultiqcModule(BaseMultiqcModule):
 
 		self.report_sections = {}
 		self.overview_stats = {}
+		self.summary_stats = {}
+
 
 		# checks that order is consistent within stats files 
 		app_order = []	
 		stats_section = ""			
-
 		for key in json.keys():
 
 			# Initializes samples for overview stats
@@ -127,25 +128,26 @@ class MultiqcModule(BaseMultiqcModule):
 				app_order = list(json[key].keys())
 
 			else:
-				log.warning("Inconsistent order of HTStream applications.")
+				log.error("Inconsistent order of HTStream applications.")
 
 
-		order_list = []
-		stats_pos = ""
+		# scold people that don't read the documentation
+		if "hts_Stats" not in app_order:
+			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
 
-		for x in range(len(app_order)):
+		temp = []
+		for app in app_order:
+			program = app.split("hts_")[-1]
 
-			if app_order[x] == "hts_Stats":
-				stats_pos = x
+			if program not in self.programs.keys():
+				log.warning(app + " is currently not supported by MultiQC: HTStrean.")
 			else:
-				order_list.append(x)
+				temp.append(app)
+
+		app_order = temp
 
 
-		temp = [app_order[x] for x in order_list]
-
-		if stats_pos != "":
-			temp.append(app_order[stats_pos])
-			app_order = temp
+		overview_order = app_order
 
 		for i in range(len(app_order)):
 
@@ -158,28 +160,70 @@ class MultiqcModule(BaseMultiqcModule):
 			for key in json.keys():
 
 				stats_dict[key] = json[key][app]
+
 				
-
 				if app == "hts_Stats":
-					frags_in = json[key][app][-1]["Fragment"]["in"]
 
-					self.overview_stats[key]["total_Q30"] = {"Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
-															 "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]}
+					if len(json[key][app]) == 2:
 
-					self.overview_stats[key]["Read_Breakdown"] = {"Paired_end": json[key][app][-1]["Paired_end"]["in"]}
+
+						# create logical order for general overview table
+						overview_order = ["Pipeline Input"]
+						for a in app_order:
+
+							if a != "hts_Stats":
+								overview_order.append(a)
+
+						overview_order.append(app)
+
+						self.overview_stats[key]["Pipeline Input"] = {
+															 "InputFragments": json[key][app][0]["Fragment"]["in"],
+
+															 "total_Q30": 
+
+																{"Read1": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"],
+																 "Read2": json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"]},
+
+															 "Read_Breakdown":
+
+															 	{"Paired_end": json[key][app][0]["Paired_end"]["in"]}
+															}
+
+
+						try:
+							self.overview_stats[key]["Pipeline Input"]["total_Q30"]["Single_end"] = json[key][app][0]["Single_end"]["total_Q30_basepairs"]
+							self.overview_stats[key]["Pipeline Input"]["Read_Breakdown"]["Single_end"] = json[key][app][0]["Single_end"]["in"]
+
+						except:
+							pass
+
+
+					self.overview_stats[key][app] = {
+													 "InputFragments": json[key][app][-1]["Fragment"]["in"],
+
+													 "total_Q30": 
+
+														{"Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
+														 "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]},
+
+													 "Read_Breakdown":
+
+													 	{"Paired_end": json[key][app][-1]["Paired_end"]["in"]}
+													}
+
 
 					try:
-						self.overview_stats[key]["total_Q30"]["Single_end"] = json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
-						self.overview_stats[key]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
+						self.overview_stats[key][app]["total_Q30"]["Single_end"] = json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
+						self.overview_stats[key][app]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
 
 					except:
-						pass
+							pass
 
 				else:
-					frags_in = json[key][app]["Fragment"]["in"]
 
+					self.overview_stats[key][app] = {"InputFragments": json[key][app]["Fragment"]["in"]}
 
-				self.overview_stats[key][app + "_InputFragments"] = frags_in
+	
 					
 
 			# if data exists for app, execute app specific stats processing
@@ -207,24 +251,30 @@ class MultiqcModule(BaseMultiqcModule):
 					description = self.programs[app]["description"]
 
 					if app == "Stats":
-						app = "Summary Stats"
 
-					self.report_sections[app] = {'description': description,
-												 'html': html}
+						self.summary_stats = {'description': description,
+											  'html': html}
+
+					else:
+
+						self.report_sections[app] = {'description': description,
+													 'html': html}
 
 
+		# add pipeline overview 
 
 		if self.overview_stats != {}:
 
 			app = OverviewStats.OverviewStats()
 			description = "General statistics from the HTStream pipeline."
-			html = app.execute(self.overview_stats, app_order)
+			html = app.execute(self.overview_stats, overview_order)
 			
 			self.add_section(name = "Processing Overview",
 							 description = description,
 							 content = html) 
 
 
+		# add apps
 
 		for section, content in self.report_sections.items():
 
@@ -238,13 +288,19 @@ class MultiqcModule(BaseMultiqcModule):
 					msg = "Report Section for " + section + " Failed."
 					log.warning(msg)
 
-				# Possibly will be of use when more is known about what to include 
 
-				# self.add_section(name = 'HTStream',
-				# 				 anchor = section,
-				# 				 description = 'This plot shows some really nice data.',
-				# 				 helptext = 'This longer string (can be **markdown**) helps explain how to interpret the plot',
-				# 				 plot = plot
-				# 				 )
+		# add summary stats
+
+		if self.summary_stats != {}:
+
+			try:
+				self.add_section(name = "Summary Stats",
+								 description = self.summary_stats["description"],
+								 content = self.summary_stats["html"])
+
+
+			except:
+				msg = "Report Section for hts_Stats Failed."
+				log.warning(msg)
 
 
