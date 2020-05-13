@@ -12,9 +12,12 @@ from multiqc.plots import table, bargraph
 
 class AdapterTrimmer():
 
-	def table(self, json):
+	def table(self, json, total):
 
 		# Table constructor. Just like the MultiQC docs.
+
+		if total == 0:
+			return ""
 		
 		headers = OrderedDict()
 
@@ -32,7 +35,7 @@ class AdapterTrimmer():
 									'format': '{:,.2f}',
 									'scale': 'Blues'
 									}
-		headers["At_Avg_BP_Trimmed"] = {'title': "Avg. BP Trimmed", 'namespace': "Avg. BP Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["At_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["At_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
@@ -105,7 +108,7 @@ class AdapterTrimmer():
 							  }
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json),
+		section = {"Table": self.table(stats_json, total),
 				   "Bp Composition Bargraph": self.bargraph(stats_json, total)}
 
 

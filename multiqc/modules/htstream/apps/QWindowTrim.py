@@ -13,20 +13,35 @@ from multiqc.plots import table, bargraph
 class QWindowTrim():
 
 
-	def table(self, json):
+	def table(self, json, bps):
 
-		# Standard table constructor. See MultiQC docs.
+		# Table construction. Taken from MultiQC docs.
+
+		if bps == 0:
+			return ""
+
 		headers = OrderedDict()
 
-		headers["Qt_PE_in"] = {'title': "PE in", 'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Qt_PE_out"] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Qt_SE_in"] = {'title': "SE in", 'namespace': "SE in",'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Qt_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Qt_Avg_BP_Trimmed"] = {'title': "Avg. BP Trimmed", 'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Oranges'}
-		headers["Qt_Notes"] = {'title': "Avg. BP Trimmed", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Qt_%_BP_Lost"] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
+		headers["Qt_%_R1_BP_Lost"] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
+		headers["Qt_%_R2_BP_Lost"] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
+		headers["Qt_%_SE_BP_Lost"] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
+		headers["Qt_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bpss Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 
+										'format': '{:,.2f}', 'scale': 'Blues'}
+		headers["Qt_%_Discarded"] = {'title': "% Discarded",
+									 'namespace': "% Discarded",
+									 'description': 'Percentage of Reads (SE and PE) Discarded',
+									 'suffix': '%',
+									 'format': '{:,.2f}',
+									 'scale': 'Oranges'
+									}
+		headers["Qt_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
-
 
 
 	def bargraph(self, json, bps):
@@ -86,6 +101,34 @@ class QWindowTrim():
 
 		for key in json.keys():
 
+			total_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) 
+
+			if total_bp_lost == 0:
+				perc_bp_lost = 0
+				total_r1 = 0 
+				total_r2 = 0
+				total_se = 0 
+
+			else:
+				perc_bp_lost = ( (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"] ) * 100
+
+				try:
+					total_r1 = ( (json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]) / total_bp_lost ) * 100
+					total_r2 = ( (json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]) / total_bp_lost) * 100
+					left_pe_trimmed = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"]
+					right_pe_trimmed = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"]
+
+				except:
+					left_pe_trimmed = 0
+					right_pe_trimmed = 0
+					
+
+				try:
+					total_se = ( (json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]) / total_bp_lost ) * 100
+				except:
+					total_se = 0
+
+
 			# trimmed reads by side
 			lefttrimmed_bp = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
 			rightrimmed_bp = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
@@ -95,11 +138,11 @@ class QWindowTrim():
 
 			# sample dictionary entry
 			stats_json[key] = {
-			 				   "Qt_PE_in": json[key]["Paired_end"]["in"],
-							   "Qt_PE_out": json[key]["Paired_end"]["out"],
-							   "Qt_SE_in" : json[key]["Single_end"]["in"],
-							   "Qt_SE_out": json[key]["Single_end"]["out"],
-							   "Qt_Avg_BP_Trimmed": trimmed_bp / json[key]["Fragment"]["in"],
+							   "Qt_%_BP_Lost": perc_bp_lost,
+							   "Qt_%_R1_BP_Lost": total_r1,
+							   "Qt_%_R2_BP_Lost": total_r2,
+							   "Nt_%_SE_BP_Lost": total_se,
+							   "Qt_Avg_BP_Trimmed": total_bp_lost / json[key]["Fragment"]["in"],
 							   "Qt_Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Qt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
 							   "Qt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
@@ -115,7 +158,7 @@ class QWindowTrim():
 
 		# sections and figure function calls
 		section = {
-				   "Table": self.table(stats_json),
+				   "Table": self.table(stats_json, total_trimmed_bp),
 				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp)
 				   }
 

@@ -30,7 +30,7 @@ class NTrimmer():
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 		headers["Nt_%_SE_BP_Lost"] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Nt_Avg_BP_Trimmed"] = {'title': "Avg. BP Trimmed", 'namespace': "Avg. BP Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
+		headers["Nt_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
 		headers["Nt_%_Discarded"] = {'title': "% Discarded",
 									 'namespace': "% Discarded",
 									 'description': 'Percentage of Reads (SE and PE) Discarded',
@@ -107,7 +107,7 @@ class NTrimmer():
 			total_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) 
 
 			if total_bp_lost == 0:
-				perc_bp_lost  = 0
+				perc_bp_lost = 0
 				total_r1 = 0 
 				total_r2 = 0
 				total_se = 0 
@@ -136,7 +136,7 @@ class NTrimmer():
 							   "Nt_%_R1_BP_Lost": total_r1,
 							   "Nt_%_R2_BP_Lost": total_r2,
 							   "Nt_%_SE_BP_Lost": total_se,
-							   "Nt_Avg_BP_Trimmed": sample_trimmed_bps / json[key]["Fragment"]["in"],
+							   "Nt_Avg_BP_Trimmed": total_bp_lost / json[key]["Fragment"]["in"],
 							   "Nt_%_Discarded" : (discarded_reads  / json[key]["Fragment"]["in"]) * 100,
 							   "Nt_Notes": json[key]["Program_details"]["options"]["notes"],
 							   "Nt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],

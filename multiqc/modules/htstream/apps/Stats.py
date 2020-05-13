@@ -390,25 +390,34 @@ class Stats():
 			except:
 				SE_presence = False
 
-			# sample instance in ordered dict
-			stats_json[key]["St_R1_histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
-			stats_json[key]["St_R2_histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
-			stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
-			stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
-			stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
-			stats_json[key]["St_Read_2_Quality_by_Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
-			stats_json[key]["St_PE_in"] = json[key][-1]["Paired_end"]["in"]
+
+			try:
+				# sample instance in ordered dict
+				stats_json[key]["St_R1_histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
+				stats_json[key]["St_R2_histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
+				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
+				stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
+				stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
+				stats_json[key]["St_Read_2_Quality_by_Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
+				stats_json[key]["St_PE_in"] = json[key][-1]["Paired_end"]["in"]
+
+				PE_presence = True
+
+			except:
+				PE_presence = False 
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {
-				   "Read Length Histogram (Read 1)": self.histogram(stats_json, "St_R1_histogram"), 
-				   "Base by Cycle (Read 1)": self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle"),
-				   "Quality by Cycle (Read 1)": self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle"),
-				   "Read Length Histogram (Read 2)": self.histogram(stats_json, "St_R2_histogram"), 
-				   "Base by Cycle (Read 2)": self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle"),
-				   "Quality by Cycle (Read 2)": self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
-				   }
+		section = {}
+
+		if PE_presence == True:
+			section["Read Length Histogram (Read 1)"] = self.histogram(stats_json, "St_R1_histogram")
+			section["Base by Cycle (Read 1)"] = self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle")
+			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle")
+			section["Read Length Histogram (Read 2)"] = self.histogram(stats_json, "St_R2_histogram")
+			section["Base by Cycle (Read 2)"] = self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle")
+			section["Quality by Cycle (Read 2)"] = self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
+
 
 		# only executres if single read data is detected
 		if SE_presence == True:
