@@ -24,14 +24,14 @@ class Overlapper():
 
 		headers["Ov_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 								 'suffix': '%', 'scale': 'Greens' }
-		headers["Ov_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Ov_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Ov_%_Overlapped"] = {'title': "% Overlapped", 
 									  'namespace': "% Overlapped",
 									  'description': 'Percentage of Reads with Overlap.',
 									  'suffix': '%',
 									  'format': '{:,.2f}',
 									  'scale': 'Blues'}
+		headers["Ov_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Ov_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Ov_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
