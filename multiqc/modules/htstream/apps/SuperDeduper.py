@@ -13,13 +13,15 @@ from multiqc.plots import table, linegraph
 class SuperDeduper():
 
 
-	def table(self, json):
+	def table(self, json, total):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
-		headers["Sd_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
-								 'suffix': '%', 'scale': 'Greens' }
+		if total != 0:
+			headers["Sd_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+									 'suffix': '%', 'scale': 'Greens' }
+
 		headers["Sd_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["Sd_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Sd_%_Duplicates"] = {'title': "% Duplicates", 
@@ -92,11 +94,22 @@ class SuperDeduper():
 
 		stats_json = OrderedDict()
 
+		perc_loss_total = 0
+
 		for key in json.keys():
 
 			# number of duplicates reletive to input reads 
 			perc_duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
-			perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
+			
+			try:
+				perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
+				PE_presence = True
+
+			except:
+				perc_loss = 0
+				PE_presence = False
+
+			perc_loss_total += perc_loss
 
 			# sample instance in ordered dict
 			stats_json[key] = {
@@ -111,7 +124,7 @@ class SuperDeduper():
 
 		# output dictionary, keys are section, value is function called for figure generation
 		section = {
-				   "Table": self.table(stats_json),
+				   "Table": self.table(stats_json, perc_loss_total),
 				   "Duplicate Saturation": self.linegraph(stats_json)
 				   }
 

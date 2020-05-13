@@ -12,7 +12,7 @@ from multiqc.plots import table, bargraph
 
 class AdapterTrimmer():
 
-	def table(self, json, total):
+	def table(self, json, total, zeroes):
 
 		# Table constructor. Just like the MultiQC docs.
 
@@ -21,20 +21,29 @@ class AdapterTrimmer():
 		
 		headers = OrderedDict()
 
-		headers["At_%_BP_Lost"] = {'title': "% Bp Lost",
-									'namespace': "% Bp Lost",
-									'description': 'Percentage of Input bps (SE and PE) trimmed.',
-									'suffix': '%',
-									'format': '{:,.2f}',
-									'scale': 'RdPu'
-									}
-		headers["At_%_Adapters"] = {'title': "% Adapters",
-									'namespace': "% Adapters",
-									'description': 'Percentage of Reads (SE and PE) with an Adapter',
-									'suffix': '%',
-									'format': '{:,.2f}',
-									'scale': 'Blues'
-									}
+		if zeroes == False:
+
+			headers["At_%_BP_Lost"] = {'title': "% Bp Lost",
+										'namespace': "% Bp Lost",
+										'description': 'Percentage of Input bps (SE and PE) trimmed.',
+										'suffix': '%',
+										'format': '{:,.2f}',
+										'scale': 'RdPu'
+										}
+			headers["At_%_Adapters"] = {'title': "% Adapters",
+										'namespace': "% Adapters",
+										'description': 'Percentage of Reads (SE and PE) with an Adapter',
+										'suffix': '%',
+										'format': '{:,.2f}',
+										'scale': 'Blues'
+										}
+
+		else:
+
+			headers["At_BP_Lost"] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Input bps (SE and PE) trimmed.', 'scale': 'RdPu', 'format': '{:,.0f}'}
+			headers["At_Adapters"] = {'title': "Adapters", 'namespace': "Adapters", 'description': 'Reads (SE and PE) with an Adapter', 'scale': 'Blues', 'format': '{:,.0f}'}
+
+
 		headers["At_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["At_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
@@ -77,12 +86,13 @@ class AdapterTrimmer():
 		stats_json = OrderedDict()
 
 		total = 0
+		zeroes = False
 
 		for key in json.keys():
 			
 			# calculations for reads with adapters and bps trimmed
 			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"] # total reads trimmed
-			bp_reads = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"] # total basepairs trimmed
+			bp_trimmed = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"] # total basepairs trimmed
 			perc_bp_lost = ( (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"] ) * 100
 
 			# if adapter trim is zero, so is the percentage and the avg basepair trimmed. This prevents division by zero error
@@ -92,14 +102,19 @@ class AdapterTrimmer():
 
 			else:
 				perc_adapters = (adapter_reads / json[key]["Fragment"]["in"]) * 100
-				avg_bp_trimmed = (bp_reads / adapter_reads)
+				avg_bp_trimmed = (bp_trimmed / adapter_reads)
 
 			total += avg_bp_trimmed
+
+			if perc_bp_lost < 0.01 and zeroes == False:
+				zeroes = True
 
 			# sample dictionary entry
 			stats_json[key] = {
 							   "At_%_BP_Lost": perc_bp_lost,
 							   "At_%_Adapters": perc_adapters,
+							   "At_BP_Lost": bp_trimmed,
+							   "At_Adapters": adapter_reads,
 							   "At_Avg_BP_Trimmed": avg_bp_trimmed,
 							   "At_Notes": json[key]["Program_details"]["options"]["notes"],
 							   "At_R1": json[key]["Paired_end"]["Read1"]["adapterBpTrim"],
@@ -107,8 +122,9 @@ class AdapterTrimmer():
 							   "At_SE": json[key]["Single_end"]["adapterBpTrim"]
 							  }
 
+
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, total),
+		section = {"Table": self.table(stats_json, total, zeroes),
 				   "Bp Composition Bargraph": self.bargraph(stats_json, total)}
 
 
