@@ -62,6 +62,10 @@ class AdapterTrimmer():
 			html = '<div class="alert alert-info"> No adapters were trimmed from samples. </div>'	
 			return html
 
+		if len(json.keys()) > 150:
+			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			return html
+
 		# bargraph dictionary. Exact use of example in MultiQC docs.
 		categories  = OrderedDict()
 

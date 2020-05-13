@@ -47,6 +47,15 @@ class CutTrim():
        							 {'name': "Read 2"},
        							 {'name': "Single End"}]
 				  }
+				  
+		# returns nothing if no reads were trimmed.
+		if bps == 0:
+			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			return html
+
+		if len(json.keys()) > 150:
+			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			return html
 
 		html = ""
 
@@ -64,11 +73,6 @@ class CutTrim():
 
 			se_data[key] = {"LT_SE": json[key]["Ct_Left_Trimmed_SE"],
 						    "RT_SE": json[key]["Ct_Right_Trimmed_SE"]}
-
-		# returns nothing if no reads were trimmed.
-		if bps == 0:
-			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
-			return html
 
 
 		cats = [OrderedDict(), OrderedDict(), OrderedDict()]

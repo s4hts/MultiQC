@@ -57,6 +57,10 @@ class QWindowTrim():
        							 {'name': "Single End"}]
 				  }
 
+		if len(json.keys()) > 150:
+			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			return html
+			
 		html = ""
 
 		r1_data = {}

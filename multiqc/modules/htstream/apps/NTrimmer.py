@@ -63,6 +63,11 @@ class NTrimmer():
 			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
 			return html
 
+		if len(json.keys()) > 150:
+			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			return html
+
+
 		# config dict for bar graph
 		config = {
 				  "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
