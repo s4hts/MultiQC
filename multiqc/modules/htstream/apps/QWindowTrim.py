@@ -33,7 +33,7 @@ class QWindowTrim():
 
 		# config dict for bar graph
 		config = {
-				  "title": "HTStream: Trimmed Basepairs Bargraph",
+				  "title": "HTStream: QWindowTrim Trimmed Basepairs Bargraph",
 				  'id': "htstream_qwindowtrimmer_bargraph",
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': False,

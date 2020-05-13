@@ -139,7 +139,7 @@ class Stats():
 
 		# config dictionary for heatmaps
 		heat_pconfig = {'id' : "",
-				   'title': "HTStream: Quality by Cycle", 
+				   'title': "HTStream: Quality by Cycle (" + title_read + ")",
 				   'yTitle': 'Q Score',
 				   'xTitle': 'Cycle',
 				   'square' : False,

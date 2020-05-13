@@ -18,7 +18,7 @@ class SeqScreener():
 		headers = OrderedDict()
 
 		headers["Ss_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
-								 'max': 100, 'suffix': '%', 'scale': 'Greens' }
+								 'suffix': '%', 'scale': 'Greens' }
 		headers["Ss_PE_hits"] = {'title': "PE hits", 'namespace': 'PE hits','description': 'Number of Paired End Reads with Sequence', 'format': '{:,.0f}', 'scale': 'Blues'}
 		headers["Ss_SE_in"] = {'title': "SE in", 'namespace': 'SE in', 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["Ss_SE_out"] = {'title': "SE out", 'namespace': 'SE out','description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}

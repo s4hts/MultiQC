@@ -19,14 +19,13 @@ class SuperDeduper():
 		headers = OrderedDict()
 
 		headers["Sd_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
-								 'max': 100, 'suffix': '%', 'scale': 'Greens' }
+								 'suffix': '%', 'scale': 'Greens' }
 		headers["Sd_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
 		headers["Sd_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
 		headers["Sd_%_Duplicates"] = {'title': "% Duplicates", 
 								   'namespace': "% Duplicates", 
 								   'description': 'Percentage of Duplicate Reads (SE and PE)',
 								   'suffix': '%',
-								   'max': 100,
 								   'format': '{:,.2f}',
 								   'scale': 'Oranges'
 								  }
