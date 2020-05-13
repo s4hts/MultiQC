@@ -12,10 +12,14 @@ from multiqc.plots import table
 
 class SeqScreener():
 
-	def table(self, json, PE_presence):
+	def table(self, json, PE_presence, total):
 
 		# Basic table constructor. See MultiQC docs.
 		headers = OrderedDict()
+
+		if total == 0:
+			html = '<div class="alert alert-info"> No hits in any sample. </div>'	
+			return html
 
 		if PE_presence == True:
 			headers["Ss_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
@@ -35,6 +39,8 @@ class SeqScreener():
 
 		stats_json = OrderedDict()
 
+		total_hits = 0 
+
 		for key in json.keys():
 
 			try:
@@ -44,9 +50,18 @@ class SeqScreener():
 
 
 			except:
-				perc_loss = "NA"
-				pe_hits = "NA"
+				perc_loss = 0
+				pe_hits = 0
 				PE_presence = False 
+
+
+			try:
+				se_hits = json[key]["Single_end"]["hits"]
+
+			except:
+				se_hits = 0
+
+			total_hits += pe_hits + se_hits
 
 			# sample entry for stats dictionary
 			stats_json[key] = {
@@ -54,13 +69,13 @@ class SeqScreener():
 							   "Ss_PE_hits": pe_hits,
 							   "Ss_SE_in" : json[key]["Single_end"]["in"],
 							   "Ss_SE_out": json[key]["Single_end"]["out"],
-							   "Ss_SE_hits": json[key]["Single_end"]["hits"],
+							   "Ss_SE_hits": se_hits,
 							   "Ss_Notes": json[key]["Program_details"]["options"]["notes"],
 						 	  }
 
 		# sections and figure function calls
 		section = {
-				   "Table": self.table(stats_json, PE_presence)
+				   "Table": self.table(stats_json, PE_presence, total_hits)
 				   }
 
 		return section

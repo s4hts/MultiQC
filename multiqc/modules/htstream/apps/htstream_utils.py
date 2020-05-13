@@ -45,7 +45,7 @@ def sample_status(samples):
 				  }
 
 	# wrapper divs
-	html = '<div class="hts_status_header">Sample Checks: </div>'
+	html = '<div class="hts_status_header" style="display: inline-block; margin-bottom: 8px;">Sample Checks: </div>'
 	html += '<div style="display: inline-block;">\n'
 
 	# initilize important variables
@@ -59,7 +59,7 @@ def sample_status(samples):
 			if index == lim:
 				style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px; border-top-right-radius: 5px; border-bottom-right-radius: 5px;'
 			else:
-				style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px;'
+				style = 'border-top-left-radius: 5px; border-bottom-left-radius: 5px; margin-left: -4px;'
 		elif index == lim:
 			style = 'border-top-right-radius: 5px; border-bottom-right-radius: 5px; margin-left: -4px;'
 		else:
