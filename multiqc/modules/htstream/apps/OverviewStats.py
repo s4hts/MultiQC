@@ -70,7 +70,7 @@ class OverviewStats():
 
 			data[x,:] = [sample["total_Q30"]["Read1"],
 						 sample["total_Q30"]["Read2"],
-						 /sample["total_Q30"]["Single_end"],
+						 sample["total_Q30"]["Single_end"],
 						 sample["Read_Breakdown"]["Paired_end"],
 						 sample["Read_Breakdown"]["Single_end"]]
 			
