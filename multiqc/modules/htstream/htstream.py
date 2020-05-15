@@ -252,10 +252,11 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		# create logical order for general overview table
-
+		overview_order = []
+		
 		if stats_wrapper == True:
-
 			overview_order = ["Pipeline Input"]
+
 			for a in app_order:
 				if a != "hts_Stats" and a not in excludes:
 					overview_order.append(a)
