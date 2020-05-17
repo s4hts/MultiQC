@@ -5,7 +5,7 @@
 from __future__ import print_function
 from collections import OrderedDict
 import logging
-import re, json, os
+import re, json, os, operator
 
 # HTStream Apps
 from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer, PolyATTrim
@@ -135,7 +135,7 @@ class MultiqcModule(BaseMultiqcModule):
 		if "hts_Stats" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
 
-
+		sample_keys =  list(sorted(json.keys()))
 	
 		excludes = []
 		stats_wrapper = False
@@ -155,7 +155,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 			stats_dict = OrderedDict()
 
-			for key in json.keys():
+			for key in sample_keys:
 
 				stats_dict[key] = json[key][app]
 

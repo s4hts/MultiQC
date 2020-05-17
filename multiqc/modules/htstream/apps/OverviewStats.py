@@ -13,6 +13,8 @@ class OverviewStats():
 	def table(self, json, app_list):
 
 		config = {'table_title': 'Input Fragment Reduction'}
+		read_reducers = {"Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
+						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"}
 
 		# Table constructor. Just like the MultiQC docs.
 		headers = OrderedDict()
@@ -31,15 +33,17 @@ class OverviewStats():
 
 			json[key] = temp
 
-
+		table_data = False
 		for i in range(len(app_list)):
 
 			app = app_list[i]
 
-			description = "Number of Input Fragments for " + app
-			color = color_rotations[i % 4]
+			if app in read_reducers:
 
-			headers[app] = {'title': app, 'namespace': app, 'description': description, 'format': '{:,.0f}', 'scale': color}
+				description = "Number of Input Fragments for " + app
+				color = color_rotations[i % 4]
+
+				headers[app] = {'title': app, 'namespace': app, 'description': description, 'format': '{:,.0f}', 'scale': color}
 
 
 		if len(headers.keys()) < 2:

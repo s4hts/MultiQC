@@ -13,6 +13,20 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
+	def table(self, json):
+
+		# striaght forward table function, right from MultiQC documentation
+		headers = OrderedDict()
+
+		headers["St_GC_Content"] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
+									'format': '{:,.2f}', 'suffix': '%', 'scale': 'Greens'}
+		headers["St_N_Content"] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
+								   'format': '{:,.2f}', 'suffix': '%','scale': 'RdPu'}
+		headers["St_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+
+
+		return table.plot(json, headers)
+
 	def base_by_cycle(self, json, read):
 
 		title_read = " ".join(read.split("_")[1:3])
@@ -375,7 +389,14 @@ class Stats():
 
 		for key in json.keys():
 
-			stats_json[key] = {}
+			gc_count = (json[key][-1]["Fragment"]["base_composition"]["G"] + json[key][-1]["Fragment"]["base_composition"]["C"])
+			gc_content = ( gc_count / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
+
+			n_content = ( json[key][-1]["Fragment"]["base_composition"]["N"] / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
+
+			stats_json[key] = {"St_GC_Content": gc_content,
+						       "St_N_Content": n_content,
+						       "St_Notes": json[key][-1]["Program_details"]["options"]["notes"]}
 
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
@@ -408,7 +429,7 @@ class Stats():
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {}
+		section = {"Table": self.table(stats_json)}
 
 		if PE_presence == True:
 			section["Read Length Histogram (Read 1)"] = self.histogram(stats_json, "St_R1_histogram")
