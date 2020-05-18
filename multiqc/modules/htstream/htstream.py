@@ -135,31 +135,31 @@ class MultiqcModule(BaseMultiqcModule):
 		if "hts_Stats" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
 
-		sample_keys =  list(sorted(json.keys()))
-	
+
+		# sort list of samples
+		sample_keys = list(sorted(json.keys()))
 		excludes = []
 		stats_wrapper = False
+
 
 		for i in range(len(app_order)):
 
 			app = app_order[i]
-
 			program = app.split("hts_")[-1]
+
 			if program not in self.programs.keys():
 				log.warning(app + " is currently not supported by MultiQC: HTStrean.")
 				excludes.append(app)
 				continue
 
 			
-			# creat stat specific dictionary, each entry will be a sample
-
+			# creat app specific dictionary, each entry will be a sample
 			stats_dict = OrderedDict()
 
 			for key in sample_keys:
 
 				stats_dict[key] = json[key][app]
 
-				
 				if app == "hts_Stats":
 
 					if len(json[key][app]) == 2:
@@ -167,17 +167,14 @@ class MultiqcModule(BaseMultiqcModule):
 						stats_wrapper = True
 
 						self.overview_stats[key]["Pipeline Input"] = {
-															 "InputFragments": json[key][app][0]["Fragment"]["in"],
-
-															 "total_Q30": 
-
-																{"Read1": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"],
-																 "Read2": json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"]},
-
-															 "Read_Breakdown":
-
-															 	{"Paired_end": json[key][app][0]["Paired_end"]["in"]}
-															}
+																	 "Fragment_Section": json[key][app][0]["Fragment"],
+																	 "total_Q30":  {
+																	 				"Read1": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"],
+																					"Read2": json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"]
+																					},
+																	 "Read_Breakdown":{
+																	 				   "Paired_end": json[key][app][0]["Paired_end"]["in"]}
+																					   }
 
 
 						try:
@@ -189,16 +186,14 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 					self.overview_stats[key][app] = {
-													 "InputFragments": json[key][app][-1]["Fragment"]["in"],
-
-													 "total_Q30": 
-
-														{"Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
-														 "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]},
-
-													 "Read_Breakdown":
-
-													 	{"Paired_end": json[key][app][-1]["Paired_end"]["in"]}
+													 "Fragment_Section": json[key][app][-1]["Fragment"],
+													 "total_Q30": {	
+																   "Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
+																   "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]
+																   },
+													 "Read_Breakdown": {
+													 					"Paired_end": json[key][app][-1]["Paired_end"]["in"]
+													 					}
 													}
 
 
@@ -207,13 +202,7 @@ class MultiqcModule(BaseMultiqcModule):
 						self.overview_stats[key][app]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
 
 					except:
-							pass
-
-				else:
-
-					self.overview_stats[key][app] = {"InputFragments": json[key][app]["Fragment"]["in"]}
-
-	
+							pass	
 					
 
 			# if data exists for app, execute app specific stats processing
@@ -223,16 +212,18 @@ class MultiqcModule(BaseMultiqcModule):
 
 				# dictionary of subsections
 				section_dict = self.programs[app]["app"].execute(stats_dict)
-				description = self.programs[app]["description"]
 
 				# if dictionary is not empty
 				if len(section_dict.keys()) != 0:
+
+					if app != "Stats":
+						self.overview_stats[key]["hts_" + app] = section_dict["Overview"] 
 
 					html = ""
 
 					for title, section in section_dict.items():
 
-						if section != "":
+						if section != "" and title != "Overview":
 							html += section + '<br>\n'
 
 					# remove trailing space
@@ -255,7 +246,7 @@ class MultiqcModule(BaseMultiqcModule):
 		overview_order = []
 		
 		if stats_wrapper == True:
-			overview_order = ["Pipeline Input"]
+			overview_order.append("Pipeline Input")
 
 			for a in app_order:
 				if a != "hts_Stats" and a not in excludes:
@@ -308,7 +299,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 			except:
-				msg = "Report Section for hts_Stats Failed."
-				log.warning(msg)
+
+				log.warning("Report Section for hts_Stats Failed.")
 
 

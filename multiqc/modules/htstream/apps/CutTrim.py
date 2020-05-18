@@ -91,6 +91,7 @@ class CutTrim():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		total = 0
 
@@ -113,6 +114,10 @@ class CutTrim():
 				
 			total += total_bp_lost
 
+			overview_dict[key] = {
+								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"] 
+								 }
+
 			# sample dictionary entry
 			stats_json[key] = {
 							   "Ct_%_BP_Lost": perc_bp_lost,
@@ -130,7 +135,8 @@ class CutTrim():
 
 		# sections and figure function calls
 		section = {"Table": self.table(stats_json, total),
-				   "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, total)}
+				   "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, total),
+				   "Overview": overview_dict}
 
 
 		return section

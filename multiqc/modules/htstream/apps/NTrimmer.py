@@ -113,6 +113,7 @@ class NTrimmer():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		# accumulator variable. Used to prevent empty bargraphs 
 		trimmed_bps = 0
@@ -149,6 +150,10 @@ class NTrimmer():
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
 
+			overview_dict[key] = {
+								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"]
+								  }
+
 			# sample entry in stats dictionary
 			stats_json[key] = {
 							   "Nt_%_BP_Lost": perc_bp_lost,
@@ -170,9 +175,8 @@ class NTrimmer():
 			trimmed_bps += sample_trimmed_bps 
 
 		# section and figure function calls
-		section = {
-				   "Table": self.table(stats_json, trimmed_bps, zeroes),
-				   "Trimmed Reads": self.bargraph(stats_json, trimmed_bps)
-				   }
+		section = {"Table": self.table(stats_json, trimmed_bps, zeroes),
+				   "Trimmed Reads": self.bargraph(stats_json, trimmed_bps),
+				   "Overview": overview_dict}
 
 		return section

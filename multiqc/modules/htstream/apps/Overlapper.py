@@ -1,6 +1,6 @@
 from collections import OrderedDict
 import logging
-import os
+import os, statistics
 
 from multiqc import config
 from multiqc.plots import table, bargraph, linegraph
@@ -99,9 +99,29 @@ class Overlapper():
 		return linegraph.plot(multi_line, config)
 
 
+	def parse_histogram_stats(self, hist):
+
+		hist_stats = {"Max": 0,
+					  "Median": 0}
+
+		median_list = []
+
+		for item in hist:
+			median_list.append(item[0])
+
+			if hist_stats["Max"] < item[1]:
+				hist_stats["Max"] = item[1]
+
+
+		hist_stats["Median"] = statistics.median(median_list)
+
+		return hist_stats
+
+
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		# accumulator for inserts, used to prevent empty bar graph
 		inserts = 0
@@ -127,8 +147,20 @@ class Overlapper():
 			perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
 			perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]) * 100
 				
+
+			overview_dict[key] = {
+								  "Hist_Stats": self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"]),
+								  "PE_Out_In": json[key]["Paired_end"]["out"] / json[key]["Paired_end"]["in"],
+								  "SE_Out_In": json[key]["Single_end"]["out"] / json[key]["Paired_end"]["in"],
+								  "Bp_Lost":  json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],
+								  "Sin": sins / json[key]["Fragment"]["in"],
+								  "Min": mins / json[key]["Fragment"]["in"],
+								  "Lin": lins / json[key]["Fragment"]["in"]
+								 }
+
 			# sample instance in dictionary
-			stats_json[key] = {"Ov_PE_loss": perc_loss,
+			stats_json[key] = {
+							   "Ov_PE_loss": perc_loss,
 							   "Ov_SE_in" : json[key]["Single_end"]["in"],
 							   "Ov_SE_out": json[key]["Single_end"]["out"],
 							   "Ov_%_Overlapped": perc_overlapped,
@@ -144,10 +176,9 @@ class Overlapper():
 
 
 		# sections and function calls 
-		section = {
-				   "Table": self.table(stats_json),
+		section = {"Table": self.table(stats_json),
 				   "Overlap Composition": self.bargraph(stats_json, inserts),
-				   "Overlapped Lengths Density Plots": self.linegraph(stats_json)
-				   }
-
+				   "Overlapped Lengths Density Plots": self.linegraph(stats_json),
+				   "Overview": overview_dict}
+				   
 		return section

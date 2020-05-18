@@ -88,11 +88,14 @@ class AdapterTrimmer():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		total = 0
 		zeroes = False
 
 		for key in json.keys():
+
+			frag_in = json[key]["Fragment"]["in"]
 			
 			# calculations for reads with adapters and bps trimmed
 			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"] # total reads trimmed
@@ -105,13 +108,24 @@ class AdapterTrimmer():
 				avg_bp_trimmed = 0
 
 			else:
-				perc_adapters = (adapter_reads / json[key]["Fragment"]["in"]) * 100
+				perc_adapters = (adapter_reads / frag_in) * 100
 				avg_bp_trimmed = (bp_trimmed / adapter_reads)
 
 			total += avg_bp_trimmed
 
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
+
+
+			overview_dict[key] = {
+								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],
+								  "R1_Bp_Trim": json[key]["Paired_end"]["Read1"]["adapterBpTrim"] / frag_in,
+								  "R1_Read_Trim": json[key]["Paired_end"]["Read1"]["adapterTrim"] / frag_in,
+								  "R2_Bp_Trim": json[key]["Paired_end"]["Read2"]["adapterBpTrim"] / frag_in,
+								  "R2_Read_Trim": json[key]["Paired_end"]["Read2"]["adapterTrim"] / frag_in,
+								  "SE_Bp_Trim": json[key]["Single_end"]["adapterBpTrim"] / frag_in,
+								  "SE_Read_Trim": json[key]["Single_end"]["adapterTrim"] / frag_in
+								  }
 
 			# sample dictionary entry
 			stats_json[key] = {
@@ -129,7 +143,7 @@ class AdapterTrimmer():
 
 		# sections and figure function calls
 		section = {"Table": self.table(stats_json, total, zeroes),
-				   "Bp Composition Bargraph": self.bargraph(stats_json, total)}
-
+				   "Bp Composition Bargraph": self.bargraph(stats_json, total),
+				   "Overview": overview_dict}
 
 		return section

@@ -149,7 +149,7 @@ class Stats():
 				  'categories': True,
 				  'title': "HTStream: Mean Quality by Cycle (" + title_read + ")",
 				  'xlab': "Cycle",
-				  'ylab': "Mean Q Score"
+				  'ylab': "Mean Q Score",
 				  }
 
 		# config dictionary for heatmaps

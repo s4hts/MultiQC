@@ -93,6 +93,7 @@ class SuperDeduper():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		perc_loss_total = 0
 
@@ -111,6 +112,12 @@ class SuperDeduper():
 
 			perc_loss_total += perc_loss
 
+			overview_dict[key] = {
+								  "Reads_Lost": json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"],
+								  "Dups": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
+								  "Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
+								 }
+
 			# sample instance in ordered dict
 			stats_json[key] = {
 			 				   "Sd_PE_loss": perc_loss,
@@ -123,9 +130,8 @@ class SuperDeduper():
 						 	  }
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {
-				   "Table": self.table(stats_json, perc_loss_total),
-				   "Duplicate Saturation": self.linegraph(stats_json)
-				   }
+		section = {"Table": self.table(stats_json, perc_loss_total),
+				   "Duplicate Saturation": self.linegraph(stats_json),
+				   "Overview": overview_dict}
 
 		return section

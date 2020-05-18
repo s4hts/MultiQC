@@ -38,6 +38,7 @@ class SeqScreener():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		total_hits = 0 
 
@@ -63,6 +64,10 @@ class SeqScreener():
 
 			total_hits += pe_hits + se_hits
 
+			overview_dict[key] = {
+								  "Reads_Lost": json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"]
+								 }
+
 			# sample entry for stats dictionary
 			stats_json[key] = {
 			 				   "Ss_PE_loss": perc_loss,
@@ -74,9 +79,8 @@ class SeqScreener():
 						 	  }
 
 		# sections and figure function calls
-		section = {
-				   "Table": self.table(stats_json, PE_presence, total_hits)
-				   }
+		section = {"Table": self.table(stats_json, PE_presence, total_hits),
+				   "Overview": overview_dict}
 
 		return section
 

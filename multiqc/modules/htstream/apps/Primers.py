@@ -103,7 +103,8 @@ class Primers():
 		# dictionary for sections and figure function calls
 		section = {
 				   "Table": self.table(stats_json),
-				   "Reads with Primers": self.bargraph(stats_json)
+				   "Reads with Primers": self.bargraph(stats_json),
+				   "Overview": 0
 				   }
 
 		return section

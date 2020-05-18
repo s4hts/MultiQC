@@ -99,6 +99,7 @@ class QWindowTrim():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 		# accumular variable that prevents empty bar graphs
 		total_trimmed_bp = 0
@@ -140,6 +141,17 @@ class QWindowTrim():
 			# total trimmed reads
 			trimmed_bp = (lefttrimmed_bp + rightrimmed_bp)
 
+			bp_in = json[key]["Fragment"]["basepairs_in"]
+
+			overview_dict[key] = {
+								  "R1_Bp_Trim_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "R1_Bp_Trim_Right": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "R2_Bp_Trim_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "R2_Bp_Trim_Right": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "SE_Bp_Trim_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "SE_Bp_Trim_Right": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  }
+
 			# sample dictionary entry
 			stats_json[key] = {
 							   "Qt_%_BP_Lost": perc_bp_lost,
@@ -161,10 +173,9 @@ class QWindowTrim():
 
 
 		# sections and figure function calls
-		section = {
-				   "Table": self.table(stats_json, total_trimmed_bp),
-				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp)
-				   }
+		section = {"Table": self.table(stats_json, total_trimmed_bp),
+				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp),
+				   "Overview": overview_dict}
 
 		return section
 	

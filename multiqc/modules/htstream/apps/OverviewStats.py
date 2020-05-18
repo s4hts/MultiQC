@@ -95,8 +95,8 @@ class OverviewStats():
 
 	def execute(self, json, app_list):
 
-			html = self.table(json, app_list)
+			#html = self.table(json, app_list)
 			#html += self.hts_mds(json)
-		
+			html = ""
 			return html
 
