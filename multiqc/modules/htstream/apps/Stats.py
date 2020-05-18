@@ -18,10 +18,11 @@ class Stats():
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
+		headers["St_Fragments_in"] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
 		headers["St_GC_Content"] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
-									'format': '{:,.2f}', 'suffix': '%', 'scale': 'Greens'}
+									'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
 		headers["St_N_Content"] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
-								   'format': '{:,.2f}', 'suffix': '%','scale': 'RdPu'}
+								   'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
 		headers["St_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
@@ -394,7 +395,8 @@ class Stats():
 
 			n_content = ( json[key][-1]["Fragment"]["base_composition"]["N"] / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
 
-			stats_json[key] = {"St_GC_Content": gc_content,
+			stats_json[key] = {"St_Fragments_in": json[key][-1]["Fragment"]["in"],
+							   "St_GC_Content": gc_content,
 						       "St_N_Content": n_content,
 						       "St_Notes": json[key][-1]["Program_details"]["options"]["notes"]}
 
