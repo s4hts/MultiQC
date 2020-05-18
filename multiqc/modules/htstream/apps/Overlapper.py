@@ -110,7 +110,7 @@ class Overlapper():
 			median_list.append(item[0])
 
 			if hist_stats["Max"] < item[1]:
-				hist_stats["Max"] = item[1]
+				hist_stats["Max"] = item[0]
 
 
 		hist_stats["Median"] = statistics.median(median_list)
@@ -147,9 +147,11 @@ class Overlapper():
 			perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
 			perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]) * 100
 				
+			parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
 
 			overview_dict[key] = {
-								  "Hist_Stats": self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"]),
+								  "Hist_Max": parsed_hist_stats["Max"],
+								  "Hist_Med": parsed_hist_stats["Median"],
 								  "PE_Out_In": json[key]["Paired_end"]["out"] / json[key]["Paired_end"]["in"],
 								  "SE_Out_In": json[key]["Single_end"]["out"] / json[key]["Paired_end"]["in"],
 								  "Bp_Lost":  json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],

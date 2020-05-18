@@ -84,9 +84,12 @@ class Primers():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_dict = {}
 
 
 		for key in json.keys():
+
+			overview_dict[key] = {"Temp": 0}
 
 			# dictionary entry for sample
 			stats_json[key] = {
@@ -104,7 +107,7 @@ class Primers():
 		section = {
 				   "Table": self.table(stats_json),
 				   "Reads with Primers": self.bargraph(stats_json),
-				   "Overview": 0
+				   "Overview": overview_dict
 				   }
 
 		return section

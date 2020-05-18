@@ -109,7 +109,6 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		self.report_sections = {}
-		self.overview_stats = {}
 		self.summary_stats = {}
 
 
@@ -118,9 +117,7 @@ class MultiqcModule(BaseMultiqcModule):
 		stats_section = ""			
 		for key in json.keys():
 
-			# Initializes samples for overview stats
-			self.overview_stats[key] = {}
-
+			sample = key
 			if app_order == []:
 				app_order = list(json[key].keys())
 
@@ -134,6 +131,14 @@ class MultiqcModule(BaseMultiqcModule):
 		# scold people that don't read the documentation
 		if "hts_Stats" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
+			self.overview_stats = {}
+
+		else:
+			if len(json[key]["hts_Stats"]) == 2:
+				self.overview_stats = {"Pipeline Input": {},
+											"hts_Stats": {}}
+			else:
+				self.overview_stats = {"hts_Stats": {}}
 
 
 		# sort list of samples
@@ -166,31 +171,24 @@ class MultiqcModule(BaseMultiqcModule):
 
 						stats_wrapper = True
 
-						self.overview_stats[key]["Pipeline Input"] = {
+						self.overview_stats["Pipeline Input"][key] = {
 																	 "Fragment_Section": json[key][app][0]["Fragment"],
-																	 "total_Q30":  {
-																	 				"Read1": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"],
-																					"Read2": json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"]
-																					},
+																	 "total_Q30": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"],
 																	 "Read_Breakdown":{
 																	 				   "Paired_end": json[key][app][0]["Paired_end"]["in"]}
 																					   }
 
 
 						try:
-							self.overview_stats[key]["Pipeline Input"]["total_Q30"]["Single_end"] = json[key][app][0]["Single_end"]["total_Q30_basepairs"]
-							self.overview_stats[key]["Pipeline Input"]["Read_Breakdown"]["Single_end"] = json[key][app][0]["Single_end"]["in"]
+							self.overview_stats["Pipeline Input"][key]["total_Q30"] += json[key][app][0]["Single_end"]["total_Q30_basepairs"]
+							self.overview_stats["Pipeline Input"][key]["Read_Breakdown"]["Single_end"] = json[key][app][0]["Single_end"]["in"]
 
 						except:
 							pass
 
-
-					self.overview_stats[key][app] = {
+					self.overview_stats[app][key] = {
 													 "Fragment_Section": json[key][app][-1]["Fragment"],
-													 "total_Q30": {	
-																   "Read1": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"],
-																   "Read2": json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"]
-																   },
+													 "total_Q30": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"],
 													 "Read_Breakdown": {
 													 					"Paired_end": json[key][app][-1]["Paired_end"]["in"]
 													 					}
@@ -198,8 +196,8 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 					try:
-						self.overview_stats[key][app]["total_Q30"]["Single_end"] = json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
-						self.overview_stats[key][app]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
+						self.overview_stats[app][key]["total_Q30"] += json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
+						self.overview_stats[app][key]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
 
 					except:
 							pass	
@@ -217,7 +215,7 @@ class MultiqcModule(BaseMultiqcModule):
 				if len(section_dict.keys()) != 0:
 
 					if app != "Stats":
-						self.overview_stats[key]["hts_" + app] = section_dict["Overview"] 
+						self.overview_stats["hts_" + app] = section_dict["Overview"] 
 
 					html = ""
 

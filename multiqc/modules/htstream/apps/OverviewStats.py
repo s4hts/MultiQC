@@ -1,8 +1,8 @@
 
 from collections import OrderedDict
 import logging
-from sklearn import manifold
 import numpy as np
+import math
 
 from . import htstream_utils
 from multiqc import config
@@ -63,28 +63,69 @@ class OverviewStats():
 		config = {'title': "HTStream: MDS Plot"}
 
 		keys = list(json.keys())
-		length_keys = len(json.keys())
+		samples_list = list(json[keys[0]].keys())
+		row_length = len(samples_list)
 
-		data = np.zeros((length_keys, 5))
+
+		data = [[] for x in range(row_length)]
+
+		stats_order = []
+		stats_bool = True
+
+		for x in range(row_length):
+
+			sample = samples_list[x]
+
+			for key in keys:
+
+				sample_json = json[key][sample]
+
+				if key == "hts_Stats" or key == "Pipeline Input":
+
+					total_frags = sample_json["Fragment_Section"]["in"]
+					total_bp = sample_json["Fragment_Section"]["basepairs_in"]
+
+					try:
+						fraction_se = sample_json["Read_Breakdown"]["Single_end"] / total_frags # fraction SE
+					except:
+						fraction_se = 0
+
+					gc_content = (sample_json["Fragment_Section"]["base_composition"]["G"] / total_bp) + (sample_json["Fragment_Section"]["base_composition"]["C"] / total_bp)
+					n_content = sample_json["Fragment_Section"]["base_composition"]["N"] / total_bp
+
+					temp = [
+							total_frags, # fragments in 
+							sample_json["total_Q30"] / total_bp, # fraction Q30
+							sample_json["Read_Breakdown"]["Paired_end"] / total_frags, # fraction PE
+							fraction_se, # fraction SE
+							gc_content, # GC Content
+							n_content # N Content
+							]
+
+					data[x] += temp
+
+					if stats_bool == True:
+						stats_order += ["Total Frags", "Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]
+
+				else:
+
+					temp = [v for k,v in sample_json.items()]
+					data[x] += temp
+
+					if stats_bool == True:
+						stats_order += [k for k,v in sample_json.items()]
+
+			stats_bool = False
 
 
-		for x in range(length_keys):
-
-			sample = json[keys[x]]
-
-			data[x,:] = [sample["total_Q30"]["Read1"],
-						 sample["total_Q30"]["Read2"],
-						 sample["total_Q30"]["Single_end"],
-						 sample["Read_Breakdown"]["Paired_end"],
-						 sample["Read_Breakdown"]["Single_end"]]
+		data = np.asarray(data).T
 			
+		data = htstream_utils.pca(data)
+			
+		for x in range(row_length):
 
-		data = manifold.MDS(n_components=2).fit(data).embedding_
-
-		for x in range(length_keys):
-
-			mds_plot[keys[x]] = {"x": data[x,0] // 100000000,
-								 "y": data[x,1] // 100000000}
+			mds_plot[samples_list[x]] = {"x": data[0, x],
+										 "y": data[1, x]}
 
 
 		html = "<hr><h4>  Random Data MDS Plot </h4>\n"
@@ -95,8 +136,9 @@ class OverviewStats():
 
 	def execute(self, json, app_list):
 
-			#html = self.table(json, app_list)
-			#html += self.hts_mds(json)
 			html = ""
+			#html = self.table(json, app_list)
+			html += self.hts_mds(json)
+			
 			return html
 

@@ -1,4 +1,6 @@
 import json
+import numpy as np
+from sklearn.decomposition import PCA
 
 #################################################
 
@@ -160,6 +162,66 @@ def stats_histogram_html(read, data, button_list, notice):
 	html += notice
 
 	return html
+
+
+#######################################
+
+# pca plot
+
+def pca(matrix):
+
+	samples = np.size(matrix,1)
+	stats = np.size(matrix,0)
+
+	to_delete = []
+
+	# normalize
+	for x in range(stats):
+
+		row = matrix[x,:]
+
+		if row[0] > 1.0:
+			norm = np.linalg.norm(row)
+			row = row / norm
+
+		if np.sum(row) == 0:
+			to_delete.append(x)
+		elif np.all(row == row[0]):
+			to_delete.append(x)
+
+		matrix[x,:] = row
+
+	to_delete = sorted(to_delete, reverse=True)
+
+	for x in to_delete:
+		matrix = np.delete(matrix, x, 0)
+	
+	samples = np.size(matrix,1)
+	stats = np.size(matrix,0)
+
+	cov_mat = np.cov(matrix)
+
+	eig_val_cov, eig_vec_cov = np.linalg.eigh(cov_mat)
+	
+	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
+
+
+	# Sort the (eigenvalue, eigenvector) tuples from high to low
+	eig_pairs.sort(key=lambda x: x[0], reverse=True)
+
+	matrix_w = np.hstack((eig_pairs[0][1].reshape(stats,1), eig_pairs[1][1].reshape(stats,1)))
+
+	transformed = matrix_w.T.dot(matrix)
+
+
+	pca = PCA(n_components=2)
+	principalComponents = pca.fit_transform(matrix.T)
+
+	print(transformed)
+	print(principalComponents)
+	exit()
+
+	return  transformed
 
 
 
