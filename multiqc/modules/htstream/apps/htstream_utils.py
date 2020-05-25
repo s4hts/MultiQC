@@ -1,6 +1,5 @@
 import json
 import numpy as np
-from sklearn.decomposition import PCA
 
 #################################################
 
@@ -134,7 +133,8 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 def stats_histogram_html(read, data, button_list, notice):
 
 
-	header_dict = {"R1": "Read 1",
+	header_dict = {"PE": "Paried End",
+				   "R1": "Read 1",
 				   "R2": "Read 2",
 				   "SE": "Single End"}
 
@@ -170,16 +170,18 @@ def stats_histogram_html(read, data, button_list, notice):
 
 def pca(matrix):
 
-	samples = np.size(matrix,1)
-	stats = np.size(matrix,0)
+	# verified using PCA from sklearn.decomposition
 
+	n, m = matrix.shape # rows, col
+	
 	to_delete = []
 
-	# normalize
-	for x in range(stats):
+	# normalize 
+	for x in range(n):
 
 		row = matrix[x,:]
 
+		# ensure all numbers are between zero and one
 		if row[0] > 1.0:
 			norm = np.linalg.norm(row)
 			row = row / norm
@@ -189,37 +191,35 @@ def pca(matrix):
 		elif np.all(row == row[0]):
 			to_delete.append(x)
 
-		matrix[x,:] = row
+		matrix[x,:] = row - np.mean(row)
 
+	# remove indeterminant columns
 	to_delete = sorted(to_delete, reverse=True)
-
 	for x in to_delete:
 		matrix = np.delete(matrix, x, 0)
 	
-	samples = np.size(matrix,1)
-	stats = np.size(matrix,0)
+	
+	n, m = matrix.shape # rows, col
 
+	# sample cov
 	cov_mat = np.cov(matrix)
 
-	eig_val_cov, eig_vec_cov = np.linalg.eigh(cov_mat)
-	
-	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
+	# for some reason, gives complex numbers, this ensures eigenvalues are real
+	eig_val_cov, eig_vec_cov = np.linalg.eig(cov_mat)
+	eig_val_cov = eig_val_cov.real
+	eig_vec_cov = eig_vec_cov.real
 
+	# creat pari list
+	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
 
 	# Sort the (eigenvalue, eigenvector) tuples from high to low
 	eig_pairs.sort(key=lambda x: x[0], reverse=True)
 
-	matrix_w = np.hstack((eig_pairs[0][1].reshape(stats,1), eig_pairs[1][1].reshape(stats,1)))
+	# eigan vector matrix
+	matrix_w = np.hstack((eig_pairs[0][1].reshape(n,1), eig_pairs[1][1].reshape(n,1)))
 
+	# transform
 	transformed = matrix_w.T.dot(matrix)
-
-
-	pca = PCA(n_components=2)
-	principalComponents = pca.fit_transform(matrix.T)
-
-	print(transformed)
-	print(principalComponents)
-	exit()
 
 	return  transformed
 

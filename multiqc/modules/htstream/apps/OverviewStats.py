@@ -12,6 +12,9 @@ class OverviewStats():
 
 	def table(self, json, app_list):
 
+		print(json)
+		return ""
+
 		config = {'table_title': 'Input Fragment Reduction'}
 		read_reducers = {"Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
 						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"}
@@ -128,7 +131,7 @@ class OverviewStats():
 										 "y": data[1, x]}
 
 
-		html = "<hr><h4>  Random Data MDS Plot </h4>\n"
+		html = "<hr><h4>  Sample PCA Plot </h4>\n"
 		html += scatter.plot(mds_plot, config)
 		
 		return html
@@ -136,9 +139,9 @@ class OverviewStats():
 
 	def execute(self, json, app_list):
 
-			html = ""
-			#html = self.table(json, app_list)
-			html += self.hts_mds(json)
+		html = "" 
+		#html = self.table(json, app_list)
+		html += self.hts_mds(json)
 			
-			return html
+		return html
 
