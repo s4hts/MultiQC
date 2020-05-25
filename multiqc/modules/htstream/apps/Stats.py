@@ -71,7 +71,6 @@ class Stats():
 					"T": {},
 					"N": {}}
 
-
 			# lists to iterate through
 			bases = json[key][read]["data"]
 			positions = json[key][read]["col_names"]
@@ -276,8 +275,7 @@ class Stats():
 
 	def histogram(self, json, read):
 
-		read_keys = {"St_R1_histogram": "R1",
-					 "St_R2_histogram": "R2",
+		read_keys = {"St_PE_histogram": "PE",
 					 "St_SE_histogram": "SE"}
 
 
@@ -289,12 +287,13 @@ class Stats():
 		first = True
 		notice_html = ""
 
+
 		# iterates over all samples in input dictionary
 		for key in json.keys():
 
 			# if read length histogram has one value (ie. all samples have a uniform length),
 			#	this data is added to a secondary table as to avoid ugly line graphs.
-			if len(json[key][read]) == 1:
+			if len(json[key][read][0]) == 1 and read_keys[read] != "PE":
 
 				# format read name for dictionary
 				read_length_col = "St_" + read_code  + "_Length"
@@ -313,32 +312,36 @@ class Stats():
 			# executes of more than one data points are found.
 			else:
 
-				data[key] = {}
-				
-				max_reads = max([item[0] for item in json[key][read]]) + 1
+				data[key] = []
 
-				current = 10
-				bins = []
-				values = []
+				for x in range(len(json[key][read])):
 
-				while current < max_reads:
-					bins.append(current)
-					values.append(1) # pseudo count
-					current += 1
+					max_reads = max([item[0] for item in json[key][read][x]]) + 1
 
-				# populate smaple dictionary with read length and its frequency
-				for item in json[key][read]:
+					current = 10
+					bins = []
+					values = []
 
-					for x in range(len(bins) - 1, -1, -1):
+					while current < max_reads:
+						bins.append(current)
+						values.append(1) # pseudo count
+						current += 1
 
-						if item[0] == bins[x]:
-							values[x] += item[1]
-							break 
+					# populate smaple dictionary with read length and its frequency
+					for item in json[key][read][x]:
 
-				values = list(map(math.log10, values))
+						for x in range(len(bins) - 1, -1, -1):
 
-				data[key] = {"bins": bins,
-							 "vals": values}
+							if item[0] == bins[x]:
+								values[x] += item[1]
+								break 
+
+					values = list(map(math.log10, values))
+
+					data[key].append({"bins": bins, "vals": values})
+
+				if read_keys[read] == "SE":
+					data[key] = data[key][-1]
 
 				if first == True:
 					active = "active" # button is default active
@@ -346,7 +349,6 @@ class Stats():
 
 				else:
 					active = "" # button is default off 
-
 
 				# # html div attributes and text
 				pid  = "htstream_stats_" + read + "_" + key + "_btn"
@@ -377,7 +379,6 @@ class Stats():
 			notice_html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
 			notice_html += table.plot(invariant_dict, headers, table_config)	
 
-
 		html = htstream_utils.stats_histogram_html(read, data, button_list, notice_html)
 
 		return html
@@ -403,7 +404,7 @@ class Stats():
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
-				stats_json[key]["St_SE_histogram"] = json[key][-1]["Single_end"]["readlength_histogram"]
+				stats_json[key]["St_SE_histogram"] = [json[key][-1]["Single_end"]["readlength_histogram"]]
 				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key][-1]["Single_end"]["base_by_cycle"]
 				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key][-1]["Single_end"]["qualities_by_cycle"]
 				stats_json[key]["St_SE_in"] = json[key][-1]["Single_end"]["in"]
@@ -416,8 +417,8 @@ class Stats():
 
 			try:
 				# sample instance in ordered dict
-				stats_json[key]["St_R1_histogram"] = json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"]
-				stats_json[key]["St_R2_histogram"] = json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]
+				stats_json[key]["St_PE_histogram"] = [json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"],
+													  json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]]
 				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
 				stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
 				stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
@@ -434,15 +435,14 @@ class Stats():
 		section = {"Table": self.table(stats_json)}
 
 		if PE_presence == True:
-			section["Read Length Histogram (Read 1)"] = self.histogram(stats_json, "St_R1_histogram")
+			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
 			section["Base by Cycle (Read 1)"] = self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle")
-			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle")
-			section["Read Length Histogram (Read 2)"] = self.histogram(stats_json, "St_R2_histogram")
 			section["Base by Cycle (Read 2)"] = self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle")
+			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle")
 			section["Quality by Cycle (Read 2)"] = self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
 
 
-		# only executres if single read data is detected
+		#only executres if single read data is detected
 		if SE_presence == True:
 			section["Read Length Histogram (Single End)"] = self.histogram(stats_json, "St_SE_histogram")
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle")

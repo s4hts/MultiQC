@@ -45,6 +45,62 @@ var title_read = read.split("_")[1];
 var title = "Read Length Histogram (" + title_read + "): " + sample;
 
 
+// Single end is handled differently, histogram parameters must be set differently
+if (title.includes('SE')) {
+
+  var bins = data[sample]["bins"];
+
+  var series_var = [{
+        name: 'Single End',
+        type: 'histogram',
+        xAxis: 1,
+        yAxis: 0,
+        stack: 0,
+        data: data[sample]["vals"],
+        type: 'column',
+    }]; 
+
+    var padidng_var = {
+                      pointPadding: 0,
+                      borderWidth: 0.1,
+                      groupPadding: 0.1,
+                      shadow: false
+                      }; 
+    console.log(series_var);
+  
+} else {
+
+  var bins = data[sample][0]["bins"];
+
+  var series_var = [{
+        name: 'Read 1',
+        type: 'histogram',
+        xAxis: 1,
+        yAxis: 0,
+        stack: 0,
+        data: data[sample][0]["vals"],
+        type: 'column',
+        color: '#84A7CA',
+    }, {
+        name: 'Read 2',
+        xAxis: 1,
+        yAxis: 0,
+        stack: 0,
+        data: data[sample][1]["vals"],
+        type: 'column',
+        color: '#E19CC6',
+        showInLegend: true
+    }]; 
+
+  var padidng_var = {
+                    pointPadding: 0,
+                    borderWidth: 0.05,
+                    groupPadding: 0.05,
+                    shadow: false
+                    }; 
+}
+
+// high chart histogram function
 Highcharts.chart(container, {
   chart: {
     type: 'column'
@@ -55,19 +111,29 @@ Highcharts.chart(container, {
   subtitle: {
     text: ''
   },
-  xAxis: {
-    categories: data[sample]["bins"],
-    crosshair: true,
-     title: {
-      text: 'Read Length'
-    }
-  },
-  yAxis: {
-    min: 0,
+  xAxis: [{
+    title: {
+      text: 'Data'
+    },
+    visible: false
+  }, {
     title: {
       text: ''
-    }
-  },
+    },
+    categories: bins,
+    type: 'linear',
+    tickPosition: 'outside'
+  }],
+  yAxis: [{
+    min: 0,
+    title: {
+      text: 'Log10 Read Counts'
+    },
+  }, {
+    visible: false,
+    type: 'linear'
+  }],
+
   tooltip: {
     headerFormat: '<span style="font-size:12px">{point.key} bp</span><table>',
     pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
@@ -77,18 +143,9 @@ Highcharts.chart(container, {
     useHTML: true
   },
   plotOptions: {
-    column: {
-      pointPadding: 0,
-      borderWidth: 0.10,
-      groupPadding: 0.10,
-      shadow: false
-    }
+    column: padidng_var
   },
-  series: [{
-    name: 'log10 Reads',
-    data: data[sample]["vals"]
-
-  }]
+  series: series_var,
 });
 
 }
@@ -96,6 +153,5 @@ Highcharts.chart(container, {
 $("document").ready(function() {
    $('.active.hist_btn').trigger( "click" );
 });
-
 
 
