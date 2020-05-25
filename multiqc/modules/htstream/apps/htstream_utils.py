@@ -186,6 +186,7 @@ def pca(matrix):
 			norm = np.linalg.norm(row)
 			row = row / norm
 
+		# remove zero rows and rows with no variation
 		if np.sum(row) == 0:
 			to_delete.append(x)
 		elif np.all(row == row[0]):

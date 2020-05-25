@@ -150,6 +150,7 @@ class Overlapper():
 			parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
 
 			overview_dict[key] = {
+								  "Input_Reads": json[key]["Fragment"]["in"],
 								  "Hist_Max": parsed_hist_stats["Max"],
 								  "Hist_Med": parsed_hist_stats["Median"],
 								  "PE_Out_In": json[key]["Paired_end"]["out"] / json[key]["Paired_end"]["in"],

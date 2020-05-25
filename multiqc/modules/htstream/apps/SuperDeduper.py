@@ -113,6 +113,7 @@ class SuperDeduper():
 			perc_loss_total += perc_loss
 
 			overview_dict[key] = {
+								  "Input_Reads": json[key]["Fragment"]["in"],
 								  "Reads_Lost": json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"],
 								  "Dups": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
 								  "Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]

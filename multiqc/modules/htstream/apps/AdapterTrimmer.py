@@ -118,6 +118,7 @@ class AdapterTrimmer():
 
 
 			overview_dict[key] = {
+								  "Input_Bp": json[key]["Fragment"]["basepairs_in"],
 								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],
 								  "R1_Bp_Trim": json[key]["Paired_end"]["Read1"]["adapterBpTrim"] / frag_in,
 								  "R1_Read_Trim": json[key]["Paired_end"]["Read1"]["adapterTrim"] / frag_in,

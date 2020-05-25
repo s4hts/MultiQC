@@ -12,58 +12,77 @@ class OverviewStats():
 
 	def table(self, json, app_list):
 
-		print(json)
-		return ""
 
-		config = {'table_title': 'Input Fragment Reduction'}
-		read_reducers = {"Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
-						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"}
+		read_data = {}
+		bp_data = {}
+
+		read_config = {'table_title': 'Input Bp Reduction'}
+		bp_config = {'table_title': 'Input Fragment Reduction'}
+
+		read_reducers = ["Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
+						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
+		bp_reducers = ["Pipeline Input", "hts_AdapterTrimmer", "hts_CutTrim", 
+						 "hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
 
 		# Table constructor. Just like the MultiQC docs.
-		headers = OrderedDict()
+		read_headers = OrderedDict()
+		bp_headers = OrderedDict()
 
 		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
 
-		html = '<h4>  Input Fragment Reduction </h4>'
 
-		for key in json.keys():
+		first_app = list(json.keys())[0]
+		samples = list(json[first_app].keys())
 
-			temp = {}
+		for samp in samples:
+
+			read_temp = {}
+			bp_temp = {}
 
 			for app in app_list:
 
-				temp[app] = json[key][app]["InputFragments"]
+				if app in read_reducers:
+					read_temp[app] = json[app][samp]["Input_Reads"]
 
-			json[key] = temp
+				if app in bp_reducers:
+					bp_temp[app] = json[app][samp]["Input_Bp"]
 
-		table_data = False
+
+			read_data[samp] = read_temp
+			bp_data[samp] = bp_temp
+
+
 		for i in range(len(app_list)):
 
 			app = app_list[i]
+			read_description = "Number of Input Fragments for " + app
+			bp_description = "Number of Input Bps for " + app
+			color = color_rotations[i % 4]
+			read_headers[app] = {'title': app, 'namespace': app, 'description': read_description, 'format': '{:,.0f}', 'scale': color}
+			bp_headers[app] = {'title': app, 'namespace': app, 'description': bp_description, 'format': '{:,.0f}', 'scale': color}
 
-			if app in read_reducers:
-
-				description = "Number of Input Fragments for " + app
-				color = color_rotations[i % 4]
-
-				headers[app] = {'title': app, 'namespace': app, 'description': description, 'format': '{:,.0f}', 'scale': color}
-
-
-		if len(headers.keys()) < 2:
+		html = '<h4>  Input Fragment Reduction </h4>'
+		if len(read_headers.keys()) < 2:
 			notice = "No Read Reducing Apps were found."
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
-
 		else:	
-			html += table.plot(json, headers, config)
+			html += table.plot(read_data, read_headers, read_config)
+
+		html += '<br>\n<h4>  Input Basepair Reduction </h4>'
+		if len(bp_headers.keys()) < 2:
+			notice = "No Read Reducing Apps were found."
+			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
+		else:	
+			html += table.plot(bp_data, bp_headers, bp_config)
 
 		return 	html
 
 
-	def hts_mds(self, json):
+	def hts_pca(self, json):
 
 		mds_plot = {}
 
-		config = {'title': "HTStream: MDS Plot"}
+		config = {'title': "HTStream: PCA Plot"}
 
 		keys = list(json.keys())
 		samples_list = list(json[keys[0]].keys())
@@ -112,14 +131,18 @@ class OverviewStats():
 
 				else:
 
-					temp = [v for k,v in sample_json.items()]
-					data[x] += temp
+					temp = []
 
-					if stats_bool == True:
-						stats_order += [k for k,v in sample_json.items()]
+					for k, v in sample_json.items():
+						if k != "Input_Reads":
+							temp.append(v)
+
+							if stats_bool == True:
+								stats_order.append(k)
+					
+					data[x] += temp		
 
 			stats_bool = False
-
 
 		data = np.asarray(data).T
 			
@@ -140,8 +163,8 @@ class OverviewStats():
 	def execute(self, json, app_list):
 
 		html = "" 
-		#html = self.table(json, app_list)
-		html += self.hts_mds(json)
+		html = self.table(json, app_list)
+		html += self.hts_pca(json)
 			
 		return html
 

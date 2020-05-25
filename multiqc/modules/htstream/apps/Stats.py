@@ -391,9 +391,11 @@ class Stats():
 
 		for key in json.keys():
 
+			#
+			# STATS FOR TABLE 
+			#
 			gc_count = (json[key][-1]["Fragment"]["base_composition"]["G"] + json[key][-1]["Fragment"]["base_composition"]["C"])
 			gc_content = ( gc_count / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
-
 			n_content = ( json[key][-1]["Fragment"]["base_composition"]["N"] / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
 
 			stats_json[key] = {"St_Fragments_in": json[key][-1]["Fragment"]["in"],
@@ -401,6 +403,10 @@ class Stats():
 						       "St_N_Content": n_content,
 						       "St_Notes": json[key][-1]["Program_details"]["options"]["notes"]}
 
+
+			#
+			# SINGLE END STATS
+			#
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
@@ -415,6 +421,9 @@ class Stats():
 				SE_presence = False
 
 
+			#
+			# PAIRED END STATS
+			#
 			try:
 				# sample instance in ordered dict
 				stats_json[key]["St_PE_histogram"] = [json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"],

@@ -175,8 +175,12 @@ class MultiqcModule(BaseMultiqcModule):
 																	 "Fragment_Section": json[key][app][0]["Fragment"],
 																	 "total_Q30": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"],
 																	 "Read_Breakdown":{
-																	 				   "Paired_end": json[key][app][0]["Paired_end"]["in"]}
-																					   }
+																	 				   "Paired_end": json[key][app][0]["Paired_end"]["in"]
+																	 				   },
+																	 "Input_Reads": json[key][app][0]["Fragment"]["in"],
+																	 "Input_Bp": json[key][app][0]["Fragment"]["basepairs_in"]
+																	}
+
 
 
 						try:
@@ -191,7 +195,9 @@ class MultiqcModule(BaseMultiqcModule):
 													 "total_Q30": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"],
 													 "Read_Breakdown": {
 													 					"Paired_end": json[key][app][-1]["Paired_end"]["in"]
-													 					}
+													 					},
+													 "Input_Reads": json[key][app][-1]["Fragment"]["in"],
+													 "Input_Bp": json[key][app][-1]["Fragment"]["basepairs_in"]
 													}
 
 
