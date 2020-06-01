@@ -28,7 +28,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 		# Initialise the parent object
 		super(MultiqcModule, self).__init__(name='HTStream',
-		anchor='htstream', href='https://ibest.github.io/HTStream/',
+		anchor='htstream', href='https://s4hts.github.io/HTStream/',
 		info=" quality control and processing pipeline for High Throughput Sequencing data ")
 
 
