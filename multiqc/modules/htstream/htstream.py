@@ -175,23 +175,10 @@ class MultiqcModule(BaseMultiqcModule):
 						stats_wrapper = True
 
 						self.overview_stats["Pipeline Input"][key] = {
-																	 "Fragment_Section": json[key][app][0]["Fragment"],
-																	 "total_Q30": json[key][app][0]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][0]["Paired_end"]["Read2"]["total_Q30_basepairs"],
-																	 "Read_Breakdown":{
-																	 				   "Paired_end": json[key][app][0]["Paired_end"]["in"]
-																	 				   },
 																	 "Input_Reads": json[key][app][0]["Fragment"]["in"],
 																	 "Input_Bp": json[key][app][0]["Fragment"]["basepairs_in"]
-																	}
+																	 }
 
-
-
-						try:
-							self.overview_stats["Pipeline Input"][key]["total_Q30"] += json[key][app][0]["Single_end"]["total_Q30_basepairs"]
-							self.overview_stats["Pipeline Input"][key]["Read_Breakdown"]["Single_end"] = json[key][app][0]["Single_end"]["in"]
-
-						except:
-							pass
 
 					self.overview_stats[app][key] = {
 													 "Fragment_Section": json[key][app][-1]["Fragment"],
@@ -223,11 +210,13 @@ class MultiqcModule(BaseMultiqcModule):
 				# if dictionary is not empty
 				if len(section_dict.keys()) != 0:
 
+					# create app k, v pair 
 					if app != "Stats":
 						self.overview_stats["hts_" + app] = section_dict["Overview"] 
 
-					html = ""
 
+					# construct html for section
+					html = ""
 					for title, section in section_dict.items():
 
 						if section != "" and title != "Overview":
@@ -236,52 +225,60 @@ class MultiqcModule(BaseMultiqcModule):
 					# remove trailing space
 					html = html[:-5]
 
+
+					# add description for app 
 					description = self.programs[app]["description"]
 
+					# stats section is treated differently
 					if app == "Stats":
-
 						self.summary_stats = {'description': description,
 											  'html': html}
 
 					else:
-
 						self.report_sections[app] = {'description': description,
 													 'html': html}
 
 
+
 		# create logical order for general overview table
 		overview_order = []
-		
 		if stats_wrapper == True:
-			overview_order.append("Pipeline Input")
 
+			overview_order.append("Pipeline Input")
+			
 			for a in app_order:
+
 				if a != "hts_Stats" and a not in excludes:
 					overview_order.append(a)
 
 			overview_order.append("hts_Stats")
 
 		else:
+
 			for a in app_order:
+
 				if a not in excludes:
 					overview_order.append(a)
 
 
-		# add pipeline overview 
-
+		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			app = OverviewStats.OverviewStats()
-			description = "General statistics from the HTStream pipeline."
-			html = app.execute(self.overview_stats, overview_order)
-			
-			self.add_section(name = "Processing Overview",
-							 description = description,
-							 content = html) 
+			try:
+				app = OverviewStats.OverviewStats()
+
+				description = "General statistics from the HTStream pipeline."
+				html = app.execute(self.overview_stats, overview_order)
+				
+				self.add_section(name = "Processing Overview",
+								 description = description,
+								 content = html) 
+
+			except:
+				log.warning("Report Section for Processing Overview Failed.")
 
 
-		# add apps
-
+		# add app sections
 		for section, content in self.report_sections.items():
 
 				try:
@@ -295,8 +292,8 @@ class MultiqcModule(BaseMultiqcModule):
 					log.warning(msg)
 
 
-		# add summary stats
 
+		# add summary stats if appropriate 
 		if self.summary_stats != {}:
 
 			try:
@@ -306,7 +303,6 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 			except:
-
 				log.warning("Report Section for hts_Stats Failed.")
 
 

@@ -186,7 +186,7 @@ def stats_histogram_html(read, data, button_list, notice):
 
 def pca(matrix):
 
-	# verified using PCA from sklearn.decomposition
+	# VERIFIED using PCA from sklearn.decomposition
 
 	n, m = matrix.shape # rows, col
 	
@@ -238,7 +238,11 @@ def pca(matrix):
 	# transform
 	transformed = matrix_w.T.dot(matrix)
 
-	return  transformed
+	# VALIDATION
+	# pca = PCA(n_components=2)
+	# transformed = pca.fit_transform(matrix.T)
+
+	return transformed
 
 
 

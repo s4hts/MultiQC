@@ -83,12 +83,11 @@ class OverviewStats():
 
 		mds_plot = {}
 
-		config = {'title': "HTStream: PCA Plot"}
-
 		keys = list(json.keys())
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)
 
+		black_list = ["Input_Reads", "Input_Bp"]
 
 		data = [[] for x in range(row_length)]
 
@@ -103,7 +102,7 @@ class OverviewStats():
 
 				sample_json = json[key][sample]
 
-				if key == "hts_Stats" or key == "Pipeline Input":
+				if key == "hts_Stats":
 
 					total_frags = sample_json["Fragment_Section"]["in"]
 					total_bp = sample_json["Fragment_Section"]["basepairs_in"]
@@ -117,7 +116,7 @@ class OverviewStats():
 					n_content = sample_json["Fragment_Section"]["base_composition"]["N"] / total_bp
 
 					temp = [
-							total_frags, # fragments in 
+							total_frags,
 							sample_json["total_Q30"] / total_bp, # fraction Q30
 							sample_json["Read_Breakdown"]["Paired_end"] / total_frags, # fraction PE
 							fraction_se, # fraction SE
@@ -128,31 +127,46 @@ class OverviewStats():
 					data[x] += temp
 
 					if stats_bool == True:
-						stats_order += ["Total Frags", "Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]
+						stats_order += ["Total Fragments", "Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]  
 
-				else:
+				elif key != "Pipeline Input":
 
 					temp = []
 
 					for k, v in sample_json.items():
-						if k != "Input_Reads":
+
+						if k not in black_list:
 							temp.append(v)
 
 							if stats_bool == True:
 								stats_order.append(k)
-					
+
 					data[x] += temp		
 
 			stats_bool = False
 
-		data = np.asarray(data).T
-			
-		data = htstream_utils.pca(data)
-			
-		for x in range(row_length):
+
+		data = htstream_utils.pca(np.asarray(data).T)			
+
+		x_min, x_max = 0, 0 
+		y_min, y_max = 0, 0
+
+		for x in range(len(data[0])):
 
 			mds_plot[samples_list[x]] = {"x": data[0, x],
 										 "y": data[1, x]}
+
+			x_min = min(x_min, data[0, x])	
+			y_min = min(y_min, data[1, x])
+			x_max = max(x_max, data[0, x])	
+			y_max = max(y_max, data[1, x])	
+
+
+		config = {'title': "HTStream: PCA Plot",
+				  'xmax': x_max + 1,                
+				  'xmin': x_min - 1,
+				  'ymax': y_max + 1,                
+				  'ymin': y_min - 1}
 
 
 		html = "<hr><h4>  Sample PCA Plot </h4>\n"
