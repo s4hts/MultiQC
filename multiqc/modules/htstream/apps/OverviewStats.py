@@ -16,8 +16,8 @@ class OverviewStats():
 		read_data = {}
 		bp_data = {}
 
-		read_config = {'table_title': 'Input Bp Reduction'}
-		bp_config = {'table_title': 'Input Fragment Reduction'}
+		read_config = {'table_title': 'Input Bp Reduction', 'id': "htstream_overview_read_reduction"}
+		bp_config = {'table_title': 'Input Fragment Reduction', 'id': "htstream_overview_bp_reduction"}
 
 		read_reducers = ["Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
 						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
@@ -42,10 +42,10 @@ class OverviewStats():
 			for app in app_list:
 
 				if app in read_reducers:
-					read_temp[app] = json[app][samp]["Input_Reads"]
+					read_temp[app + " (read)"] = json[app][samp]["Input_Reads"]
 
 				if app in bp_reducers:
-					bp_temp[app] = json[app][samp]["Input_Bp"]
+					bp_temp[app + " (bps)"] = json[app][samp]["Input_Bp"]
 
 
 			read_data[samp] = read_temp
@@ -58,10 +58,11 @@ class OverviewStats():
 			read_description = "Number of Input Fragments for " + app
 			bp_description = "Number of Input Bps for " + app
 			color = color_rotations[i % 4]
-			read_headers[app] = {'title': app, 'namespace': app, 'description': read_description, 'format': '{:,.0f}', 'scale': color}
-			bp_headers[app] = {'title': app, 'namespace': app, 'description': bp_description, 'format': '{:,.0f}', 'scale': color}
+			read_headers[app + " (read)"] = {'title': app, 'namespace': app, 'description': read_description, 'format': '{:,.0f}', 'scale': color}
+			bp_headers[app + " (bps)"] = {'title': app, 'namespace': app, 'description': bp_description, 'format': '{:,.0f}', 'scale': color}
 
 		html = '<h4>  Input Fragment Reduction </h4>'
+
 		if len(read_headers.keys()) < 2:
 			notice = "No Read Reducing Apps were found."
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	

@@ -8,8 +8,8 @@ import logging
 import re, json, os, operator
 
 # HTStream Apps
-from .apps import AdapterTrimmer, CutTrim, Overlapper, QWindowTrim, NTrimmer, PolyATTrim
-from .apps import  SeqScreener, SuperDeduper, Primers, Stats, OverviewStats, htstream_utils
+from .apps import AdapterTrimmer, CutTrim, LengthFilter, Overlapper, QWindowTrim, NTrimmer
+from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats, OverviewStats, htstream_utils
 
 from multiqc import config
 from multiqc.modules.base_module import BaseMultiqcModule
@@ -82,6 +82,9 @@ class MultiqcModule(BaseMultiqcModule):
 						'CutTrim': {"app": CutTrim.CutTrim(),
 								    "description": "Trims a fixed number of bases from the 5' and/or 3' end of each read."},
 
+						'LengthFilter': {"app": LengthFilter.LengthFilter(),
+								    "description": "Discards reads below a minimum length threshold."},
+
 						'NTrimmer': {"app": NTrimmer.NTrimmer(),
 									 "description": "Trims reads to the longest subsequence that contains no Ns."},
 						
@@ -153,7 +156,7 @@ class MultiqcModule(BaseMultiqcModule):
 			program = app.split("hts_")[-1]
 
 			if program not in self.programs.keys():
-				log.warning(app + " is currently not supported by MultiQC: HTStrean.")
+				log.warning(app + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
 				excludes.append(app)
 				continue
 
