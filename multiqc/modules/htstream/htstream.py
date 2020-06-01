@@ -82,6 +82,9 @@ class MultiqcModule(BaseMultiqcModule):
 						'CutTrim': {"app": CutTrim.CutTrim(),
 								    "description": "Trims a fixed number of bases from the 5' and/or 3' end of each read."},
 
+						'LengthFilter': {"app": LengthFilter.LengthFilter(),
+								    "description": "Discards reads below a minimum length threshold."},
+
 						'NTrimmer': {"app": NTrimmer.NTrimmer(),
 									 "description": "Trims reads to the longest subsequence that contains no Ns."},
 						
