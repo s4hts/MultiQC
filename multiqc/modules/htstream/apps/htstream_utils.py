@@ -32,6 +32,22 @@ def resolve(pairs):
 
 	return  resolved_dict
 
+
+#######################################
+
+# prints keys in a pretty way
+
+def key_print(dictionary):
+
+	string = ""
+
+	for key in dictionary.keys():
+		string += key + ", "
+
+	string = string[:-2] + "."
+
+	return  string 
+
 #######################################
 
 # sample status div creator
