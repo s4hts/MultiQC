@@ -12,17 +12,17 @@ from multiqc.plots import table, bargraph
 
 class Primers():
 
-	def table(self, json):
+	def table(self, json, index):
 
 		# standard table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
-		headers["Pr_PE_in"] = {'title': "PE in", 'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Pr_PE_out"] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Pr_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Pr_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Pr_Reads_Flipped"] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
-		headers["Pr_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Pr_PE_in" + index] = {'title': "PE in", 'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
+		headers["Pr_PE_out" + index] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Pr_SE_in" + index] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Pr_SE_out" + index] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
+		headers["Pr_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -81,7 +81,7 @@ class Primers():
 		return bargraph.plot(data, categories)
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -93,19 +93,19 @@ class Primers():
 
 			# dictionary entry for sample
 			stats_json[key] = {
-			 				   "Pr_PE_in": json[key]["Paired_end"]["in"],
-							   "Pr_PE_out": json[key]["Paired_end"]["out"],
-							   "Pr_SE_in" : json[key]["Single_end"]["in"],
-							   "Pr_SE_out": json[key]["Single_end"]["out"],
-							   "Pr_Reads_Flipped": json[key]["Fragment"]["flipped"],
-							   "Pr_Notes": json[key]["Program_details"]["options"]["notes"],
+			 				   "Pr_PE_in" + index: json[key]["Paired_end"]["in"],
+							   "Pr_PE_out" + index: json[key]["Paired_end"]["out"],
+							   "Pr_SE_in" + index: json[key]["Single_end"]["in"],
+							   "Pr_SE_out" + index: json[key]["Single_end"]["out"],
+							   "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
+							   "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "Pr_Primers": json[key]["Program_details"]["primers"],
 							   "Pr_Primer_Counts": json[key]["Fragment"]["primers_counts"]
 						 	  }
 
 		# dictionary for sections and figure function calls
 		section = {
-				   "Table": self.table(stats_json),
+				   "Table": self.table(stats_json, index),
 				   "Reads with Primers": self.bargraph(stats_json),
 				   "Overview": overview_dict
 				   }

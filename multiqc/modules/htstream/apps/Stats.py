@@ -14,17 +14,17 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
-	def table(self, json):
+	def table(self, json, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
-		headers["St_Fragments_in"] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
-		headers["St_GC_Content"] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
+		headers["St_Fragments_in" + index] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
+		headers["St_GC_Content" + index] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
 									'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
-		headers["St_N_Content"] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
+		headers["St_N_Content" + index] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
 								   'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
-		headers["St_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["St_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
 		return table.plot(json, headers)
@@ -133,7 +133,7 @@ class Stats():
 
 
 
-	def quality_by_cycle(self, json, read):
+	def quality_by_cycle(self, json, read, index):
 
 		# Here is the most complicated figure implementation in this whole module.
 		#	The issues here are that MultiQC had limited options for displaying 
@@ -182,7 +182,7 @@ class Stats():
 			line_data[key] = {}
 
 			# creates unique heatmap id that can be queired later by js.
-			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_heatmap"
+			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_heatmap_" + index
 
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = json[key][read]["col_names"]
@@ -257,18 +257,19 @@ class Stats():
 				heatmap.plot(data, x_lab, y_lab, heat_pconfig)
 
 
+
 			# html div attributes and text
 			name = key
 			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
 
-			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
+			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, {i})" id="{pid}">{n}</button>\n'.format(a=active, i=index, pid=pid, n=name))
 
 	
 		status_div = htstream_utils.sample_status(status_dict)
 
 		line_plot = linegraph.plot(line_data, line_config)
 
-		html = htstream_utils.qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap_html)
+		html = htstream_utils.qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap_html, index)
 
 		return html
 
@@ -384,7 +385,7 @@ class Stats():
 
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_stats = {} 
@@ -398,10 +399,10 @@ class Stats():
 			gc_content = ( gc_count / json[key]["Fragment"]["basepairs_out"] ) * 100 
 			n_content = ( json[key]["Fragment"]["base_composition"]["N"] / json[key]["Fragment"]["basepairs_out"] ) * 100 
 
-			stats_json[key] = {"St_Fragments_in": json[key]["Fragment"]["in"],
-							   "St_GC_Content": gc_content,
-						       "St_N_Content": n_content,
-						       "St_Notes": json[key]["Program_details"]["options"]["notes"]}
+			stats_json[key] = {"St_Fragments_in" + index: json[key]["Fragment"]["in"],
+							   "St_GC_Content" + index: gc_content,
+						       "St_N_Content" + index: n_content,
+						       "St_Notes" + index: json[key]["Program_details"]["options"]["notes"]}
 
 
 			overview_stats[key] = {"Output_Reads": json[key]["Fragment"]["out"],
@@ -456,22 +457,22 @@ class Stats():
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json),
+		section = {"Table": self.table(stats_json, index),
 				   "Overview": overview_stats}
 
 		if PE_presence == True:
 			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
 			section["Base by Cycle (Read 1)"] = self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle")
 			section["Base by Cycle (Read 2)"] = self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle")
-			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle")
-			section["Quality by Cycle (Read 2)"] = self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle")
+			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle", index)
+			section["Quality by Cycle (Read 2)"] = self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle", index)
 
 
 		#only executres if single read data is detected
 		if SE_presence == True:
 			section["Read Length Histogram (Single End)"] = self.histogram(stats_json, "St_SE_histogram")
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle")
-			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle")
+			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle", index)
 
 	
 		return section 

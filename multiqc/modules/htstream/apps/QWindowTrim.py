@@ -13,7 +13,7 @@ from multiqc.plots import table, bargraph
 class QWindowTrim():
 
 
-	def table(self, json, bps):
+	def table(self, json, bps, index):
 
 		# Table construction. Taken from MultiQC docs.
 
@@ -22,24 +22,24 @@ class QWindowTrim():
 
 		headers = OrderedDict()
 
-		headers["Qt_%_BP_Lost"] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Qt_%_R1_BP_Lost"] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Qt_%_R2_BP_Lost"] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Qt_%_SE_BP_Lost"] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Qt_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bpss Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 
+		headers["Qt_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bpss Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 
 										'format': '{:,.2f}', 'scale': 'Blues'}
-		headers["Qt_%_Discarded"] = {'title': "% Discarded",
+		headers["Qt_%_Discarded" + index] = {'title': "% Discarded",
 									 'namespace': "% Discarded",
 									 'description': 'Percentage of Reads (SE and PE) Discarded',
 									 'suffix': '%',
 									 'format': '{:,.2f}',
 									 'scale': 'Oranges'
 									}
-		headers["Qt_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Qt_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -96,7 +96,7 @@ class QWindowTrim():
 		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -155,12 +155,12 @@ class QWindowTrim():
 
 			# sample dictionary entry
 			stats_json[key] = {
-							   "Qt_%_BP_Lost": perc_bp_lost,
-							   "Qt_%_R1_BP_Lost": total_r1,
-							   "Qt_%_R2_BP_Lost": total_r2,
-							   "Nt_%_SE_BP_Lost": total_se,
-							   "Qt_Avg_BP_Trimmed": total_bp_lost / json[key]["Fragment"]["in"],
-							   "Qt_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Qt_%_BP_Lost" + index: perc_bp_lost,
+							   "Qt_%_R1_BP_Lost" + index: total_r1,
+							   "Qt_%_R2_BP_Lost" + index: total_r2,
+							   "Nt_%_SE_BP_Lost" + index: total_se,
+							   "Qt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
+							   "Qt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "Qt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
 							   "Qt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
 							   "Qt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
@@ -174,7 +174,7 @@ class QWindowTrim():
 
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, total_trimmed_bp),
+		section = {"Table": self.table(stats_json, total_trimmed_bp, index),
 				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp),
 				   "Overview": overview_dict}
 

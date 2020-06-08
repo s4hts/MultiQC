@@ -122,10 +122,15 @@ class OverviewStats():
 					except:
 						fraction_se = 0
 
+					try:
+						fraction_pe = sample_json["Read_Breakdown"]["Paired_end"] / total_frags # fraction PE
+					except:
+						fraction_pe = 0
+
 					temp = [
 							total_frags,
 							sample_json["total_Q30"] / total_bp, # fraction Q30
-							sample_json["Read_Breakdown"]["Paired_end"] / total_frags, # fraction PE
+							fraction_pe,
 							fraction_se, # fraction SE
 							gc_content, # GC Content
 							n_content # N Content
@@ -169,10 +174,10 @@ class OverviewStats():
 
 
 		config = {'title': "HTStream: PCA Plot",
-				  'xmax': x_max + 1,                
-				  'xmin': x_min - 1,
-				  'ymax': y_max + 1,                
-				  'ymin': y_min - 1}
+				  'xmax': x_max + 0.25,                
+				  'xmin': x_min - 0.25,
+				  'ymax': y_max + 0.25,                
+				  'ymin': y_min - 0.25}
 
 
 		html = "<hr><h4>  Sample PCA Plot </h4>\n"

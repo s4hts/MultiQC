@@ -12,7 +12,7 @@ from multiqc.plots import table
 
 class SeqScreener():
 
-	def table(self, json, PE_presence, total):
+	def table(self, json, PE_presence, total, index):
 
 		# Basic table constructor. See MultiQC docs.
 		headers = OrderedDict()
@@ -22,20 +22,20 @@ class SeqScreener():
 			return html
 
 		if PE_presence == True:
-			headers["Ss_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+			headers["Ss_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 								 'suffix': "%", 'scale': 'Greens' }
-			headers["Ss_PE_hits"] = {'title': "PE hits", 'namespace': 'PE hits','description': 'Number of Paired End Reads with Sequence', 'format': '{:,.0f}', 'scale': 'Blues'}
+			headers["Ss_PE_hits" + index] = {'title': "PE hits", 'namespace': 'PE hits','description': 'Number of Paired End Reads with Sequence', 'format': '{:,.0f}', 'scale': 'Blues'}
 
-		headers["Ss_SE_in"] = {'title': "SE in", 'namespace': 'SE in', 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Ss_SE_out"] = {'title': "SE out", 'namespace': 'SE out','description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Ss_SE_hits"] = {'title': "SE hits", 'namespace': 'SE hits', 'description': 'Number of Single End Reads with Sequence', 'format': '{:,.0f}', 'scale': 'Blues'}
-		headers["Ss_Notes"] = {'title': "Notes", 'namespace': 'Notes', 'description': 'Notes'}
+		headers["Ss_SE_in" + index] = {'title': "SE in", 'namespace': 'SE in', 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Ss_SE_out" + index] = {'title': "SE out", 'namespace': 'SE out','description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Ss_SE_hits" + index] = {'title': "SE hits", 'namespace': 'SE hits', 'description': 'Number of Single End Reads with Sequence', 'format': '{:,.0f}', 'scale': 'Blues'}
+		headers["Ss_Notes" + index] = {'title': "Notes", 'namespace': 'Notes', 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -71,16 +71,16 @@ class SeqScreener():
 
 			# sample entry for stats dictionary
 			stats_json[key] = {
-			 				   "Ss_PE_loss": perc_loss,
-							   "Ss_PE_hits": pe_hits,
-							   "Ss_SE_in" : json[key]["Single_end"]["in"],
-							   "Ss_SE_out": json[key]["Single_end"]["out"],
-							   "Ss_SE_hits": se_hits,
-							   "Ss_Notes": json[key]["Program_details"]["options"]["notes"],
+			 				   "Ss_PE_loss" + index: perc_loss,
+							   "Ss_PE_hits" + index: pe_hits,
+							   "Ss_SE_in" + index: json[key]["Single_end"]["in"],
+							   "Ss_SE_out"  + index: json[key]["Single_end"]["out"],
+							   "Ss_SE_hits" + index: se_hits,
+							   "Ss_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 						 	  }
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, PE_presence, total_hits),
+		section = {"Table": self.table(stats_json, PE_presence, total_hits, index),
 				   "Overview": overview_dict}
 
 		return section

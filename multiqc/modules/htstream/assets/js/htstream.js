@@ -1,31 +1,37 @@
-function htstream_div_switch(ele) {
+function htstream_div_switch(ele, index) {
 
-var plot_id = ele.id.split("_b")[0].concat("_heatmap");
+var suffix = "_heatmap_" + index.toString();
+var plot_id = ele.id.split("_b")[0].concat(suffix);
 var plot_div = ele.parentNode.parentNode.querySelector('.hc-plot');
 
-
 plot_div.id = plot_id;
+
+
 plot_div.className = "hc-plot not_rendered hc-heatmap";
 plot_graph(plot_id);
 
+
 }
 
-function htstream_plot_switch(ele) {
+function htstream_plot_switch(ele, index) {
 
 var plot_id = ele.id.split("_btn")[0];
-var read = plot_id.split("heat_").pop();
 
 if (plot_id.includes('htstream_qbc_line')) {
 
+  var read = plot_id.split("line_").pop();
 	var on = document.getElementById(plot_id);
 	var off = document.getElementById("htstream_qbc_heat_" + read);
+
 	on.style.display = 'block';
 	off.style.display = 'none';
 
 } else {
 
+   var read = plot_id.split("heat_").pop();
 	var on = document.getElementById(plot_id);
 	var off = document.getElementById("htstream_qbc_line_" + read);
+
 	on.style.display = 'block';
 	off.style.display = 'none';
 	var plot_div = on.querySelector('.hc-plot');
@@ -41,8 +47,6 @@ function htstream_histogram(read, sample) {
 var text = document.getElementsByClassName("htstream_histogram_content_" + read)[0].innerText;
 var data = JSON.parse(text)[0];
 
-
-console.log(data);
 var container = "htstream_histogram_".concat(read);
 var title_read = read.split("_")[1];
 var title_sample = sample.split("_")[0] + "_" + sample.split("_")[1]

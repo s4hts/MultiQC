@@ -12,7 +12,7 @@ from multiqc.plots import table, bargraph
 
 class CutTrim():
 
-	def table(self, json, bps):
+	def table(self, json, bps, index):
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:
@@ -23,15 +23,15 @@ class CutTrim():
 		
 		headers = OrderedDict()
 
-		headers["Ct_%_BP_Lost"] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Ct_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Ct_%_R1_BP_Lost"] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Ct_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Ct_%_R2_BP_Lost"] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Ct_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Ct_%_SE_BP_Lost"] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Ct_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Ct_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Ct_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -88,7 +88,7 @@ class CutTrim():
 
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -121,11 +121,11 @@ class CutTrim():
 
 			# sample dictionary entry
 			stats_json[key] = {
-							   "Ct_%_BP_Lost": perc_bp_lost,
-							   "Ct_Notes": json[key]["Program_details"]["options"]["notes"],
-							   "Ct_%_R1_BP_Lost": total_r1,
-							   "Ct_%_R2_BP_Lost": total_r2,
-							   "Ct_%_SE_BP_Lost": total_se,
+							   "Ct_%_BP_Lost" + index: perc_bp_lost,
+							   "Ct_Notes" + index: json[key]["Program_details"]["options"]["notes"],
+							   "Ct_%_R1_BP_Lost" + index: total_r1,
+							   "Ct_%_R2_BP_Lost" + index: total_r2,
+							   "Ct_%_SE_BP_Lost" + index: total_se,
 							   "Ct_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"], 
 							   "Ct_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
 							   "Ct_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"], 
@@ -135,7 +135,7 @@ class CutTrim():
 							  }
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, total),
+		section = {"Table": self.table(stats_json, total, index),
 				   "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, total),
 				   "Overview": overview_dict}
 

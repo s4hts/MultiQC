@@ -12,7 +12,7 @@ from multiqc.plots import table, bargraph
 
 class AdapterTrimmer():
 
-	def table(self, json, total, zeroes):
+	def table(self, json, total, zeroes, index):
 
 		# Table constructor. Just like the MultiQC docs.
 
@@ -23,14 +23,14 @@ class AdapterTrimmer():
 
 		if zeroes == False:
 
-			headers["At_%_BP_Lost"] = {'title': "% Bp Lost",
+			headers["At_%_BP_Lost" + index] = {'title': "% Bp Lost",
 										'namespace': "% Bp Lost",
 										'description': 'Percentage of Input bps (SE and PE) trimmed.',
 										'suffix': '%',
 										'format': '{:,.2f}',
 										'scale': 'RdPu'
 										}
-			headers["At_%_Adapters"] = {'title': "% Adapters",
+			headers["At_%_Adapters" + index] = {'title': "% Adapters",
 										'namespace': "% Adapters",
 										'description': 'Percentage of Reads (SE and PE) with an Adapter',
 										'suffix': '%',
@@ -40,12 +40,12 @@ class AdapterTrimmer():
 
 		else:
 
-			headers["At_BP_Lost"] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Input bps (SE and PE) trimmed.', 'scale': 'RdPu', 'format': '{:,.0f}'}
-			headers["At_Adapters"] = {'title': "Adapters", 'namespace': "Adapters", 'description': 'Reads (SE and PE) with an Adapter', 'scale': 'Blues', 'format': '{:,.0f}'}
+			headers["At_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Input bps (SE and PE) trimmed.', 'scale': 'RdPu', 'format': '{:,.0f}'}
+			headers["At_Adapters" + index] = {'title': "Adapters", 'namespace': "Adapters", 'description': 'Reads (SE and PE) with an Adapter', 'scale': 'Blues', 'format': '{:,.0f}'}
 
 
-		headers["At_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
-		headers["At_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["At_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
+		headers["At_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -85,7 +85,7 @@ class AdapterTrimmer():
 		return bargraph.plot(json, categories, config)
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -130,12 +130,12 @@ class AdapterTrimmer():
 
 			# sample dictionary entry
 			stats_json[key] = {
-							   "At_%_BP_Lost": perc_bp_lost,
-							   "At_%_Adapters": perc_adapters,
-							   "At_BP_Lost": bp_trimmed,
-							   "At_Adapters": adapter_reads,
-							   "At_Avg_BP_Trimmed": avg_bp_trimmed,
-							   "At_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "At_%_BP_Lost" + index: perc_bp_lost,
+							   "At_%_Adapters" + index: perc_adapters,
+							   "At_BP_Lost" + index: bp_trimmed,
+							   "At_Adapters" + index: adapter_reads,
+							   "At_Avg_BP_Trimmed" + index: avg_bp_trimmed,
+							   "At_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "At_R1": json[key]["Paired_end"]["Read1"]["adapterBpTrim"],
 							   "At_R2": json[key]["Paired_end"]["Read2"]["adapterBpTrim"],
 							   "At_SE": json[key]["Single_end"]["adapterBpTrim"]
@@ -143,7 +143,7 @@ class AdapterTrimmer():
 
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, total, zeroes),
+		section = {"Table": self.table(stats_json, total, zeroes, index),
 				   "Bp Composition Bargraph": self.bargraph(stats_json, total),
 				   "Overview": overview_dict}
 

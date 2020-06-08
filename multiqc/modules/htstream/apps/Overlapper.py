@@ -15,24 +15,24 @@ log = logging.getLogger(__name__)
 
 class Overlapper():
 
-	def table(self, json):
+	def table(self, json, index):
 
 		config = {'namespace': 'overlapper'}
 
 		# straight forward table construction.
 		headers = OrderedDict()
 
-		headers["Ov_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+		headers["Ov_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 								 'suffix': '%', 'scale': 'Greens' }
-		headers["Ov_%_Overlapped"] = {'title': "% Overlapped", 
+		headers["Ov_%_Overlapped" + index] = {'title': "% Overlapped", 
 									  'namespace': "% Overlapped",
 									  'description': 'Percentage of Reads with Overlap.',
 									  'suffix': '%',
 									  'format': '{:,.2f}',
 									  'scale': 'Blues'}
-		headers["Ov_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Ov_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Ov_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Ov_SE_in" + index] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Ov_SE_out" + index] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Ov_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
@@ -118,7 +118,7 @@ class Overlapper():
 		return hist_stats
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -163,11 +163,11 @@ class Overlapper():
 
 			# sample instance in dictionary
 			stats_json[key] = {
-							   "Ov_PE_loss": perc_loss,
-							   "Ov_SE_in" : json[key]["Single_end"]["in"],
-							   "Ov_SE_out": json[key]["Single_end"]["out"],
-							   "Ov_%_Overlapped": perc_overlapped,
-						 	   "Ov_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Ov_PE_loss" + index: perc_loss,
+							   "Ov_SE_in" + index: json[key]["Single_end"]["in"],
+							   "Ov_SE_out" + index: json[key]["Single_end"]["out"],
+							   "Ov_%_Overlapped" + index: perc_overlapped,
+						 	   "Ov_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "Ov_Sins": sins,
 							   "Ov_Mins": mins,
 							   "Ov_Lins": lins,
@@ -179,7 +179,7 @@ class Overlapper():
 
 
 		# sections and function calls 
-		section = {"Table": self.table(stats_json),
+		section = {"Table": self.table(stats_json, index),
 				   "Overlap Composition": self.bargraph(stats_json, inserts),
 				   "Overlapped Lengths Density Plots": self.linegraph(stats_json),
 				   "Overview": overview_dict}

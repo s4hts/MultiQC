@@ -13,25 +13,25 @@ from multiqc.plots import table, linegraph
 class SuperDeduper():
 
 
-	def table(self, json, total):
+	def table(self, json, total, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
 		if total != 0:
-			headers["Sd_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+			headers["Sd_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 									 'suffix': '%', 'scale': 'Greens' }
 
-		headers["Sd_SE_in"] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Sd_SE_out"] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Sd_%_Duplicates"] = {'title': "% Duplicates", 
+		headers["Sd_SE_in" + index] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Sd_SE_out" + index] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Sd_%_Duplicates" + index] = {'title': "% Duplicates", 
 								   'namespace': "% Duplicates", 
 								   'description': 'Percentage of Duplicate Reads (SE and PE)',
 								   'suffix': '%',
 								   'format': '{:,.2f}',
 								   'scale': 'Oranges'
 								  }
-		headers["Sd_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Sd_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
 		return table.plot(json, headers)
@@ -90,7 +90,7 @@ class SuperDeduper():
 		return html
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -121,17 +121,17 @@ class SuperDeduper():
 
 			# sample instance in ordered dict
 			stats_json[key] = {
-			 				   "Sd_PE_loss": perc_loss,
-							   "Sd_SE_in": json[key]["Single_end"]["in"],
-							   "Sd_SE_out": json[key]["Single_end"]["out"],
-							   "Sd_%_Duplicates": perc_duplicates,
-							   "Sd_Notes": json[key]["Program_details"]["options"]["notes"],
+			 				   "Sd_PE_loss" + index: perc_loss,
+							   "Sd_SE_in" + index: json[key]["Single_end"]["in"],
+							   "Sd_SE_out" + index: json[key]["Single_end"]["out"],
+							   "Sd_%_Duplicates" + index: perc_duplicates,
+							   "Sd_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "Sd_Duplicates": json[key]["Fragment"]["duplicate"],
 							   "Sd_Saturation": json[key]["Fragment"]["duplicate_saturation"]
 						 	  }
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json, perc_loss_total),
+		section = {"Table": self.table(stats_json, perc_loss_total, index),
 				   "Duplicate Saturation": self.linegraph(stats_json),
 				   "Overview": overview_dict}
 

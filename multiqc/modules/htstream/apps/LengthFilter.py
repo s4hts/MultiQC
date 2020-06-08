@@ -18,7 +18,7 @@ from multiqc.plots import table, bargraph
 
 class LengthFilter():
 
-	def table(self, json, PE_presence, total):
+	def table(self, json, PE_presence, total, index):
 
 	# Basic table constructor. See MultiQC docs.
 		headers = OrderedDict()
@@ -28,17 +28,17 @@ class LengthFilter():
 			return html
 
 		if PE_presence == True:
-			headers["Lf_PE_loss"] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
+			headers["Lf_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 								 'suffix': "%", 'scale': 'Greens' }
 
-		headers["Lf_SE_in"] = {'title': "SE in", 'namespace': 'SE in', 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Lf_SE_out"] = {'title': "SE out", 'namespace': 'SE out','description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Lf_Notes"] = {'title': "Notes", 'namespace': 'Notes', 'description': 'Notes'}
+		headers["Lf_SE_in" + index] = {'title': "SE in", 'namespace': 'SE in', 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
+		headers["Lf_SE_out" + index] = {'title': "SE out", 'namespace': 'SE out','description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		headers["Lf_Notes" + index] = {'title': "Notes", 'namespace': 'Notes', 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -69,14 +69,14 @@ class LengthFilter():
 
 			# sample entry for stats dictionary
 			stats_json[key] = {
-			 				   "Lf_PE_loss": perc_loss,
-							   "Lf_SE_in" : json[key]["Single_end"]["in"],
-							   "Lf_SE_out": json[key]["Single_end"]["out"],
-							   "Lf_Notes": json[key]["Program_details"]["options"]["notes"],
+			 				   "Lf_PE_loss" + index: perc_loss,
+							   "Lf_SE_in" + index: json[key]["Single_end"]["in"],
+							   "Lf_SE_out" + index: json[key]["Single_end"]["out"],
+							   "Lf_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 						 	  }
 
 		# sections and figure function calls
-		section = {"Table": self.table(stats_json, PE_presence, total_loss),
+		section = {"Table": self.table(stats_json, PE_presence, total_loss, index),
 				   "Overview": overview_dict}
 
 

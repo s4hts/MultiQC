@@ -178,9 +178,10 @@ class MultiqcModule(BaseMultiqcModule):
 
 				app_name = app 
 				app = program
+				index = app_name.split("(")[1][:-1]
 
 				# dictionary of subsections
-				section_dict = self.programs[app]["app"].execute(stats_dict)
+				section_dict = self.programs[app]["app"].execute(stats_dict, index)
 
 				# if dictionary is not empty
 				if len(section_dict.keys()) != 0:
@@ -210,25 +211,28 @@ class MultiqcModule(BaseMultiqcModule):
 		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			#try:
-			app = OverviewStats.OverviewStats()
+			try:
+				app = OverviewStats.OverviewStats()
 
-			description = "General statistics from the HTStream pipeline."
-			html = app.execute(self.overview_stats, app_order)
-			
-			self.add_section(name = "Processing Overview",
-							 description = description,
-							 content = html) 
+				description = "General statistics from the HTStream pipeline."
+				html = app.execute(self.overview_stats, app_order)
+				
+				self.add_section(name = "Processing Overview",
+								 description = description,
+								 content = html) 
 
-			# except:
-			# 	log.warning("Report Section for Processing Overview Failed.")
+			except:
+			 	log.warning("Report Section for Processing Overview Failed.")
 
 
 		# add app sections
 		for section, content in self.report_sections.items():
 
+				temp_list = section.split("(")
+				name = temp_list[0][:-1] + "_" + temp_list[1][0]
+
 				try:
-					self.add_section(name = section,
+					self.add_section(name = name,
 									 description = content["description"],
 									 content = content["html"])
 

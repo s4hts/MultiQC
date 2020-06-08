@@ -12,7 +12,7 @@ from multiqc.plots import table, bargraph
 
 class PolyATTrim():
 
-	def table(self, json, bps, zeroes):
+	def table(self, json, bps, zeroes, index):
 
 		# Table construction. Taken from MultiQC docs.
 
@@ -22,31 +22,31 @@ class PolyATTrim():
 		headers = OrderedDict()
 
 		if zeroes == False:
-			headers["Pt_%_BP_Lost"] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+			headers["Pt_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 		else:
-			headers["Pt_BP_Lost"] = {'title': "Total Bp Lost", 'namespace': "Total Bp Lost", 'description': 'Total input bps (SE and PE) trimmed.',
+			headers["Pt_BP_Lost" + index] = {'title': "Total Bp Lost", 'namespace': "Total Bp Lost", 'description': 'Total input bps (SE and PE) trimmed.',
 									 'format': '{:,.0f}', 'scale': 'Greens'}
 
-		headers["Pt_%_R1_BP_Lost"] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Pt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Pt_%_R2_BP_Lost"] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Pt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Pt_%_SE_BP_Lost"] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Pt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
 
 		if zeroes == False:
-			headers["Pt_Avg_BP_Trimmed"] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
+			headers["Pt_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
 			
 
 
-		headers["Pt_Notes"] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+		headers["Pt_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
-	def execute(self, json):
+	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
@@ -90,19 +90,19 @@ class PolyATTrim():
 
 			# sample entry in stats dictionary
 			stats_json[key] = {
-							   "Pt_%_BP_Lost": perc_bp_lost,
-							   "Pt_BP_Lost": total_bp_lost,
-							   "Pt_%_R1_BP_Lost": total_r1,
-							   "Pt_%_R2_BP_Lost": total_r2,
-							   "Pt_%_SE_BP_Lost": total_se,
-							   "Pt_Avg_BP_Trimmed": total_bp_lost / json[key]["Fragment"]["in"],
-							   "Pt_Notes": json[key]["Program_details"]["options"]["notes"],
+							   "Pt_%_BP_Lost" + index: perc_bp_lost,
+							   "Pt_BP_Lost" + index: total_bp_lost,
+							   "Pt_%_R1_BP_Lost" + index: total_r1,
+							   "Pt_%_R2_BP_Lost" + index: total_r2,
+							   "Pt_%_SE_BP_Lost" + index: total_se,
+							   "Pt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
+							   "Pt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							  }
 
 			trimmed_bps += sample_trimmed_bps 
 
 		# section and figure function calls
-		section = {"Table": self.table(stats_json, trimmed_bps, zeroes),
+		section = {"Table": self.table(stats_json, trimmed_bps, zeroes, index),
 				   "Overview": overview_dict}
 
 

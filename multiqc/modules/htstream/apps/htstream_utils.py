@@ -21,18 +21,6 @@ def resolve(pairs):
 			resolved_dict[k + " (" + str(index_dict[k]) + ")"] = v
 			index_dict[k] += 1
 
-
-		# # if key is stats, return both entries are added to list
-		# if k == "hts_Stats":
-
-		# 	try:
-		# 		resolved_dict[k].append(v)
-
-		# 	except:
-		# 		resolved_dict[k] = []
-		# 		resolved_dict[k].append(v)
-
-		# if not stats, business as usual
 		elif "hts_" in k:
 			resolved_dict[k + " (1)"] = v
 			index_dict[k] = 2
@@ -112,7 +100,7 @@ def sample_status(samples):
 
 # Quality by Base html formatter
 
-def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap):
+def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap, index):
 
 	read_header  = " ".join(read.split("_")[1:3])
 
@@ -126,8 +114,8 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 	wrapper_html += status_div 
 
 	wrapper_html += '<div class="btn-group hc_switch_group">\n'
-	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{b}_{u}_btn">Linegraph</button>\n'.format(b=btn_id, u=unique_id)
-	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{b}_{u}_btn">Heatmaps</button></div>\n'.format(b=btn_id, u=unique_id)
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, {i})" id="htstream_qbc_line_{b}_{u}_btn">Linegraph</button>\n'.format(b=btn_id, i=index, u=unique_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, {i})" id="htstream_qbc_heat_{b}_{u}_btn">Heatmaps</button></div>\n'.format(b=btn_id, i=index, u=unique_id)
 	wrapper_html += "<br></br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
