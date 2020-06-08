@@ -13,7 +13,7 @@ plot_graph(plot_id);
 function htstream_plot_switch(ele) {
 
 var plot_id = ele.id.split("_btn")[0];
-var read = plot_id.split("_").pop();
+var read = plot_id.split("heat_").pop();
 
 if (plot_id.includes('htstream_qbc_line')) {
 
@@ -32,6 +32,7 @@ if (plot_id.includes('htstream_qbc_line')) {
 	plot_graph(plot_div.id);
 
 }
+
 }
 
 
@@ -40,9 +41,12 @@ function htstream_histogram(read, sample) {
 var text = document.getElementsByClassName("htstream_histogram_content_" + read)[0].innerText;
 var data = JSON.parse(text)[0];
 
+
+console.log(data);
 var container = "htstream_histogram_".concat(read);
 var title_read = read.split("_")[1];
-var title = "Read Length Histogram (" + title_read + "): " + sample;
+var title_sample = sample.split("_")[0] + "_" + sample.split("_")[1]
+var title = "Read Length Histogram (" + title_read + "): " + title_sample;
 
 
 // Single end is handled differently, histogram parameters must be set differently
@@ -58,6 +62,7 @@ if (title.includes('SE')) {
         stack: 0,
         data: data[sample]["vals"],
         type: 'column',
+        color: '#84A7CA'
     }]; 
 
     var padidng_var = {
@@ -66,7 +71,6 @@ if (title.includes('SE')) {
                       groupPadding: 0.1,
                       shadow: false
                       }; 
-    console.log(series_var);
   
 } else {
 
@@ -127,7 +131,7 @@ Highcharts.chart(container, {
   yAxis: [{
     min: 0,
     title: {
-      text: 'Log10 Read Counts'
+      text: 'Reads'
     },
   }, {
     visible: false,

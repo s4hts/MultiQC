@@ -49,21 +49,21 @@ class LengthFilter():
 
 			try:
 				perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
-				PE_presence = True
-				frag_in = json[key]["Fragment"]["in"]
+				frag_out = json[key]["Fragment"]["out"]
 				reads_lost = json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"]
+				PE_presence = True
 
 
 			except:
 				perc_loss = 0
-				frag_in = 0
+				frag_out = 0
 				reads_lost = 0
 				PE_presence = False 
 
 			total_loss += perc_loss
 
 			overview_dict[key] = {
-								  "Input_Reads": frag_in,
+								  "Output_Reads": frag_out,
 								  "Reads_Lost": reads_lost
 								 }
 

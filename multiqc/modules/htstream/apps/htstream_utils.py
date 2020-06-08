@@ -12,21 +12,31 @@ import numpy as np
 def resolve(pairs):
 
 	resolved_dict = {}
+	index_dict = {}
 
 	# iterates through json key value pairs
 	for k, v in pairs:
 
-		# if key is stats, return both entries are added to list
-		if k == "hts_Stats":
+		if k in index_dict.keys() and "hts_" in k:
+			resolved_dict[k + " (" + str(index_dict[k]) + ")"] = v
+			index_dict[k] += 1
 
-			try:
-				resolved_dict[k].append(v)
 
-			except:
-				resolved_dict[k] = []
-				resolved_dict[k].append(v)
+		# # if key is stats, return both entries are added to list
+		# if k == "hts_Stats":
+
+		# 	try:
+		# 		resolved_dict[k].append(v)
+
+		# 	except:
+		# 		resolved_dict[k] = []
+		# 		resolved_dict[k].append(v)
 
 		# if not stats, business as usual
+		elif "hts_" in k:
+			resolved_dict[k + " (1)"] = v
+			index_dict[k] = 2
+
 		else:
 			resolved_dict[k] = v
 
@@ -102,12 +112,13 @@ def sample_status(samples):
 
 # Quality by Base html formatter
 
-def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap):
+def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap):
 
 	read_header  = " ".join(read.split("_")[1:3])
 
 	# id of switch buttun, named after read type.
 	btn_id = "-".join(read.split("_")[:3]).lower()
+	
 
 	# section header
 	wrapper_html = '<h4> Quality by Cycle: ' + read_header + '</h4>'
@@ -115,13 +126,13 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 	wrapper_html += status_div 
 
 	wrapper_html += '<div class="btn-group hc_switch_group">\n'
-	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{r}_btn">Linegraph</button>\n'.format(r=btn_id)
-	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{r}_btn">Heatmaps</button></div>\n'.format(r=btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this)" id="htstream_qbc_line_{b}_{u}_btn">Linegraph</button>\n'.format(b=btn_id, u=unique_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this)" id="htstream_qbc_heat_{b}_{u}_btn">Heatmaps</button></div>\n'.format(b=btn_id, u=unique_id)
 	wrapper_html += "<br></br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
-	wrapper_html += '<div id="htstream_qbc_line_{r}" class="htstream_fadein">'.format(r=btn_id)
+	wrapper_html += '<div id="htstream_qbc_line_{b}_{u}" class="htstream_fadein">'.format(b=btn_id, u=unique_id)
 	wrapper_html += line_plot + "</div>"
 
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
@@ -134,7 +145,7 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 	heatmap_html += heatmap
 
 	# heatmap div
-	wrapper_html += '<div id="htstream_qbc_heat_{r}" class="htstream_fadein" style="display:none;">'.format(r=btn_id)
+	wrapper_html += '<div id="htstream_qbc_heat_{b}_{u}" class="htstream_fadein" style="display:none;">'.format(b=btn_id, u=unique_id)
 	wrapper_html += heatmap_html + "</div>"
 
 	final_html = wrapper_html 
@@ -146,7 +157,7 @@ def qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap
 
 # Quality by Base html formatter
 
-def stats_histogram_html(read, data, button_list, notice):
+def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 
 	header_dict = {"PE": "Paried End",
@@ -172,8 +183,8 @@ def stats_histogram_html(read, data, button_list, notice):
 
 		data = "["+ json.dumps(data) +"]"
 
-		html += '''<div id="htstream_histogram_{r}" class="hc-plot"></div></div>'''.format(r = read)
-		html += '''<script type="text/javascript" class="htstream_histogram_content_{r}">{d}</script>'''.format(r = read, d = data) 
+		html += '''<div id="htstream_histogram_{r}_{u}" class="hc-plot"></div></div>'''.format(r = read, u = unique_id)
+		html += '''<script type="text/javascript" class="htstream_histogram_content_{r}_{u}">{d}</script>'''.format(r = read, u = unique_id, d = data) 
 
 	html += notice
 

@@ -89,8 +89,7 @@ class Primers():
 
 		for key in json.keys():
 
-			overview_dict[key] = {"Input_Bp": json[key]["Fragment"]["basepairs_in"],
-								  "temp": 0}
+			overview_dict[key] = {"Output_Bp": json[key]["Fragment"]["basepairs_out"]}
 
 			# dictionary entry for sample
 			stats_json[key] = {

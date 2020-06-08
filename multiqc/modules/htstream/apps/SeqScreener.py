@@ -65,7 +65,7 @@ class SeqScreener():
 			total_hits += pe_hits + se_hits
 
 			overview_dict[key] = {
-								  "Input_Reads": json[key]["Fragment"]["in"],
+								  "Output_Reads": json[key]["Fragment"]["out"],
 								  "Reads_Lost": json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"]
 								 }
 

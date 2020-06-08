@@ -16,12 +16,12 @@ class OverviewStats():
 		read_data = {}
 		bp_data = {}
 
-		read_config = {'table_title': 'Input Bp Reduction', 'id': "htstream_overview_read_reduction"}
-		bp_config = {'table_title': 'Input Fragment Reduction', 'id': "htstream_overview_bp_reduction"}
+		read_config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
+		bp_config = {'table_title': 'Basepair Reduction', 'id': "htstream_overview_bp_reduction"}
 
-		read_reducers = ["Pipeline Input", "hts_SeqScreener", "hts_SuperDeduper", 
+		read_reducers = ["hts_SeqScreener", "hts_SuperDeduper", 
 						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
-		bp_reducers = ["Pipeline Input", "hts_AdapterTrimmer", "hts_CutTrim", 
+		bp_reducers = ["hts_AdapterTrimmer", "hts_CutTrim", 
 						 "hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
 
 		# Table constructor. Just like the MultiQC docs.
@@ -30,22 +30,29 @@ class OverviewStats():
 
 		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
 
-
 		first_app = list(json.keys())[0]
 		samples = list(json[first_app].keys())
+
+		app_list = ["Pipeline Input"] + app_list
 
 		for samp in samples:
 
 			read_temp = {}
 			bp_temp = {}
 
+
 			for app in app_list:
 
-				if app in read_reducers:
-					read_temp[app + " (read)"] = json[app][samp]["Input_Reads"]
+				if app.split(" (")[0] in read_reducers:
+					read_temp[app + " (read)"] = json[app][samp]["Output_Reads"]
 
-				if app in bp_reducers:
+				if app.split(" (")[0] in bp_reducers:
+					bp_temp[app + " (bps)"] = json[app][samp]["Output_Bp"]
+
+				if app == "Pipeline Input":
+					read_temp[app + " (read)"] = json[app][samp]["Input_Reads"]
 					bp_temp[app + " (bps)"] = json[app][samp]["Input_Bp"]
+
 
 
 			read_data[samp] = read_temp
@@ -55,21 +62,22 @@ class OverviewStats():
 		for i in range(len(app_list)):
 
 			app = app_list[i]
-			read_description = "Number of Input Fragments for " + app
-			bp_description = "Number of Input Bps for " + app
+			read_description = "Number of Output Fragments for " + app
+			bp_description = "Number of Output Bps for " + app
 			color = color_rotations[i % 4]
 			read_headers[app + " (read)"] = {'title': app, 'namespace': app, 'description': read_description, 'format': '{:,.0f}', 'scale': color}
 			bp_headers[app + " (bps)"] = {'title': app, 'namespace': app, 'description': bp_description, 'format': '{:,.0f}', 'scale': color}
 
-		html = '<h4>  Input Fragment Reduction </h4>'
 
+		html = '<h4> Fragment Reduction </h4>'
 		if len(read_headers.keys()) < 2:
 			notice = "No Read Reducing Apps were found."
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
 		else:	
 			html += table.plot(read_data, read_headers, read_config)
 
-		html += '<br>\n<h4>  Input Basepair Reduction </h4>'
+
+		html += '<br>\n<h4> Basepair Reduction </h4>'
 		if len(bp_headers.keys()) < 2:
 			notice = "No Read Reducing Apps were found."
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -87,7 +95,7 @@ class OverviewStats():
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)
 
-		black_list = ["Input_Reads", "Input_Bp"]
+		black_list = ["Output_Reads", "Output_Bp"]
 
 		data = [[] for x in range(row_length)]
 
@@ -102,18 +110,17 @@ class OverviewStats():
 
 				sample_json = json[key][sample]
 
-				if key == "hts_Stats":
+				if "hts_Stats" in key:
 
-					total_frags = sample_json["Fragment_Section"]["in"]
-					total_bp = sample_json["Fragment_Section"]["basepairs_in"]
+					total_frags = sample_json["Output_Reads"]
+					total_bp = sample_json["Output_Bp"]
+					gc_content = sample_json["gc_content"]
+					n_content = sample_json["n_content"]
 
 					try:
 						fraction_se = sample_json["Read_Breakdown"]["Single_end"] / total_frags # fraction SE
 					except:
 						fraction_se = 0
-
-					gc_content = (sample_json["Fragment_Section"]["base_composition"]["G"] / total_bp) + (sample_json["Fragment_Section"]["base_composition"]["C"] / total_bp)
-					n_content = sample_json["Fragment_Section"]["base_composition"]["N"] / total_bp
 
 					temp = [
 							total_frags,
@@ -144,7 +151,6 @@ class OverviewStats():
 					data[x] += temp		
 
 			stats_bool = False
-
 
 		data = htstream_utils.pca(np.asarray(data).T)			
 

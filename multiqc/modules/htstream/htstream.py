@@ -116,7 +116,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		# checks that order is consistent within stats files 
-		app_order = []	
+		app_order = []
 		stats_section = ""			
 		for key in json.keys():
 
@@ -131,78 +131,53 @@ class MultiqcModule(BaseMultiqcModule):
 				log.error("Inconsistent order of HTStream applications.")
 
 
+
 		# scold people that don't read the documentation
-		if "hts_Stats" not in app_order:
+		if "hts_Stats (1)" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
-			self.overview_stats = {}
-
-		else:
-			if len(json[key]["hts_Stats"]) == 2:
-				self.overview_stats = {"Pipeline Input": {},
-											"hts_Stats": {}}
-			else:
-				self.overview_stats = {"hts_Stats": {}}
-
+		
+		self.overview_stats = {"Pipeline Input": {}}
 
 		# sort list of samples
 		sample_keys = list(sorted(json.keys()))
 		excludes = []
 		stats_wrapper = False
+		pipeline_input = True
 
 
 		for i in range(len(app_order)):
 
 			app = app_order[i]
-			program = app.split("hts_")[-1]
+			program = app.split("hts_")[-1].split(" (")[0]
 
 			if program not in self.programs.keys():
 				log.warning(app + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
 				excludes.append(app)
 				continue
 
-			
 			# creat app specific dictionary, each entry will be a sample
 			stats_dict = OrderedDict()
+
 
 			for key in sample_keys:
 
 				stats_dict[key] = json[key][app]
 
-				if app == "hts_Stats":
+				if pipeline_input == True:
 
-					if len(json[key][app]) == 2:
-
-						stats_wrapper = True
-
-						self.overview_stats["Pipeline Input"][key] = {
-																	 "Input_Reads": json[key][app][0]["Fragment"]["in"],
-																	 "Input_Bp": json[key][app][0]["Fragment"]["basepairs_in"]
-																	 }
-
-
-					self.overview_stats[app][key] = {
-													 "Fragment_Section": json[key][app][-1]["Fragment"],
-													 "total_Q30": json[key][app][-1]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key][app][-1]["Paired_end"]["Read2"]["total_Q30_basepairs"],
-													 "Read_Breakdown": {
-													 					"Paired_end": json[key][app][-1]["Paired_end"]["in"]
-													 					},
-													 "Input_Reads": json[key][app][-1]["Fragment"]["in"],
-													 "Input_Bp": json[key][app][-1]["Fragment"]["basepairs_in"]
-													}
-
-
-					try:
-						self.overview_stats[app][key]["total_Q30"] += json[key][app][-1]["Single_end"]["total_Q30_basepairs"]
-						self.overview_stats[app][key]["Read_Breakdown"]["Single_end"] = json[key][app][-1]["Single_end"]["in"]
-
-					except:
-							pass	
+					self.overview_stats["Pipeline Input"][key] = {
+																 "Input_Reads": json[key][app]["Fragment"]["in"],
+																 "Input_Bp": json[key][app]["Fragment"]["basepairs_in"]
+																 }
 					
+
+			pipeline_input = False					
 
 			# if data exists for app, execute app specific stats processing
 			if len(stats_dict.keys()) != 0:
 
-				app = app.split("hts_")[-1]
+				app_name = app 
+				app = program
 
 				# dictionary of subsections
 				section_dict = self.programs[app]["app"].execute(stats_dict)
@@ -210,10 +185,8 @@ class MultiqcModule(BaseMultiqcModule):
 				# if dictionary is not empty
 				if len(section_dict.keys()) != 0:
 
-					# create app k, v pair 
-					if app != "Stats":
-						self.overview_stats["hts_" + app] = section_dict["Overview"] 
-
+					
+					self.overview_stats[app_name] = section_dict["Overview"] 
 
 					# construct html for section
 					html = ""
@@ -229,53 +202,26 @@ class MultiqcModule(BaseMultiqcModule):
 					# add description for app 
 					description = self.programs[app]["description"]
 
-					# stats section is treated differently
-					if app == "Stats":
-						self.summary_stats = {'description': description,
-											  'html': html}
+					self.report_sections[app_name] = {'description': description,
+													  'html': html}
 
-					else:
-						self.report_sections[app] = {'description': description,
-													 'html': html}
-
-
-
-		# create logical order for general overview table
-		overview_order = []
-		if stats_wrapper == True:
-
-			overview_order.append("Pipeline Input")
-			
-			for a in app_order:
-
-				if a != "hts_Stats" and a not in excludes:
-					overview_order.append(a)
-
-			overview_order.append("hts_Stats")
-
-		else:
-
-			for a in app_order:
-
-				if a not in excludes:
-					overview_order.append(a)
 
 
 		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			try:
-				app = OverviewStats.OverviewStats()
+			#try:
+			app = OverviewStats.OverviewStats()
 
-				description = "General statistics from the HTStream pipeline."
-				html = app.execute(self.overview_stats, overview_order)
-				
-				self.add_section(name = "Processing Overview",
-								 description = description,
-								 content = html) 
+			description = "General statistics from the HTStream pipeline."
+			html = app.execute(self.overview_stats, app_order)
+			
+			self.add_section(name = "Processing Overview",
+							 description = description,
+							 content = html) 
 
-			except:
-				log.warning("Report Section for Processing Overview Failed.")
+			# except:
+			# 	log.warning("Report Section for Processing Overview Failed.")
 
 
 		# add app sections

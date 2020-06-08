@@ -115,7 +115,7 @@ class CutTrim():
 			total += total_bp_lost
 
 			overview_dict[key] = {
-								  "Input_Bp": json[key]["Fragment"]["basepairs_in"],
+								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
 								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"] 
 								 }
 

@@ -1,5 +1,6 @@
 from collections import OrderedDict
 import logging, statistics, math
+from random import random
 
 from . import htstream_utils
 from multiqc import config
@@ -168,7 +169,7 @@ class Stats():
     			  }
 
 		btn_id = "-".join(read.split("_")[:3]).lower()
-
+		unique_id = str(random() % 1000)[2:]
 		line_data = {}
 		status_dict = {}
 		first = True
@@ -258,7 +259,7 @@ class Stats():
 
 			# html div attributes and text
 			name = key
-			pid = "htstream_" + btn_id + "_" + key + "_btn"
+			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
 
 			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
 
@@ -267,7 +268,7 @@ class Stats():
 
 		line_plot = linegraph.plot(line_data, line_config)
 
-		html = htstream_utils.qual_by_cycle_html(read, status_div, line_plot, btn_id, button_list, heatmap_html)
+		html = htstream_utils.qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap_html)
 
 		return html
 
@@ -286,7 +287,7 @@ class Stats():
 		button_list = []
 		first = True
 		notice_html = ""
-
+		unique_id = str(random() % 1000)[2:]
 
 		# iterates over all samples in input dictionary
 		for key in json.keys():
@@ -311,8 +312,8 @@ class Stats():
 
 			# executes of more than one data points are found.
 			else:
-
-				data[key] = []
+				dict_key = key + "_" + unique_id
+				data[dict_key] = []
 
 				for x in range(len(json[key][read])):
 
@@ -336,12 +337,10 @@ class Stats():
 								values[x] += item[1]
 								break 
 
-					values = list(map(math.log10, values))
-
-					data[key].append({"bins": bins, "vals": values})
+					data[dict_key].append({"bins": bins, "vals": values})
 
 				if read_keys[read] == "SE":
-					data[key] = data[key][-1]
+					data[dict_key] = data[dict_key][-1]
 
 				if first == True:
 					active = "active" # button is default active
@@ -351,9 +350,9 @@ class Stats():
 					active = "" # button is default off 
 
 				# # html div attributes and text
-				pid  = "htstream_stats_" + read + "_" + key + "_btn"
-
-				button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}\')" id="{p}">{s}</button>\n'.format(a=active, r=read, s=key, p=pid))
+				pid  = "htstream_stats_" + read + "_" + key + "_" + unique_id + "_btn"
+				read_id = read + "_" + unique_id
+				button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}_{u}\')" id="{p}">{s}</button>\n'.format(a=active, r=read_id, u=unique_id, s=key, p=pid))
 
 
 		# if samples with uniform read length are present
@@ -379,7 +378,7 @@ class Stats():
 			notice_html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
 			notice_html += table.plot(invariant_dict, headers, table_config)	
 
-		html = htstream_utils.stats_histogram_html(read, data, button_list, notice_html)
+		html = htstream_utils.stats_histogram_html(read, data, unique_id, button_list, notice_html)
 
 		return html
 
@@ -388,33 +387,43 @@ class Stats():
 	def execute(self, json):
 
 		stats_json = OrderedDict()
+		overview_stats = {} 
 
 		for key in json.keys():
 
 			#
 			# STATS FOR TABLE 
 			#
-			gc_count = (json[key][-1]["Fragment"]["base_composition"]["G"] + json[key][-1]["Fragment"]["base_composition"]["C"])
-			gc_content = ( gc_count / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
-			n_content = ( json[key][-1]["Fragment"]["base_composition"]["N"] / json[key][-1]["Fragment"]["basepairs_out"] ) * 100 
+			gc_count = (json[key]["Fragment"]["base_composition"]["G"] + json[key]["Fragment"]["base_composition"]["C"])
+			gc_content = ( gc_count / json[key]["Fragment"]["basepairs_out"] ) * 100 
+			n_content = ( json[key]["Fragment"]["base_composition"]["N"] / json[key]["Fragment"]["basepairs_out"] ) * 100 
 
-			stats_json[key] = {"St_Fragments_in": json[key][-1]["Fragment"]["in"],
+			stats_json[key] = {"St_Fragments_in": json[key]["Fragment"]["in"],
 							   "St_GC_Content": gc_content,
 						       "St_N_Content": n_content,
-						       "St_Notes": json[key][-1]["Program_details"]["options"]["notes"]}
+						       "St_Notes": json[key]["Program_details"]["options"]["notes"]}
 
 
+			overview_stats[key] = {"Output_Reads": json[key]["Fragment"]["out"],
+								   "Output_Bp": json[key]["Fragment"]["basepairs_out"],
+								   "gc_content": gc_content,
+								   "n_content": n_content,
+								   "total_Q30": 0,
+								   "Read_Breakdown": {}}
 			#
 			# SINGLE END STATS
 			#
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
-				stats_json[key]["St_SE_histogram"] = [json[key][-1]["Single_end"]["readlength_histogram"]]
-				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key][-1]["Single_end"]["base_by_cycle"]
-				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key][-1]["Single_end"]["qualities_by_cycle"]
-				stats_json[key]["St_SE_in"] = json[key][-1]["Single_end"]["in"]
-							   
+				stats_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
+				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
+				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
+				stats_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
+				
+				overview_stats[key]["total_Q30"] += json[key]["Single_end"]["total_Q30_basepairs"]
+				overview_stats[key]["Read_Breakdown"]["Single_end"] = json[key]["Single_end"]["in"]
+
 				SE_presence = True
 
 			except:
@@ -426,13 +435,17 @@ class Stats():
 			#
 			try:
 				# sample instance in ordered dict
-				stats_json[key]["St_PE_histogram"] = [json[key][-1]["Paired_end"]["Read1"]["readlength_histogram"],
-													  json[key][-1]["Paired_end"]["Read2"]["readlength_histogram"]]
-				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["base_by_cycle"]
-				stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key][-1]["Paired_end"]["Read2"]["base_by_cycle"]
-				stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key][-1]["Paired_end"]["Read1"]["qualities_by_cycle"]
-				stats_json[key]["St_Read_2_Quality_by_Cycle"] =json[key][-1]["Paired_end"]["Read2"]["qualities_by_cycle"]
-				stats_json[key]["St_PE_in"] = json[key][-1]["Paired_end"]["in"]
+				stats_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
+													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
+				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key]["Paired_end"]["Read1"]["base_by_cycle"]
+				stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key]["Paired_end"]["Read2"]["base_by_cycle"]
+				stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key]["Paired_end"]["Read1"]["qualities_by_cycle"]
+				stats_json[key]["St_Read_2_Quality_by_Cycle"] = json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]
+				stats_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
+
+
+				overview_stats[key]["total_Q30"] += json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]
+				overview_stats[key]["Read_Breakdown"]["Paired_end"] = json[key]["Paired_end"]["in"]				   
 
 				PE_presence = True
 
@@ -440,8 +453,11 @@ class Stats():
 				PE_presence = False 
 
 
+
+
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json)}
+		section = {"Table": self.table(stats_json),
+				   "Overview": overview_stats}
 
 		if PE_presence == True:
 			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
