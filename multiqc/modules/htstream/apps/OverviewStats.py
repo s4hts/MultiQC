@@ -138,7 +138,7 @@ class OverviewStats():
 					data[x] += temp
 
 					if stats_bool == True:
-						stats_order += [key + ": Q30 Faction",
+						stats_order += [key + ": Q30 Fraction",
 										key + ": GC Content",
 										key + ": N Content",
 										key + ": Fraction PE",
@@ -172,8 +172,8 @@ class OverviewStats():
 
 
 		config = {'title': "HTStream: PCA Plot",
-				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]) + " - " + stats_order[0],
-				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1]) + " - " + stats_order[1]}
+				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]), # + " - " + stats_order[0],
+				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])} # + " - " + stats_order[1]}
 
 
 		html = "<hr><h4> PCA Plot </h4>\n"
