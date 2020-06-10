@@ -129,8 +129,8 @@ class OverviewStats():
 
 					temp = [
 							sample_json["total_Q30"] / total_bp, # fraction Q30
-							fraction_pe,
-							fraction_se, # fraction SE
+							fraction_pe, 
+							fraction_se, 
 							gc_content, # GC Content
 							n_content # N Content
 							]
@@ -138,7 +138,11 @@ class OverviewStats():
 					data[x] += temp
 
 					if stats_bool == True:
-						stats_order += ["Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]  
+						stats_order += [key + ": Q30 Faction",
+										key + ": GC Content",
+										key + ": N Content",
+										key + ": Fraction PE",
+										key + ": Fraction SE"]  
 
 				elif key != "Pipeline Input":
 
@@ -150,13 +154,13 @@ class OverviewStats():
 							temp.append(v)
 
 							if stats_bool == True:
-								stats_order.append(k)
+								stats_order.append(str(key + ": " + k))
 
 					data[x] += temp		
 
 			stats_bool = False
 
-		data = htstream_utils.pca(np.asarray(data).T)			
+		data, stats_order = htstream_utils.pca(np.asarray(data).T, stats_order)			
 
 		x_min, x_max = 0, 0 
 		y_min, y_max = 0, 0
@@ -166,20 +170,22 @@ class OverviewStats():
 			mds_plot[samples_list[x]] = {"x": data[0, x],
 										 "y": data[1, x]}
 
-			x_min = min(x_min, data[0, x])	
-			y_min = min(y_min, data[1, x])
-			x_max = max(x_max, data[0, x])	
-			y_max = max(y_max, data[1, x])	
+			# x_min = min(x_min, data[0, x])	
+			# y_min = min(y_min, data[1, x])
+			# x_max = max(x_max, data[0, x])	
+			# y_max = max(y_max, data[1, x])	
 
 
 		config = {'title': "HTStream: PCA Plot",
-				  'xmax': x_max + 0.25,                
-				  'xmin': x_min - 0.25,
-				  'ymax': y_max + 0.25,                
-				  'ymin': y_min - 0.25}
+				  'xlab': "PC1 - " + stats_order[0],
+				  'ylab': "PC2 - " + stats_order[1]}
+				  # 'xmax': x_max + 0.25,                
+				  # 'xmin': x_min - 0.25,
+				  # 'ymax': y_max + 0.25,                
+				  # 'ymin': y_min - 0.25}
 
 
-		html = "<hr><h4>  Sample PCA Plot </h4>\n"
+		html = "<hr><h4> PCA Plot </h4>\n"
 		html += scatter.plot(mds_plot, config)
 		
 		return html

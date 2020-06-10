@@ -183,7 +183,7 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 # pca plot
 
-def pca(matrix):
+def pca(matrix, stats_order):
 
 	# VERIFIED using PCA from sklearn.decomposition
 
@@ -213,7 +213,8 @@ def pca(matrix):
 	to_delete = sorted(to_delete, reverse=True)
 	for x in to_delete:
 		matrix = np.delete(matrix, x, 0)
-	
+		stats_order.remove(stats_order[x])
+
 	
 	n, m = matrix.shape # rows, col
 
@@ -225,11 +226,14 @@ def pca(matrix):
 	eig_val_cov = eig_val_cov.real
 	eig_vec_cov = eig_vec_cov.real
 
-	# creat pari list
+	# creat pair list
 	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
 
+
 	# Sort the (eigenvalue, eigenvector) tuples from high to low
-	eig_pairs.sort(key=lambda x: x[0], reverse=True)
+	eig_pairs, stats_order = (list(t) for t in zip(*sorted(zip(eig_pairs, stats_order), key=lambda x: x[0][0], reverse=True)))
+	#eig_pairs.sort(key=lambda x: x[0], reverse=True)
+
 
 	# eigan vector matrix
 	matrix_w = np.hstack((eig_pairs[0][1].reshape(n,1), eig_pairs[1][1].reshape(n,1)))
@@ -241,7 +245,7 @@ def pca(matrix):
 	# pca = PCA(n_components=2)
 	# transformed = pca.fit_transform(matrix.T)
 
-	return transformed
+	return transformed, stats_order
 
 
 
