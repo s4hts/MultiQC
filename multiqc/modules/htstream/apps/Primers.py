@@ -10,6 +10,12 @@ from multiqc.plots import table, bargraph
 
 #################################################
 
+'''
+##################
+This tool is currently a work in progress 
+##################
+'''
+
 class Primers():
 
 	def table(self, json, index):
@@ -54,11 +60,6 @@ class Primers():
 		data  = OrderedDict()
 
 
-		'''
-		##################
-		This tool is currently a work in progress 
-		##################
-		'''
 		for sample in json.keys():
 
 			data[sample] = {}

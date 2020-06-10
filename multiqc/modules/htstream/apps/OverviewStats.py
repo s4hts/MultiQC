@@ -169,7 +169,7 @@ class OverviewStats():
 
 			mds_plot[samples_list[x]] = {"x": data[0, x],
 										 "y": data[1, x]}
-										 
+
 
 		config = {'title': "HTStream: PCA Plot",
 				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]) + " - " + stats_order[0],
@@ -184,7 +184,6 @@ class OverviewStats():
 
 	def execute(self, json, app_list):
 
-		html = "" 
 		html = self.table(json, app_list)
 		html += self.hts_pca(json)
 			

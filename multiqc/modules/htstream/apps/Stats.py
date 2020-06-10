@@ -135,11 +135,11 @@ class Stats():
 
 	def quality_by_cycle(self, json, read, index):
 
-		# Here is the most complicated figure implementation in this whole module.
+		# Here is the most complicated figure implementation in this module.
 		#	The issues here are that MultiQC had limited options for displaying 
 		#	multiple figures if its a heatmap. Also, it doesnt allow you to switch
 		#	back and forth between figure typs. There are workarounds, however, using
-		#	javascript and some clever organizations of javascript.
+		#	javascript and some clever organizations :).
 
 		title_read = " ".join(read.split("_")[1:3])
 
