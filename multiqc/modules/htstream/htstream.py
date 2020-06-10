@@ -112,8 +112,6 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		self.report_sections = {}
-		self.summary_stats = {}
-
 
 		# checks that order is consistent within stats files 
 		app_order = []
@@ -144,6 +142,9 @@ class MultiqcModule(BaseMultiqcModule):
 		stats_wrapper = False
 		pipeline_input = True
 
+
+		############################
+		# GENERATE REPORT SECTIONS 
 
 		for i in range(len(app_order)):
 
@@ -208,30 +209,25 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 
+		############################
+		# ADD SECTIONS TO FILE
+
 		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			# try:
-			# 	app = OverviewStats.OverviewStats()
+			try:
+				app = OverviewStats.OverviewStats()
 
-			# 	description = "General statistics from the HTStream pipeline."
-			# 	html = app.execute(self.overview_stats, app_order)
+				description = "General statistics from the HTStream pipeline."
+				html = app.execute(self.overview_stats, app_order)
 				
-			# 	self.add_section(name = "Processing Overview",
-			# 					 description = description,
-			# 					 content = html) 
+				self.add_section(name = "Processing Overview",
+								 description = description,
+								 content = html) 
 
-			# except:
-			#  	log.warning("Report Section for Processing Overview Failed.")
+			except:
+			 	log.warning("Report Section for Processing Overview Failed.")
 
-			app = OverviewStats.OverviewStats()
-
-			description = "General statistics from the HTStream pipeline."
-			html = app.execute(self.overview_stats, app_order)
-			
-			self.add_section(name = "Processing Overview",
-							 description = description,
-							 content = html) 
 
 
 		# add app sections
@@ -251,17 +247,5 @@ class MultiqcModule(BaseMultiqcModule):
 					log.warning(msg)
 
 
-
-		# add summary stats if appropriate 
-		if self.summary_stats != {}:
-
-			try:
-				self.add_section(name = "Summary Stats",
-								 description = self.summary_stats["description"],
-								 content = self.summary_stats["html"])
-
-
-			except:
-				log.warning("Report Section for hts_Stats Failed.")
 
 

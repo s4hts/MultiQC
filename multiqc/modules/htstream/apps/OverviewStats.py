@@ -169,20 +169,11 @@ class OverviewStats():
 
 			mds_plot[samples_list[x]] = {"x": data[0, x],
 										 "y": data[1, x]}
-
-			# x_min = min(x_min, data[0, x])	
-			# y_min = min(y_min, data[1, x])
-			# x_max = max(x_max, data[0, x])	
-			# y_max = max(y_max, data[1, x])	
-
+										 
 
 		config = {'title': "HTStream: PCA Plot",
 				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]) + " - " + stats_order[0],
 				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1]) + " - " + stats_order[1]}
-				  # 'xmax': x_max + 0.25,                
-				  # 'xmin': x_min - 0.25,
-				  # 'ymax': y_max + 0.25,                
-				  # 'ymin': y_min - 0.25}
 
 
 		html = "<hr><h4> PCA Plot </h4>\n"
