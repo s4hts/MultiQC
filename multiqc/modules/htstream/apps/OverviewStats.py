@@ -128,7 +128,6 @@ class OverviewStats():
 						fraction_pe = 0
 
 					temp = [
-							total_frags,
 							sample_json["total_Q30"] / total_bp, # fraction Q30
 							fraction_pe,
 							fraction_se, # fraction SE
@@ -139,7 +138,7 @@ class OverviewStats():
 					data[x] += temp
 
 					if stats_bool == True:
-						stats_order += ["Total Fragments", "Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]  
+						stats_order += ["Q30 Faction", "Fraction PE", "Fraction SE", "GC", "N"]  
 
 				elif key != "Pipeline Input":
 
