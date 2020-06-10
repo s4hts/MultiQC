@@ -160,7 +160,7 @@ class OverviewStats():
 
 			stats_bool = False
 
-		data, stats_order = htstream_utils.pca(np.asarray(data).T, stats_order)			
+		data, stats_order, pc_perc = htstream_utils.pca(np.asarray(data).T, stats_order)			
 
 		x_min, x_max = 0, 0 
 		y_min, y_max = 0, 0
@@ -177,8 +177,8 @@ class OverviewStats():
 
 
 		config = {'title': "HTStream: PCA Plot",
-				  'xlab': "PC1 - " + stats_order[0],
-				  'ylab': "PC2 - " + stats_order[1]}
+				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]) + " - " + stats_order[0],
+				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1]) + " - " + stats_order[1]}
 				  # 'xmax': x_max + 0.25,                
 				  # 'xmin': x_min - 0.25,
 				  # 'ymax': y_max + 0.25,                

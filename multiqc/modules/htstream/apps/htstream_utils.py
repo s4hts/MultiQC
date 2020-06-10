@@ -201,13 +201,13 @@ def pca(matrix, stats_order):
 			norm = np.linalg.norm(row)
 			row = row / norm
 
-		# remove zero rows and rows with no variation
+		# remove zero rows and rows with no variation, also, mean center and normalize variance
 		if np.sum(row) == 0:
 			to_delete.append(x)
 		elif np.all(row == row[0]):
 			to_delete.append(x)
-
-		matrix[x,:] = row - np.mean(row)
+		else:
+			matrix[x,:] = (row - np.mean(row) ) / np.std(row)
 
 	# remove indeterminant columns
 	to_delete = sorted(to_delete, reverse=True)
@@ -215,7 +215,6 @@ def pca(matrix, stats_order):
 		matrix = np.delete(matrix, x, 0)
 		stats_order.remove(stats_order[x])
 
-	
 	n, m = matrix.shape # rows, col
 
 	# sample cov
@@ -229,11 +228,13 @@ def pca(matrix, stats_order):
 	# creat pair list
 	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
 
-
 	# Sort the (eigenvalue, eigenvector) tuples from high to low
 	eig_pairs, stats_order = (list(t) for t in zip(*sorted(zip(eig_pairs, stats_order), key=lambda x: x[0][0], reverse=True)))
 	#eig_pairs.sort(key=lambda x: x[0], reverse=True)
 
+	# pc percentages
+	eig_sum = sum([eig_pairs[x][0] for x in range(len(eig_pairs))])
+	pc_perc = [(eig_pairs[0][0] / eig_sum) * 100, (eig_pairs[1][0] / eig_sum) * 100]
 
 	# eigan vector matrix
 	matrix_w = np.hstack((eig_pairs[0][1].reshape(n,1), eig_pairs[1][1].reshape(n,1)))
@@ -245,7 +246,7 @@ def pca(matrix, stats_order):
 	# pca = PCA(n_components=2)
 	# transformed = pca.fit_transform(matrix.T)
 
-	return transformed, stats_order
+	return transformed, stats_order, pc_perc
 
 
 
