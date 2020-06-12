@@ -7,32 +7,6 @@ import numpy as np
 
 #################################################
 
-# json key collision resolving function
-
-def resolve(pairs):
-
-	resolved_dict = {}
-	index_dict = {}
-
-	# iterates through json key value pairs
-	for k, v in pairs:
-
-		if k in index_dict.keys() and "hts_" in k:
-			resolved_dict[k + " (" + str(index_dict[k]) + ")"] = v
-			index_dict[k] += 1
-
-		elif "hts_" in k:
-			resolved_dict[k + " (1)"] = v
-			index_dict[k] = 2
-
-		else:
-			resolved_dict[k] = v
-
-	return  resolved_dict
-
-
-#######################################
-
 # prints keys in a pretty way
 
 def key_print(dictionary):
@@ -45,6 +19,7 @@ def key_print(dictionary):
 	string = string[:-2] + "."
 
 	return  string 
+
 
 #######################################
 
@@ -185,7 +160,6 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 def pca(matrix, stats_order):
 
-	# VERIFIED using PCA from sklearn.decomposition
 
 	n, m = matrix.shape # rows, col
 	
@@ -201,10 +175,8 @@ def pca(matrix, stats_order):
 			norm = np.linalg.norm(row)
 			row = row / norm
 
-		# remove zero rows and rows with no variation, also, mean center and normalize variance
-		if np.sum(row) == 0:
-			to_delete.append(x)
-		elif np.all(row == row[0]):
+		# remove rows with no variation, also, mean center and normalize variance
+		if np.all(row == row[0]):
 			to_delete.append(x)
 		else:
 			matrix[x,:] = (row - np.mean(row) ) / np.std(row)
@@ -243,6 +215,7 @@ def pca(matrix, stats_order):
 	transformed = matrix_w.T.dot(matrix)
 
 	# VALIDATION
+	# VERIFIED using PCA from sklearn.decomposition
 	# pca = PCA(n_components=2)
 	# transformed = pca.fit_transform(matrix.T)
 

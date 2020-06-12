@@ -43,10 +43,10 @@ class OverviewStats():
 
 			for app in app_list:
 
-				if app.split(" (")[0] in read_reducers:
+				if app[:-2] in read_reducers:
 					read_temp[app + " (read)"] = json[app][samp]["Output_Reads"]
 
-				if app.split(" (")[0] in bp_reducers:
+				if app[:-2] in bp_reducers:
 					bp_temp[app + " (bps)"] = json[app][samp]["Output_Bp"]
 
 				if app == "Pipeline Input":

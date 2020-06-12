@@ -69,7 +69,21 @@ class MultiqcModule(BaseMultiqcModule):
 
 	def parse_json(self, f):
 
-		return json.loads(f, object_pairs_hook=htstream_utils.resolve)
+		app_dict = {}
+
+		apps = json.loads(f)
+
+		for a in apps:
+			i = 1
+			app_name = a["Program_details"]["program"] + "_" + str(i)
+
+			while app_name in app_dict.keys():
+				i += 1
+				app_name = a["Program_details"]["program"] + "_" + str(i)
+
+			app_dict[app_name] = a	
+
+		return app_dict
 
 
 	def parse_stats(self, json):
@@ -131,7 +145,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 
 		# scold people that don't read the documentation
-		if "hts_Stats (1)" not in app_order:
+		if "hts_Stats_1" not in app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
 		
 		self.overview_stats = {"Pipeline Input": {}}
@@ -149,7 +163,7 @@ class MultiqcModule(BaseMultiqcModule):
 		for i in range(len(app_order)):
 
 			app = app_order[i]
-			program = app.split("hts_")[-1].split(" (")[0]
+			program = app.split("hts_")[-1].split("_")[0]
 
 			if program not in self.programs.keys():
 				log.warning(app + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
@@ -179,7 +193,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 				app_name = app 
 				app = program
-				index = app_name.split("(")[1][:-1]
+				index = app_name.split("_")[-1]
 
 				# dictionary of subsections
 				section_dict = self.programs[app]["app"].execute(stats_dict, index)
@@ -233,8 +247,8 @@ class MultiqcModule(BaseMultiqcModule):
 		# add app sections
 		for section, content in self.report_sections.items():
 
-				temp_list = section.split("(")
-				name = temp_list[0] + temp_list[1][0]
+				temp_list = section.split("_")
+				name = temp_list[0] + "_" + temp_list[1] + " " + temp_list[-1]
 
 				try:
 					self.add_section(name = name,
