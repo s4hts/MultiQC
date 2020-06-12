@@ -7,6 +7,33 @@ import numpy as np
 
 #################################################
 
+# convert json
+
+def resolve(pairs):
+
+
+	resolved_dict = {}
+	index_dict = {}
+
+	# iterates through json key value pairs
+	for k, v in pairs:
+
+		if k in index_dict.keys() and "hts_" in k:
+			resolved_dict[k + " (" + str(index_dict[k]) + ")"] = v
+			index_dict[k] += 1
+
+		elif "hts_" in k:
+			resolved_dict[k + " (1)"] = v
+			index_dict[k] = 2
+
+		else:
+			resolved_dict[k] = v
+
+	return  resolved_dict
+
+
+#######################################
+
 # prints keys in a pretty way
 
 def key_print(dictionary):
