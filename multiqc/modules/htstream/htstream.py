@@ -108,8 +108,8 @@ class MultiqcModule(BaseMultiqcModule):
 						'PolyATTrim': {"app": PolyATTrim.PolyATTrim(),
 									   "description": "Attempts to trim poly-A and poly-T sequences from the end of reads."},
 
-						'Primers': {"app": Primers.Primers(),
-									"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
+						# 'Primers': {"app": Primers.Primers(),
+						# 			"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
 
 						'QWindowTrim': {"app": QWindowTrim.QWindowTrim(),
 										"description": "Uses a sliding window approach to remove the low quality ends of reads."},
@@ -166,8 +166,7 @@ class MultiqcModule(BaseMultiqcModule):
 			program = app.split("hts_")[-1].split("_")[0]
 
 			if program not in self.programs.keys():
-				log.warning(app + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
-				excludes.append(app)
+				log.warning("hts_" + program + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
 				continue
 
 			# creat app specific dictionary, each entry will be a sample
