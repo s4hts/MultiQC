@@ -52,7 +52,7 @@ class Primers():
 					   'datalabels': False,
 					   'colstops': [
 						        [0, '#FFFFFF'],
-						        [1, '#E70808']
+						        [1, '#1DC802']
 						           ]
     			  }
 
