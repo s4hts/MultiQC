@@ -82,6 +82,7 @@ class Primers():
 				x_pos = labs.index(counts_list[x][0])
 				y_pos = labs.index(counts_list[x][1])
 				data[x_pos][y_pos] = counts_list[x][-1]
+				data[y_pos][x_pos] = counts_list[x][-1]
 			
 
 			# if this is the first sample process, lucky them, they get to be shown first and marked as active.
