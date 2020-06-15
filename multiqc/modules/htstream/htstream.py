@@ -70,7 +70,6 @@ class MultiqcModule(BaseMultiqcModule):
 	def parse_json(self, f):
 
 		app_dict = {}
-
 		apps = json.loads(f)
 
 		for a in apps:
@@ -108,8 +107,8 @@ class MultiqcModule(BaseMultiqcModule):
 						'PolyATTrim': {"app": PolyATTrim.PolyATTrim(),
 									   "description": "Attempts to trim poly-A and poly-T sequences from the end of reads."},
 
-						# 'Primers': {"app": Primers.Primers(),
-						# 			"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
+						'Primers': {"app": Primers.Primers(),
+									"description": "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."},
 
 						'QWindowTrim': {"app": QWindowTrim.QWindowTrim(),
 										"description": "Uses a sliding window approach to remove the low quality ends of reads."},
@@ -129,7 +128,8 @@ class MultiqcModule(BaseMultiqcModule):
 
 		# checks that order is consistent within stats files 
 		app_order = []
-		stats_section = ""			
+		stats_section = ""
+
 		for key in json.keys():
 
 			sample = key
@@ -200,7 +200,6 @@ class MultiqcModule(BaseMultiqcModule):
 				# if dictionary is not empty
 				if len(section_dict.keys()) != 0:
 
-					
 					self.overview_stats[app_name] = section_dict["Overview"] 
 
 					# construct html for section

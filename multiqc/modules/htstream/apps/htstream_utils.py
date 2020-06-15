@@ -142,6 +142,32 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 
 	return final_html 
 
+#######################################
+
+# Primers heatmap html formatter
+
+def primers_heatmap_html(unique_id, button_list, heatmap):
+
+	wrapper_html = '<h4> Primer Counts </h4>'
+
+	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
+	heatmap_html = '<div class="btn-group hc_switch_group">\n'
+
+	for buttons in button_list:
+		heatmap_html += buttons
+
+	heatmap_html += '</div>\n\n<br></br>\n\n'
+	heatmap_html += heatmap
+
+	# heatmap div
+	wrapper_html += '<div id="htstream_qbc_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
+	wrapper_html += heatmap_html + "</div>"
+
+	final_html = wrapper_html 
+
+	return final_html 
+
+
 
 #######################################
 

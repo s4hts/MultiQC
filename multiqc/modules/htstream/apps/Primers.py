@@ -1,8 +1,10 @@
 from collections import OrderedDict
 import logging
+from random import random
 
+from . import htstream_utils
 from multiqc import config
-from multiqc.plots import table, bargraph
+from multiqc.plots import table, heatmap
 
 #################################################
 
@@ -18,68 +20,94 @@ This tool is currently a work in progress
 
 class Primers():
 
-	def table(self, json, index):
+	def table(self, json, index, total_flipped):
 
 		# standard table constructor. See MultiQC docs.
 		headers = OrderedDict()
 
-		headers["Pr_PE_in" + index] = {'title': "PE in", 'namespace': "PE in", 'description': 'Number of Input Paired End Reads', 'format': '{:,.0f}', 'scale': 'Greens' }
-		headers["Pr_PE_out" + index] = {'title': "PE out", 'namespace': "PE out", 'description': 'Number of Output Paired End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Pr_SE_in" + index] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Pr_SE_out" + index] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
-		headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
+		headers["Pr_%_BP_Lost" + index] = {'title': "% Bp Lost",
+										   'namespace': "% Bp Lost",
+										   'description': 'Percentage of bps lost.',
+										   'suffix': '%',
+										   'format': '{:,.2f}',
+										   'scale': 'Greens'
+											}
+		headers["Pr_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Number of basepairs lost', 'format': '{:,.0f}', 'scale': 'RdPu'}
+
+		if total_flipped != 0:
+			headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
+		
 		headers["Pr_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
 
-	def bargraph(self, json):
+	def heatmap(self, json, index):
 
-		# bar graph config dict
-		config = {'title': "HTStream: Reads with Primers Bargraph",
-				  'id': "htstream_primers_bargraph"}
-
-		# bar graph constuctor
-		categories  = OrderedDict()
-
-		categories['Primer 1 Only'] = {
-									   'name': 'Primer 1 Only',
-									   'color': '#4d8de4'
-									  }
-		categories['Primer 2 Only'] = {
-									   'name': 'Primer 2 Only',
-									   'color': '#e57433'
-									  }
-		categories['Both Primers'] = {
-									   'name': 'Both Primers',
-									   'color': '#33a02c'
-									  }
-
-		# data dictionary for bar graph
-		data  = OrderedDict()
+		# config dictionary for heatmaps
+		heat_pconfig = {'id' : "htstream_primers_bargraph_" + index,
+					   'title': "HTStream: Primers Heatmap",
+					   'square' : False,
+					   'datalabels': False,
+					   'colstops': [
+						        [0, '#FFFFFF'],
+						        [1, '#E70808']
+						           ]
+    			  }
 
 
-		for sample in json.keys():
+		btn_id = "primers_" + index 
+		unique_id = str(random() % 1000)[2:]
+		first = True
+		button_list = []
+	
+		for key in json.keys():
 
-			data[sample] = {}
+			# creates unique heatmap id that can be queired later by js.
+			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_heatmap_" + index
 
-			for item in json[sample]["Pr_Primer_Counts"]: 
+			data = []
+			labs = []
+			counts_list = json[key]["Pr_Primer_Counts" + index]
 
-				if item[0] != "None" and item[1] == "None":
-					data[sample]["Primer 1 Only"] = item[2]
+			for x in range(len(counts_list)):
+				temp = counts_list[x]
+				labs += temp[:-1]
 
-				elif item[0] == "None" and item[1] != "None":
-					data[sample]["Primer 2 Only"] = item[2]
+			labs = list(set(labs))
 
-				elif item[0] != "None" and item[1] != "None" :
-					data[sample]["Both Primers"] = item[2]
+			data = [ [0] * len(labs) for i in range(len(labs)) ] 
 
-			if data[sample] == {}:
-				return ""
+			for x in range(len(counts_list)):
+				x_pos = labs.index(counts_list[x][0])
+				y_pos = labs.index(counts_list[x][1])
+				data[x_pos][y_pos] = counts_list[x][-1]
+			
 
 
-		return bargraph.plot(data, categories)
+			# if this is the first sample process, lucky them, they get to be shown first and marked as active.
+			#	This step is necessary otherwise, the plot div is not initialized. The additional calls to the 
+			#	heatmap function are simply to add the data to the internal jsons used by MultiQC.
+			if first == True:
+				active = "active" # button is default active
+				first = False # shuts off first gat
+				heatmap_html = heatmap.plot(data, labs, labs, heat_pconfig)
+
+			else:
+				active = "" # button is default off 
+				heatmap.plot(data, labs, labs, heat_pconfig)
+
+
+			# html div attributes and text
+			name = key
+			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
+
+			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, {i})" id="{pid}">{n}</button>\n'.format(a=active, i=index, pid=pid, n=name))
+
+		html = htstream_utils.primers_heatmap_html(unique_id, button_list, heatmap_html)
+
+		return html
 
 
 	def execute(self, json, index):
@@ -87,27 +115,32 @@ class Primers():
 		stats_json = OrderedDict()
 		overview_dict = {}
 
+		total_flipped = 0
 
 		for key in json.keys():
 
-			overview_dict[key] = {"Output_Bp": json[key]["Fragment"]["basepairs_out"]}
+			bp_lost = ( json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"] )
+			perc_bp_lost = bp_lost / json[key]["Fragment"]["basepairs_in"]
 
-			# dictionary entry for sample
+			total_flipped += json[key]["Fragment"]["flipped"]
+
+			overview_dict[key] = {
+								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
+								  }
+
 			stats_json[key] = {
-			 				   "Pr_PE_in" + index: json[key]["Paired_end"]["in"],
-							   "Pr_PE_out" + index: json[key]["Paired_end"]["out"],
-							   "Pr_SE_in" + index: json[key]["Single_end"]["in"],
-							   "Pr_SE_out" + index: json[key]["Single_end"]["out"],
+							   "Pr_%_BP_Lost" + index: perc_bp_lost * 100,
+							   "Pr_BP_Lost" + index: bp_lost,
+							   "Pr_Primer_Counts" + index: json[key]["Fragment"]['primers_counts'],
 							   "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
 							   "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
-							   "Pr_Primers": json[key]["Program_details"]["primers"],
-							   "Pr_Primer_Counts": json[key]["Fragment"]["primers_counts"]
-						 	  }
+							  }
+
 
 		# dictionary for sections and figure function calls
 		section = {
-				   "Table": self.table(stats_json, index),
-				   "Reads with Primers": self.bargraph(stats_json),
+				   "Table": self.table(stats_json, index, total_flipped),
+				   "Primer Counts": self.heatmap(stats_json, index),
 				   "Overview": overview_dict
 				   }
 
