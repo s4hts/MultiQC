@@ -132,12 +132,13 @@ class MultiqcModule(BaseMultiqcModule):
 
 		for key in json.keys():
 
-			sample = key
+			temp = list(json[key].keys())
+			
 			if app_order == []:
-				app_order = list(json[key].keys())
+				app_order = temp
 
-			elif app_order == list(json[key].keys()):
-				app_order = list(json[key].keys())
+			elif app_order == temp:
+				continue
 
 			else:
 				log.error("Inconsistent order of HTStream applications.")

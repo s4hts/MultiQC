@@ -30,8 +30,7 @@ class Primers():
 										   'description': 'Percentage of bps lost.',
 										   'suffix': '%',
 										   'format': '{:,.2f}',
-										   'scale': 'Greens'
-											}
+										   'scale': 'Greens'}
 		headers["Pr_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Number of basepairs lost', 'format': '{:,.0f}', 'scale': 'RdPu'}
 
 		if total_flipped != 0:
@@ -84,7 +83,6 @@ class Primers():
 				y_pos = labs.index(counts_list[x][1])
 				data[x_pos][y_pos] = counts_list[x][-1]
 			
-
 
 			# if this is the first sample process, lucky them, they get to be shown first and marked as active.
 			#	This step is necessary otherwise, the plot div is not initialized. The additional calls to the 

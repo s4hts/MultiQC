@@ -40,6 +40,8 @@ class Stats():
 
 		return table.plot(json, headers)
 
+		
+
 	def base_by_cycle(self, json, read):
 
 		title_read = " ".join(read.split("_")[1:3])
