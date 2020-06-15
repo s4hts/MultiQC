@@ -14,12 +14,23 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
-	def table(self, json, index):
+	def table(self, json, se_presence, pe_presence, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
 		headers["St_Fragments_in" + index] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
+
+		if pe_presence == True:
+			headers["St_R1_Q30" + index] = {'title': "% R1 Q30", 'namespace': "% R1 Q30", 'description': 'percentage of read 1 bps Q30 or greater', 
+											'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
+			headers["St_R2_Q30" + index] = {'title': "% R2 Q30", 'namespace': "% R2 Q30", 'description': 'percentage of read 2 bps Q30 or greater', 
+											'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
+
+		if se_presence == True:
+			headers["St_SE_Q30" + index] = {'title': "% SE Q30", 'namespace': "% SE Q30", 'description': 'percentage of single end read bps Q30 or greater', 
+											'format': '{:,.2f}', 'suffix': '%', 'scale': 'Greens'}
+
 		headers["St_GC_Content" + index] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
 									'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
 		headers["St_N_Content" + index] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
@@ -417,6 +428,7 @@ class Stats():
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
+				stats_json[key]["St_SE_Q30" + index] = ( json[key]["Single_end"]["total_Q30_basepairs"] / json[key]["Single_end"]["basepairs_in"] ) * 100 
 				stats_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
 				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
 				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
@@ -436,6 +448,8 @@ class Stats():
 			#
 			try:
 				# sample instance in ordered dict
+				stats_json[key]["St_R1_Q30" + index] = ( json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read1"]["basepairs_in"] ) * 100 
+				stats_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
 				stats_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
 				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key]["Paired_end"]["Read1"]["base_by_cycle"]
@@ -457,7 +471,7 @@ class Stats():
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json, index),
+		section = {"Table": self.table(stats_json, SE_presence, PE_presence, index),
 				   "Overview": overview_stats}
 
 		if PE_presence == True:
