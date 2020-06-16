@@ -40,7 +40,7 @@ class Stats():
 
 		return table.plot(json, headers)
 
-		
+
 
 	def base_by_cycle(self, json, read):
 
@@ -64,19 +64,39 @@ class Stats():
 								{'from': 40, 'to': 60, 'color': '#e6dcc3'},
 								{'from': 60, 'to': 100, 'color': '#e6c3c3'},
 								]
+
 				  }
 
-		# initalize data structures and important variables
-		data_list = []
-		status_dict = {}
 
 		# header read type
 		read_header = " ".join(read.split("_")[1:3])
+
+		if read_header == "Paired End":
+			config['xPlotLines'] = [{'color': '#5D4B87', 
+									 "width": 1.5, 
+									 "value": 151, 
+									 "dashStyle": 'shortdash',
+									 "zIndex": 4}]
+				
+		# initalize data structures and important variables
+		data_list = []
+		status_dict = {}
 
 		# section header
 		html = '<h4> Base by Cycle: ' + read_header + '</h4>'
 
 		for key in json.keys():
+
+			if read_header == "Paired End":
+
+				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(5) ]
+				temp_col_name = [ str(int(x) + 151) for x in json[key][read][1]["col_names"]]
+
+				json[key][read] = {
+					 			   "data": temp_data,
+					 			   "col_names": json[key][read][0]["col_names"] + temp_col_name
+							 	  }
+
 
 			# initializes dat dict. Each key is a line in the graph
 			data = {"A": {},
@@ -88,6 +108,7 @@ class Stats():
 			# lists to iterate through
 			bases = json[key][read]["data"]
 			positions = json[key][read]["col_names"]
+
 
 			# vairables containing max percentage reached by any nucleotide in the sample
 			#	This data is stored so it can be correctly marked in the sample check div.
@@ -120,13 +141,17 @@ class Stats():
 			# selects color to mark sample if a read has a region of low complextity
 			if sample_max >= 60:
 				sample_status = 'FAIL'
+
 			elif sample_max >= 40:
 				sample_status = 'QUESTIONABLE'
+
 			else:
 				sample_status = 'PASS'
 
 			# adds color to sample in color dictionary
 			status_dict[key] = sample_status
+
+
 
 			# this config file is for the individual line of the multiline graph
 			config["data_labels"].append({'name': key,'ylab': 'Percentage', 
@@ -181,6 +206,17 @@ class Stats():
 					           ]
     			  }
 
+		read_header = " ".join(read.split("_")[1:3])
+
+		if read_header == "Paired End":
+			line_config['xPlotLines'] = [{'color': '#5D4B87', 
+										 "width": 1.5, 
+										 "value": 151, 
+										 "dashStyle": 'shortdash',
+										 "zIndex": 4}]
+
+
+
 		btn_id = "-".join(read.split("_")[:3]).lower()
 		unique_id = str(random() % 1000)[2:]
 		line_data = {}
@@ -197,6 +233,19 @@ class Stats():
 			# creates unique heatmap id that can be queired later by js.
 			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_heatmap_" + index
 
+			if read_header == "Paired End":
+
+				length = len(json[key][read][0]["data"])
+				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(length) ]
+				temp_col_name = [ str(int(x) + 151) for x in json[key][read][1]["col_names"]]
+
+				json[key][read] = {
+					 			   "data": temp_data,
+					 			   "col_names": json[key][read][0]["col_names"] + temp_col_name,
+					 			   "row_names": json[key][read][0]["row_names"],
+					 			   "shape": [json[key][read][0]["shape"][0], json[key][read][0]["shape"][-1] + json[key][read][1]["shape"][-1]]
+							 	  }
+
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = json[key][read]["col_names"]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
@@ -206,7 +255,6 @@ class Stats():
 			# create variables for range functions in loops. Represents shape of data
 			quality_scores = json[key][read]["shape"][0]
 			cycles = json[key][read]["shape"][-1]
-
 
 			# temp total list 
 			total = []
@@ -454,10 +502,10 @@ class Stats():
 				stats_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
 				stats_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
-				stats_json[key]["St_Read_1_Base_by_Cycle"] = json[key]["Paired_end"]["Read1"]["base_by_cycle"]
-				stats_json[key]["St_Read_2_Base_by_Cycle"] = json[key]["Paired_end"]["Read2"]["base_by_cycle"]
-				stats_json[key]["St_Read_1_Quality_by_Cycle"] = json[key]["Paired_end"]["Read1"]["qualities_by_cycle"]
-				stats_json[key]["St_Read_2_Quality_by_Cycle"] = json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]
+				stats_json[key]["St_Paired_End_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
+																  json[key]["Paired_end"]["Read2"]["base_by_cycle"]]
+				stats_json[key]["St_Paired_End_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],
+																 json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]]
 				stats_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
 
 
@@ -478,10 +526,8 @@ class Stats():
 
 		if PE_presence == True:
 			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
-			section["Base by Cycle (Read 1)"] = self.base_by_cycle(stats_json, "St_Read_1_Base_by_Cycle")
-			section["Base by Cycle (Read 2)"] = self.base_by_cycle(stats_json, "St_Read_2_Base_by_Cycle")
-			section["Quality by Cycle (Read 1)"] = self.quality_by_cycle(stats_json, "St_Read_1_Quality_by_Cycle", index)
-			section["Quality by Cycle (Read 2)"] = self.quality_by_cycle(stats_json, "St_Read_2_Quality_by_Cycle", index)
+			section["Base by Cycle (Paired End)"] = self.base_by_cycle(stats_json, "St_Paired_End_Base_by_Cycle")
+			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(stats_json, "St_Paired_End_Quality_by_Cycle", index)
 
 
 		#only executres if single read data is detected
