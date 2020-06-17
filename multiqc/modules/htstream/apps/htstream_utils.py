@@ -251,12 +251,20 @@ def pca(matrix, stats_order):
 	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
 
 	# Sort the (eigenvalue, eigenvector) tuples from high to low
-	eig_pairs, stats_order = (list(t) for t in zip(*sorted(zip(eig_pairs, stats_order), key=lambda x: x[0][0], reverse=True)))
-	#eig_pairs.sort(key=lambda x: x[0], reverse=True)
+	#eig_pairs, stats_order = (list(t) for t in zip(*sorted(zip(eig_pairs, stats_order), key=lambda x: x[0][0], reverse=True)))
+	eig_pairs.sort(key=lambda x: x[0], reverse=True)
 
 	# pc percentages
 	eig_sum = sum([eig_pairs[x][0] for x in range(len(eig_pairs))])
 	pc_perc = [(eig_pairs[0][0] / eig_sum) * 100, (eig_pairs[1][0] / eig_sum) * 100]
+
+
+	loadings = {}
+	for x in range(len(stats_order)):
+		loadings[stats_order[x]] = {'x': eig_pairs[0][1][x],
+									'y': eig_pairs[1][1][x],
+									"color": '#BE2C2C'}
+
 
 	# eigan vector matrix
 	matrix_w = np.hstack((eig_pairs[0][1].reshape(n,1), eig_pairs[1][1].reshape(n,1)))
@@ -269,7 +277,7 @@ def pca(matrix, stats_order):
 	# pca = PCA(n_components=2)
 	# transformed = pca.fit_transform(matrix.T)
 
-	return transformed, stats_order, pc_perc
+	return transformed, loadings, pc_perc
 
 
 

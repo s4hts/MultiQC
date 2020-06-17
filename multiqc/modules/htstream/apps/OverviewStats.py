@@ -128,6 +128,7 @@ class OverviewStats():
 						fraction_pe = 0
 
 					temp = [
+							total_frags, 
 							sample_json["total_Q30"] / total_bp, # fraction Q30
 							fraction_pe, 
 							fraction_se, 
@@ -138,7 +139,8 @@ class OverviewStats():
 					data[x] += temp
 
 					if stats_bool == True:
-						stats_order += [key + ": Q30 Fraction",
+						stats_order += [key + ": Total Fragments",
+										key + ": Q30 Fraction",
 										key + ": GC Content",
 										key + ": N Content",
 										key + ": Fraction PE",
@@ -160,7 +162,7 @@ class OverviewStats():
 
 			stats_bool = False
 
-		data, stats_order, pc_perc = htstream_utils.pca(np.asarray(data).T, stats_order)			
+		data, loadings, pc_perc = htstream_utils.pca(np.asarray(data).T, stats_order)			
 
 		x_min, x_max = 0, 0 
 		y_min, y_max = 0, 0
@@ -172,12 +174,18 @@ class OverviewStats():
 
 
 		config = {'title': "HTStream: PCA Plot",
-				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]), # + " - " + stats_order[0],
-				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])} # + " - " + stats_order[1]}
+				  'data_labels': [
+									{'name': 'Samples', 'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
+														'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])},
+									{'name': 'Loadings', 'xlab': "PC1",
+														 'ylab': "PC2"}
+								  ]}
 
+		data = [mds_plot, loadings]
 
 		html = "<hr><h4> PCA Plot </h4>\n"
-		html += scatter.plot(mds_plot, config)
+		html += scatter.plot(data, config)
+
 		
 		return html
 
