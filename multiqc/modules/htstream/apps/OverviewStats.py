@@ -95,9 +95,10 @@ class OverviewStats():
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)
 
-		black_list = ["Output_Reads", "Output_Bp"]
+		exclude_list = ["Output_Reads", "Output_Bp"]
 
 		data = [[] for x in range(row_length)]
+		data_out = {}
 
 		stats_order = []
 		stats_bool = True
@@ -135,16 +136,16 @@ class OverviewStats():
 							gc_content, # GC Content
 							n_content # N Content
 							]
-
-					data[x] += temp
-
+				
 					if stats_bool == True:
 						stats_order += [key + ": Total Fragments",
 										key + ": Q30 Fraction",
 										key + ": GC Content",
 										key + ": N Content",
 										key + ": Fraction PE",
-										key + ": Fraction SE"]  
+										key + ": Fraction SE"]
+
+					data[x] += temp	
 
 				elif key != "Pipeline Input":
 
@@ -152,20 +153,50 @@ class OverviewStats():
 
 					for k, v in sample_json.items():
 
-						if k not in black_list:
+						if k not in exclude_list:
 							temp.append(v)
 
 							if stats_bool == True:
 								stats_order.append(str(key + ": " + k))
 
-					data[x] += temp		
+					data[x] += temp
 
 			stats_bool = False
 
-		data, loadings, pc_perc = htstream_utils.pca(np.asarray(data).T, stats_order)			
 
-		x_min, x_max = 0, 0 
-		y_min, y_max = 0, 0
+		# prepe matrix
+		data = np.asarray(data).T
+		n, m = data.shape # rows, col
+		to_delete = []
+
+		# normalize 
+		for x in range(n):
+
+			row = data[x,:]
+
+			# remove rows with no variation, also, mean center and normalize variance
+			if np.all(row == row[0]):
+				to_delete.append(x)
+
+			else:
+				data[x,:] = (row - np.min(row) ) / (np.max(row) - np.min(row)) # min max normalization
+
+
+		# remove indeterminant columns
+		to_delete = sorted(to_delete, reverse=True)
+		for x in to_delete:	
+			data = np.delete(data, x, 0)
+			stats_order.remove(stats_order[x])
+
+
+		# format dictionary for output pca stats
+		for x in range(len(samples_list)):
+			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
+
+
+		# pca function
+		data, loadings, pc_perc = htstream_utils.pca(data, stats_order)			
+
 
 		for x in range(len(data[0])):
 
@@ -187,13 +218,15 @@ class OverviewStats():
 		html += scatter.plot(data, config)
 
 		
-		return html
+		return html, data_out
 
 
 	def execute(self, json, app_list):
 
-		html = self.table(json, app_list)
-		html += self.hts_pca(json)
-			
-		return html
+		table_html = self.table(json, app_list)
+		scatter_html, pca_data = self.hts_pca(json)
+
+		html = table_html + scatter_html
+
+		return html, pca_data
 

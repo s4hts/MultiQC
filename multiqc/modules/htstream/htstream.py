@@ -58,7 +58,7 @@ class MultiqcModule(BaseMultiqcModule):
 		self.data = self.ignore_samples(self.data)
 
 		# parse json containing stats on each sample
-		self.parse_stats(self.data) 
+		self.generate_reports(self.data) 
 
 		# general stats table, can't upload dictionary of dictionaries :/
 		#self.general_stats_addcols(self.data)
@@ -93,7 +93,7 @@ class MultiqcModule(BaseMultiqcModule):
 		return app_dict
 
 
-	def parse_stats(self, json):
+	def generate_reports(self, json):
 
 		# preserves order of apps in report
 		self.programs = {
@@ -236,18 +236,30 @@ class MultiqcModule(BaseMultiqcModule):
 		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			try:
-				app = OverviewStats.OverviewStats()
+			# try:
+			# 	app = OverviewStats.OverviewStats()
 
-				description = "General statistics from the HTStream pipeline."
-				html = app.execute(self.overview_stats, app_order)
+			# 	description = "General statistics from the HTStream pipeline."
+			# 	html, pca_data = app.execute(self.overview_stats, app_order)
+					
+			# 	self.write_data_file(pca_data, 'htstream_pca_matrix.txt')
+			# 	self.add_section(name = "Processing Overview",
+			# 					 description = description,
+			# 					 content = html) 
+
+			# except:
+			#  	log.warning("Report Section for Processing Overview Failed.")
+
+			app = OverviewStats.OverviewStats()
+
+			description = "General statistics from the HTStream pipeline."
+			html, pca_data = app.execute(self.overview_stats, app_order)
 				
-				self.add_section(name = "Processing Overview",
-								 description = description,
-								 content = html) 
+			self.write_data_file(pca_data, 'htstream_pca_matrix')
+			self.add_section(name = "Processing Overview",
+							 description = description,
+							 content = html) 
 
-			except:
-			 	log.warning("Report Section for Processing Overview Failed.")
 
 
 

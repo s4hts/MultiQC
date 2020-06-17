@@ -213,30 +213,6 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 def pca(matrix, stats_order):
 
-
-	n, m = matrix.shape # rows, col
-	
-	to_delete = []
-
-	# normalize 
-	for x in range(n):
-
-		row = matrix[x,:]
-
-		# remove rows with no variation, also, mean center and normalize variance
-		if np.all(row == row[0]):
-			to_delete.append(x)
-
-		else:
-			matrix[x,:] = (row - np.min(row) ) / (np.max(row) - np.min(row)) # min max normalization
-
-
-	# remove indeterminant columns
-	to_delete = sorted(to_delete, reverse=True)
-	for x in to_delete:	
-		matrix = np.delete(matrix, x, 0)
-		stats_order.remove(stats_order[x])
-
 	n, m = matrix.shape # rows, col
 
 	# sample cov
