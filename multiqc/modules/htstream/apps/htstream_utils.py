@@ -237,7 +237,6 @@ def pca(matrix, stats_order):
 		matrix = np.delete(matrix, x, 0)
 		stats_order.remove(stats_order[x])
 
-	print(matrix)
 	n, m = matrix.shape # rows, col
 
 	# sample cov
