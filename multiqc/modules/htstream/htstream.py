@@ -45,7 +45,7 @@ class MultiqcModule(BaseMultiqcModule):
 			self.add_data_source(file) # write file to MultiQC souce file 
 
 			self.s_name = file['s_name'] # sample name
-			self.file_data = self.parse_json(file['f']) # parse stats file. Should return json directory of apps and their stats 
+			self.file_data = self.parse_json(file['s_name'], file['f']) # parse stats file. Should return json directory of apps and their stats 
 
 			self.data[self.s_name] = self.file_data # add sample and stats to OrderedDict
 
@@ -67,20 +67,28 @@ class MultiqcModule(BaseMultiqcModule):
 	#################################################
 	# Json and stats parsing functions
 
-	def parse_json(self, f):
+	def parse_json(self, name, f):
 
 		app_dict = {}
 		apps = json.loads(f)
 
-		for a in apps:
-			i = 1
-			app_name = a["Program_details"]["program"] + "_" + str(i)
+		try:
 
-			while app_name in app_dict.keys():
-				i += 1
+			for a in apps:
+				i = 1
 				app_name = a["Program_details"]["program"] + "_" + str(i)
 
-			app_dict[app_name] = a	
+				while app_name in app_dict.keys():
+					i += 1
+					app_name = a["Program_details"]["program"] + "_" + str(i)
+
+				app_dict[app_name] = a	
+
+		except:
+
+			app_dict = json.loads(f, object_pairs_hook=htstream_utils.resolve)
+			log.warning("Sample " + name + "uses old json format. Please update to a newer version of HTStream.")
+
 
 		return app_dict
 

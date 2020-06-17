@@ -216,7 +216,6 @@ class Stats():
 										 "zIndex": 4}]
 
 
-
 		btn_id = "-".join(read.split("_")[:3]).lower()
 		unique_id = str(random() % 1000)[2:]
 		line_data = {}

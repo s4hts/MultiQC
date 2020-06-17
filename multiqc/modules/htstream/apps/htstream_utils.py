@@ -11,7 +11,6 @@ import numpy as np
 
 def resolve(pairs):
 
-
 	resolved_dict = {}
 	index_dict = {}
 
@@ -19,17 +18,18 @@ def resolve(pairs):
 	for k, v in pairs:
 
 		if k in index_dict.keys() and "hts_" in k:
-			resolved_dict[k + " (" + str(index_dict[k]) + ")"] = v
+			resolved_dict[k + "_" + str(index_dict[k])] = v
 			index_dict[k] += 1
 
 		elif "hts_" in k:
-			resolved_dict[k + " (1)"] = v
+			resolved_dict[k + "_1"] = v
 			index_dict[k] = 2
 
 		else:
 			resolved_dict[k] = v
 
 	return  resolved_dict
+
 
 
 #######################################
