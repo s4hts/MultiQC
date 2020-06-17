@@ -236,29 +236,19 @@ class MultiqcModule(BaseMultiqcModule):
 		# add pipeline overview section if appropriate
 		if self.overview_stats != {}:
 
-			# try:
-			# 	app = OverviewStats.OverviewStats()
+			try:
+				app = OverviewStats.OverviewStats()
 
-			# 	description = "General statistics from the HTStream pipeline."
-			# 	html, pca_data = app.execute(self.overview_stats, app_order)
+				description = "General statistics from the HTStream pipeline."
+				html, pca_data = app.execute(self.overview_stats, app_order)
 					
-			# 	self.write_data_file(pca_data, 'htstream_pca_matrix.txt')
-			# 	self.add_section(name = "Processing Overview",
-			# 					 description = description,
-			# 					 content = html) 
+				self.write_data_file(pca_data, 'htstream_pca_matrix.txt')
+				self.add_section(name = "Processing Overview",
+								 description = description,
+								 content = html) 
 
-			# except:
-			#  	log.warning("Report Section for Processing Overview Failed.")
-
-			app = OverviewStats.OverviewStats()
-
-			description = "General statistics from the HTStream pipeline."
-			html, pca_data = app.execute(self.overview_stats, app_order)
-				
-			self.write_data_file(pca_data, 'htstream_pca_matrix')
-			self.add_section(name = "Processing Overview",
-							 description = description,
-							 content = html) 
+			except:
+			 	log.warning("Report Section for Processing Overview Failed.")
 
 
 
