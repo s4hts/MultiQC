@@ -223,23 +223,21 @@ def pca(matrix, stats_order):
 
 		row = matrix[x,:]
 
-		# ensure all numbers are between zero and one
-		if row[0] > 1.0:
-			norm = np.linalg.norm(row)
-			row = row / norm
-
 		# remove rows with no variation, also, mean center and normalize variance
 		if np.all(row == row[0]):
 			to_delete.append(x)
+
 		else:
-			matrix[x,:] = (row - np.mean(row) ) / np.std(row)
+			matrix[x,:] = (row - np.min(row) ) / (np.max(row) - np.min(row)) # min max normalization
+
 
 	# remove indeterminant columns
 	to_delete = sorted(to_delete, reverse=True)
-	for x in to_delete:
+	for x in to_delete:	
 		matrix = np.delete(matrix, x, 0)
 		stats_order.remove(stats_order[x])
 
+	print(matrix)
 	n, m = matrix.shape # rows, col
 
 	# sample cov
