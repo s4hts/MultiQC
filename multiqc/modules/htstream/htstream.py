@@ -87,7 +87,7 @@ class MultiqcModule(BaseMultiqcModule):
 		except:
 
 			app_dict = json.loads(f, object_pairs_hook=htstream_utils.resolve)
-			log.warning("Sample " + name + "uses old json format. Please update to a newer version of HTStream.")
+			log.warning("Sample " + name + " uses old json format. Please update to a newer version of HTStream.")
 
 
 		return app_dict
