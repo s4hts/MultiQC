@@ -49,8 +49,8 @@ var data = JSON.parse(text)[0];
 
 var container = "htstream_histogram_".concat(read);
 var title_read = read.split("_")[1];
-var title_sample = sample.split("_")[0] + "_" + sample.split("_")[1]
-var title = "Read Length Histogram (" + title_read + "): " + title_sample;
+var temp_array = sample.split("_");
+var title = "Read Length Histogram (" + title_read + "): " + temp_array.splice(0, temp_array.length - 1).join(by="_");
 
 
 // Single end is handled differently, histogram parameters must be set differently
