@@ -243,6 +243,7 @@ class MultiqcModule(BaseMultiqcModule):
 				html, pca_data = app.execute(self.overview_stats, app_order)
 					
 				self.write_data_file(pca_data, 'htstream_pca_matrix.txt')
+				
 				self.add_section(name = "Processing Overview",
 								 description = description,
 								 content = html) 

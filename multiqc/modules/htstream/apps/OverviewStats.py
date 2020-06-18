@@ -189,7 +189,7 @@ class OverviewStats():
 			stats_order.remove(stats_order[x])
 
 
-		# format dictionary for output pca stats
+		# format dictionary for output pca stats (raw data)
 		for x in range(len(samples_list)):
 			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
 

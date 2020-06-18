@@ -383,10 +383,11 @@ class Stats():
 					current = 10
 					bins = []
 					values = []
+					log_values = []
 
 					while current < max_reads:
 						bins.append(current)
-						values.append(1) # pseudo count
+						log_values.append(1) # pseudo count
 						current += 1
 
 					# populate smaple dictionary with read length and its frequency
@@ -396,6 +397,7 @@ class Stats():
 
 							if item[0] == bins[x]:
 								values[x] += item[1]
+								log_values[x] += item[]
 								break 
 
 					data[dict_key].append({"bins": bins, "vals": values})
