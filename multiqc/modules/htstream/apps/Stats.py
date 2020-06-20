@@ -90,7 +90,7 @@ class Stats():
 			if read_header == "Paired End":
 
 				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(5) ]
-				temp_col_name = [ str(int(x) + 151) for x in json[key][read][1]["col_names"]]
+				temp_col_name = [ str(int(x) + 151 ) for x in json[key][read][1]["col_names"]]
 
 				json[key][read] = {
 					 			   "data": temp_data,
