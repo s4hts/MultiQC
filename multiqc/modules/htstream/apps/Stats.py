@@ -352,52 +352,34 @@ class Stats():
 
 		# iterates over all samples in input dictionary
 		for key in json.keys():
+			
+			dict_key = key + "_" + unique_id
+			data[dict_key] = []
 
-			# if read length histogram has one value (ie. all samples have a uniform length),
-			#	this data is added to a secondary table as to avoid ugly line graphs.
-			if len(json[key][read][0]) == 1 and read_keys[read] != "PE":
+			for x in range(len(json[key][read])):
 
-				# format read name for dictionary
-				read_length_col = "St_" + read_code  + "_Length"
-				read_count_col = "St_" + read_code  + "_Reads"
+				max_reads = max([item[0] for item in json[key][read][x]]) + 1
 
-					# try appending dictionary, if key doesn't exist, create the instance.
-				try:
-					invariant_dict[key][read_length_col] = json[key][read][0][0]
-					invariant_dict[key][read_count_col] = json[key][read][0][1]
+				current = 10
+				bins = []
+				values = []
 
-				except:
-					invariant_dict[key] = {}
-					invariant_dict[key][read_length_col] = json[key][read][0][0]
-					invariant_dict[key][read_count_col] = json[key][read][0][1]
+				while current < max_reads:
+					values.append(0)
+					bins.append(current)
+					current += 1
 
-			# executes of more than one data points are found.
-			else:
-				dict_key = key + "_" + unique_id
-				data[dict_key] = []
+				# populate smaple dictionary with read length and its frequency
+				for item in json[key][read][x]:
 
-				for x in range(len(json[key][read])):
+					for x in range(len(bins) - 1, -1, -1):
 
-					max_reads = max([item[0] for item in json[key][read][x]]) + 1
+						if item[0] == bins[x]:
+							values[x] += item[1]
+							break
+							
 
-					current = 10
-					bins = []
-					values = []
-
-					while current < max_reads:
-						bins.append(current)
-						current += 1
-
-					# populate smaple dictionary with read length and its frequency
-					for item in json[key][read][x]:
-
-						for x in range(len(bins) - 1, -1, -1):
-
-							if item[0] == bins[x]:
-								values[x] += item[1]
-								break 
-
-					data[dict_key].append({"bins": bins, "vals": values})
+				data[dict_key].append({"bins": bins, "vals": values})
 
 				if read_keys[read] == "SE":
 					data[dict_key] = data[dict_key][-1]
@@ -413,30 +395,6 @@ class Stats():
 				pid  = "htstream_stats_" + read + "_" + key + "_" + unique_id + "_btn"
 				read_id = read + "_" + unique_id
 				button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}_{u}\')" id="{p}">{s}</button>\n'.format(a=active, r=read_id, u=unique_id, s=key, p=pid))
-
-
-		# if samples with uniform read length are present
-		if len(invariant_dict.keys()) != 0:
-
-			# notice
-			notice = 'Samples with uniform read lengths identified (displayed below). <br />'
-
-			# table
-			headers = OrderedDict()
-			table_config = {'table_title': "Length of Uniform Reads"}
-
-
-			# instantiates table columns
-			headers["St_{r}_Length".format(r = read_code)] = {'title': "Read Length ({r})".format(r = read_code), 
-									   						  'namespace': "Read Length ({r})".format(r = read_code), 
-									  						  'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Greens' }
-			headers["St_{r}_Reads".format(r = read_code)] = {'title': "Read Count ({r})".format(r = read_code), 
-															 'namespace': "Read Count ({r})".format(r = read_code),
-															 'description': 'Length of Read Type', 'format': '{:,.0f}', 'scale': 'Purples' }
-			
-			# add to output html
-			notice_html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
-			notice_html += table.plot(invariant_dict, headers, table_config)	
 
 		html = htstream_utils.stats_histogram_html(read, data, unique_id, button_list, notice_html)
 
