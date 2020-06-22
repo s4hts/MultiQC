@@ -44,12 +44,12 @@ class QWindowTrim():
 		return table.plot(json, headers)
 
 
-	def bargraph(self, json, bps):
+	def bargraph(self, json, bps, index):
 
 		# config dict for bar graph
 		config = {
 				  "title": "HTStream: QWindowTrim Trimmed Basepairs Bargraph",
-				  'id': "htstream_qwindowtrimmer_bargraph",
+				  'id': "htstream_qwindowtrimmer_bargraph_" + index,
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': False,
 				  'data_labels': [{'name': "Read 1"},
@@ -175,7 +175,7 @@ class QWindowTrim():
 
 		# sections and figure function calls
 		section = {"Table": self.table(stats_json, total_trimmed_bp, index),
-				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp),
+				   "Trimmed Basepairs": self.bargraph(stats_json, total_trimmed_bp, index),
 				   "Overview": overview_dict}
 
 		return section

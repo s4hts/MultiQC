@@ -413,12 +413,12 @@ class Stats():
 			# STATS FOR TABLE 
 			#
 			gc_count = (json[key]["Fragment"]["base_composition"]["G"] + json[key]["Fragment"]["base_composition"]["C"])
-			gc_content = ( gc_count / json[key]["Fragment"]["basepairs_out"] ) * 100 
-			n_content = ( json[key]["Fragment"]["base_composition"]["N"] / json[key]["Fragment"]["basepairs_out"] ) * 100 
+			gc_content = gc_count / json[key]["Fragment"]["basepairs_out"]
+			n_content = json[key]["Fragment"]["base_composition"]["N"] / json[key]["Fragment"]["basepairs_out"]
 
 			stats_json[key] = {"St_Fragments_in" + index: json[key]["Fragment"]["in"],
-							   "St_GC_Content" + index: gc_content,
-						       "St_N_Content" + index: n_content,
+							   "St_GC_Content" + index: gc_content * 100 ,
+						       "St_N_Content" + index: n_content * 100 ,
 						       "St_Notes" + index: json[key]["Program_details"]["options"]["notes"]}
 
 

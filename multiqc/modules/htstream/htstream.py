@@ -242,7 +242,7 @@ class MultiqcModule(BaseMultiqcModule):
 				description = "General statistics from the HTStream pipeline."
 				html, pca_data = app.execute(self.overview_stats, app_order)
 					
-				self.write_data_file(pca_data, 'htstream_pca_data_matrix')
+				self.write_data_file(pca_data, 'htstream_raw_pca_data_matrix')
 				
 				self.add_section(name = "Processing Overview",
 								 description = description,
