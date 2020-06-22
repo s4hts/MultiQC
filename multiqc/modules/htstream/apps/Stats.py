@@ -384,17 +384,17 @@ class Stats():
 				if read_keys[read] == "SE":
 					data[dict_key] = data[dict_key][-1]
 
-				if first == True:
-					active = "active" # button is default active
-					first = False # shuts off first gat
+			if first == True:
+				active = "active" # button is default active
+				first = False # shuts off first gat
 
-				else:
-					active = "" # button is default off 
+			else:
+				active = "" # button is default off 
 
-				# # html div attributes and text
-				pid  = "htstream_stats_" + read + "_" + key + "_" + unique_id + "_btn"
-				read_id = read + "_" + unique_id
-				button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}_{u}\')" id="{p}">{s}</button>\n'.format(a=active, r=read_id, u=unique_id, s=key, p=pid))
+			# # html div attributes and text
+			pid  = "htstream_stats_" + read + "_" + key + "_" + unique_id + "_btn"
+			read_id = read + "_" + unique_id
+			button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}_{u}\')" id="{p}">{s}</button>\n'.format(a=active, r=read_id, u=unique_id, s=key, p=pid))
 
 		html = htstream_utils.stats_histogram_html(read, data, unique_id, button_list, notice_html)
 

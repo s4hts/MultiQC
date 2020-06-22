@@ -96,11 +96,12 @@ class AdapterTrimmer():
 		for key in json.keys():
 
 			frag_in = json[key]["Fragment"]["in"]
+			bp_in = json[key]["Fragment"]["basepairs_in"]
 			
 			# calculations for reads with adapters and bps trimmed
 			adapter_reads = json[key]["Single_end"]["adapterTrim"] + json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"] # total reads trimmed
 			bp_trimmed = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"] # total basepairs trimmed
-			perc_bp_lost = ( (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"] ) * 100
+			perc_bp_lost = ( (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / bp_in ) * 100
 
 			# if adapter trim is zero, so is the percentage and the avg basepair trimmed. This prevents division by zero error
 			if adapter_reads == 0:
@@ -119,12 +120,12 @@ class AdapterTrimmer():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],
-								  "R1_Bp_Trim": json[key]["Paired_end"]["Read1"]["adapterBpTrim"] / frag_in,
+								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / bp_in,
+								  "R1_Bp_Trim": json[key]["Paired_end"]["Read1"]["adapterBpTrim"] / bp_in,
 								  "R1_Read_Trim": json[key]["Paired_end"]["Read1"]["adapterTrim"] / frag_in,
-								  "R2_Bp_Trim": json[key]["Paired_end"]["Read2"]["adapterBpTrim"] / frag_in,
+								  "R2_Bp_Trim": json[key]["Paired_end"]["Read2"]["adapterBpTrim"] / bp_in,
 								  "R2_Read_Trim": json[key]["Paired_end"]["Read2"]["adapterTrim"] / frag_in,
-								  "SE_Bp_Trim": json[key]["Single_end"]["adapterBpTrim"] / frag_in,
+								  "SE_Bp_Trim": json[key]["Single_end"]["adapterBpTrim"] / bp_in,
 								  "SE_Read_Trim": json[key]["Single_end"]["adapterTrim"] / frag_in
 								  }
 

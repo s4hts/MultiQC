@@ -140,10 +140,10 @@ class OverviewStats():
 					if stats_bool == True:
 						stats_order += [key + ": Total Fragments",
 										key + ": Q30 Fraction",
-										key + ": GC Content",
-										key + ": N Content",
 										key + ": Fraction PE",
-										key + ": Fraction SE"]
+										key + ": Fraction SE",
+										key + ": GC Content",
+										key + ": N Content"]
 
 					data[x] += temp	
 
@@ -169,6 +169,10 @@ class OverviewStats():
 		n, m = data.shape # rows, col
 		to_delete = []
 
+		# format dictionary for output pca stats (raw data)
+		# for x in range(len(samples_list)):
+		# 	data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
+
 		# normalize 
 		for x in range(n):
 
@@ -178,8 +182,11 @@ class OverviewStats():
 			if np.all(row == row[0]):
 				to_delete.append(x)
 
-			else:
-				data[x,:] = (row - np.min(row) ) / (np.max(row) - np.min(row)) # min max normalization
+			elif any(i > 1 for i in row):
+				data[x,:] = (row - np.mean(row)) / ( (np.mean(row) / 2) * (1 - (np.mean(row) / 2)) )
+
+			# else:
+			# 	data[x,:] = (row - np.mean(row))
 
 
 		# remove indeterminant columns
@@ -188,10 +195,10 @@ class OverviewStats():
 			data = np.delete(data, x, 0)
 			stats_order.remove(stats_order[x])
 
-
 		# format dictionary for output pca stats (raw data)
 		for x in range(len(samples_list)):
 			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
+		
 
 
 		# pca function
@@ -208,8 +215,8 @@ class OverviewStats():
 				  'data_labels': [
 									{'name': 'Samples', 'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
 														'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])},
-									{'name': 'Loadings', 'xlab': "PC1",
-														 'ylab': "PC2"}
+									{'name': 'Loadings', 'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
+														 'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])}
 								  ]}
 
 		data = [mds_plot, loadings]
