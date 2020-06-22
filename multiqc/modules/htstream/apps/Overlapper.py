@@ -151,8 +151,8 @@ class Overlapper():
 
 			overview_dict[key] = {
 								  "Output_Reads": json[key]["Fragment"]["out"],
-								  "Hist_Max": parsed_hist_stats["Max"],
-								  "Hist_Med": parsed_hist_stats["Median"],
+								  # "Hist_Max": parsed_hist_stats["Max"],
+								  # "Hist_Med": parsed_hist_stats["Median"],
 								  "PE_Lost": json[key]["Paired_end"]["out"] / json[key]["Paired_end"]["in"],
 								  "SE_Lost": json[key]["Single_end"]["out"] / json[key]["Paired_end"]["in"],
 								  "Bp_Lost":  json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"],

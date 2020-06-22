@@ -174,13 +174,14 @@ class OverviewStats():
 
 			row = data[x,:]
 			mean = np.mean(row)
+			std = np.std(row)
 
 			# remove rows with no variation, also, mean center and normalize variance
 			if np.all(row == row[0]):
 				to_delete.append(x)
 
 			elif any(i > 1 for i in row):
-				data[x,:] = (row - mean) / ( (mean / 2) * (1 - (mean / 2)) )
+				data[x,:] = (row - mean) / std
 
 			else:
 				data[x,:] = (row - np.mean(row))
