@@ -66,7 +66,7 @@ class SeqScreener():
 
 			overview_dict[key] = {
 								  "Output_Reads": json[key]["Fragment"]["out"],
-								  "Reads_Lost": json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"]
+								  "Reads_Lost": (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
 								 }
 
 			# sample entry for stats dictionary

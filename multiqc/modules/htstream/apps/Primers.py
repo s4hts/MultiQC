@@ -125,6 +125,7 @@ class Primers():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
+								  "Bp_Lost": bp_lost / json[key]["Fragment"]["basepairs_in"]
 								  }
 
 			stats_json[key] = {

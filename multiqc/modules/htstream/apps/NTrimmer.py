@@ -152,7 +152,7 @@ class NTrimmer():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Bp_Lost": json[key]["Fragment"]["basepairs_out"] / json[key]["Fragment"]["basepairs_in"]
+								  "Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"]
 								  }
 
 			# sample entry in stats dictionary

@@ -50,7 +50,7 @@ class LengthFilter():
 			try:
 				perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
 				frag_out = json[key]["Fragment"]["out"]
-				reads_lost = json[key]["Fragment"]["out"] / json[key]["Fragment"]["in"]
+				reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
 				PE_presence = True
 
 

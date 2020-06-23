@@ -167,7 +167,10 @@ class OverviewStats():
 		n, m = data.shape # rows, col
 		to_delete = []
 
-	
+		# format dictionary for output pca stats (raw data)
+		for x in range(len(samples_list)):
+			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
+
 
 		# normalize 
 		for x in range(n):
@@ -181,10 +184,11 @@ class OverviewStats():
 				to_delete.append(x)
 
 			elif any(i > 1 for i in row):
-				data[x,:] = (row - mean) / std
+				data[x,:] = (row - mean) / std 
 
 			else:
 				data[x,:] = (row - np.mean(row))
+
 
 
 		# remove indeterminant columns
@@ -193,10 +197,7 @@ class OverviewStats():
 			data = np.delete(data, x, 0)
 			stats_order.remove(stats_order[x])
 
-		# format dictionary for output pca stats (raw data)
-		for x in range(len(samples_list)):
-			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
-
+		
 		# pca function
 		data, loadings, pc_perc = htstream_utils.pca(data, stats_order)			
 
