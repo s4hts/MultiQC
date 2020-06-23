@@ -96,6 +96,7 @@ class OverviewStats():
 		row_length = len(samples_list)
 
 		exclude_list = ["Output_Reads", "Output_Bp"]
+		special_list = ["Hist_Med", "Hist_Max"]
 
 		data = [[] for x in range(row_length)]
 		data_out = {}
@@ -182,6 +183,9 @@ class OverviewStats():
 			# remove rows with no variation, also, mean center and normalize variance
 			if np.all(row == row[0]):
 				to_delete.append(x)
+
+			elif any(s in stats_order[x] for s in special_list):
+				data[x,:] = (row - mean) / mean
 
 			elif any(i > 1 for i in row):
 				data[x,:] = (row - mean) / std 
