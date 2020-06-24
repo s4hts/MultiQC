@@ -65,8 +65,10 @@ class OverviewStats():
 			read_description = "Number of Output Fragments for " + app
 			bp_description = "Number of Output Bps for " + app
 			color = color_rotations[i % 4]
-			read_headers[app + " (read)"] = {'title': app, 'namespace': app, 'description': read_description, 'format': '{:,.0f}', 'scale': color}
-			bp_headers[app + " (bps)"] = {'title': app, 'namespace': app, 'description': bp_description, 'format': '{:,.0f}', 'scale': color}
+			read_headers[app + " (read)"] = {'title': app, 'namespace': app, 'description': read_description,
+											 'format': '{:,.0f}', 'scale': color}
+			bp_headers[app + " (bps)"] = {'title': app, 'namespace': app, 'description': bp_description, 
+										  'format': '{:,.0f}', 'scale': color}
 
 
 		html = '<h4> Fragment Reduction </h4>'
@@ -89,7 +91,7 @@ class OverviewStats():
 
 	def hts_pca(self, json):
 
-		mds_plot = {}
+		pca_plot = {}
 
 		keys = list(json.keys())
 		samples_list = list(json[keys[0]].keys())
@@ -99,7 +101,6 @@ class OverviewStats():
 		special_list = ["Hist_Med", "Hist_Max"]
 
 		data = [[] for x in range(row_length)]
-		data_out = {}
 
 		stats_order = []
 		stats_bool = True
@@ -162,53 +163,19 @@ class OverviewStats():
 
 			stats_bool = False
 
-
 		# prepe matrix
 		data = np.asarray(data).T
-		n, m = data.shape # rows, col
-		to_delete = []
-
-		# format dictionary for output pca stats (raw data)
-		for x in range(len(samples_list)):
-			data_out[samples_list[x]] = dict(zip(stats_order, data[:,x]))
-
-
-		# normalize 
-		for x in range(n):
-
-			row = data[x,:]
-			mean = np.mean(row)
-			std = np.std(row)
-
-			# remove rows with no variation, also, mean center and normalize variance
-			if np.all(row == row[0]):
-				to_delete.append(x)
-
-			elif any(s in stats_order[x] for s in special_list):
-				data[x,:] = (row - mean) / mean
-
-			elif any(i > 1 for i in row):
-				data[x,:] = (row - mean) / std 
-
-			else:
-				data[x,:] = (row - np.mean(row))
-
-
-
-		# remove indeterminant columns
-		to_delete = sorted(to_delete, reverse=True)
-		for x in to_delete:	
-			data = np.delete(data, x, 0)
-			stats_order.remove(stats_order[x])
-
 		
-		# pca function
+		# normalize 
+		data, stats_order, raw_data = htstream_utils.normalize(data, samples_list, stats_order, special_list)
+
+		# pca 
 		data, loadings, pc_perc = htstream_utils.pca(data, stats_order)			
 
 
 		for x in range(len(data[0])):
 
-			mds_plot[samples_list[x]] = {"x": data[0, x],
+			pca_plot[samples_list[x]] = {"x": data[0, x],
 										 "y": data[1, x]}
 
 
@@ -222,13 +189,13 @@ class OverviewStats():
 														 'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])}
 								  ]}
 
-		data = [mds_plot, loadings]
+		data = [pca_plot, loadings]
 
 		html = "<hr><h4> PCA Plot </h4>\n"
 		html += scatter.plot(data, config)
 
 		
-		return html, data_out
+		return html, raw_data
 
 
 	def execute(self, json, app_list):

@@ -246,7 +246,7 @@ class Stats():
 							 	  }
 
 			# creates x and y axis labels for heatmap (categorical)
-			x_lab = json[key][read]["col_names"]
+			x_lab = [str(int(x) - 1) for x in json[key][read]["col_names"]]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
 
 			data = []

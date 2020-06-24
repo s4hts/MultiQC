@@ -31,7 +31,6 @@ def resolve(pairs):
 	return  resolved_dict
 
 
-
 #######################################
 
 # prints keys in a pretty way
@@ -205,6 +204,51 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 	html += notice
 
 	return html
+
+
+#######################################
+
+# pca plot
+
+def normalize(data, samples_list, stats_order, special_list):
+
+	n, m = data.shape # rows, col
+	to_delete = []
+	raw_data = {}
+
+	# format dictionary for output pca stats (raw data)
+	for x in range(len(samples_list)):
+		raw_data[samples_list[x]] = dict(zip(stats_order, data[:,x]))
+
+	# normalize 
+	for x in range(n):
+
+		row = data[x,:]
+		mean = np.mean(row)
+		std = np.std(row)
+
+		# remove rows with no variation, also, mean center and normalize variance
+		if np.all(row == row[0]):
+			to_delete.append(x)
+
+		elif any(s in stats_order[x] for s in special_list):
+			data[x,:] = (row - mean) / 15
+
+		elif any(i > 1 for i in row):
+			data[x,:] = (row - mean) / std 
+
+		else:
+			data[x,:] = (row - np.mean(row)) 
+
+
+	# remove indeterminant columns
+	to_delete = sorted(to_delete, reverse=True)
+	for x in to_delete:	
+		data = np.delete(data, x, 0)
+		stats_order.remove(stats_order[x])
+		
+
+	return data, stats_order, raw_data
 
 
 #######################################

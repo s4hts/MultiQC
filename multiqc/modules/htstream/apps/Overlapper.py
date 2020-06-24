@@ -154,7 +154,6 @@ class Overlapper():
 								  "Hist_Max": parsed_hist_stats["Max"],
 								  "Hist_Med": parsed_hist_stats["Median"],
 								  "PE_Lost": (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Fragment"]["in"],
-								  "SE_Lost": (json[key]["Single_end"]["in"] - json[key]["Single_end"]["out"]) / json[key]["Fragment"]["in"],
 								  "Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"],
 								  "Sin": sins / json[key]["Fragment"]["in"],
 								  "Min": mins / json[key]["Fragment"]["in"],
