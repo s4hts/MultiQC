@@ -57,7 +57,12 @@ class LengthFilter():
 		for key in json.keys():
 
 			frag_out = json[key]["Fragment"]["out"]
-			reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
+
+			try:
+				reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
+			
+			except:
+				reads_lost = 0
 
 			try:
 				pe_perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
