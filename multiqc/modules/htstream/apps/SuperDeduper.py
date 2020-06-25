@@ -13,17 +13,23 @@ from multiqc.plots import table, linegraph
 class SuperDeduper():
 
 
-	def table(self, json, total, index):
+	def table(self, json, pe_total, se_total, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
-		if total != 0:
+		if (pe_total + se_total) == 0:
+			html = '<div class="alert alert-info"> No Duplicates in any sample. </div>'	
+			return html
+
+		if pe_total != 0:
 			headers["Sd_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
 									 'suffix': '%', 'scale': 'Greens' }
 
-		headers["Sd_SE_in" + index] = {'title': "SE in", 'namespace': "SE in", 'description': 'Number of Input Single End Reads', 'format': '{:,.0f}', 'scale': 'Greens'}
-		headers["Sd_SE_out" + index] = {'title': "SE out", 'namespace': "SE out", 'description': 'Number of Output Single End Reads', 'format': '{:,.0f}', 'scale': 'RdPu'}
+		if se_total != 0:
+			headers["Sd_SE_loss" + index] = {'title': "% SE Lost", 'namespace': "% SE Lost",'description': 'Percentage of Single End Reads Lost', 'format': '{:,.2f}', 
+									 'suffix': '%', 'scale': 'RdPu' }
+
 		headers["Sd_%_Duplicates" + index] = {'title': "% Duplicates", 
 								   'namespace': "% Duplicates", 
 								   'description': 'Percentage of Duplicate Reads (SE and PE)',
@@ -95,7 +101,8 @@ class SuperDeduper():
 		stats_json = OrderedDict()
 		overview_dict = {}
 
-		perc_loss_total = 0
+		pe_total_loss = 0 
+		se_total_loss = 0 
 
 		for key in json.keys():
 
@@ -103,14 +110,19 @@ class SuperDeduper():
 			perc_duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
 			
 			try:
-				perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
-				PE_presence = True
+				perc_pe_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
 
 			except:
-				perc_loss = 0
-				PE_presence = False
+				perc_pe_loss = 0
 
-			perc_loss_total += perc_loss
+			try:
+				perc_se_loss = ((json[key]["Single_end"]["in"] - json[key]["Single_end"]["out"]) / json[key]["Single_end"]["in"])  * 100
+
+			except:
+				perc_se_loss = 0
+
+			pe_total_loss += perc_pe_loss
+			se_total_loss += perc_se_loss 
 
 			overview_dict[key] = {
 								  "Output_Reads": json[key]["Fragment"]["out"],
@@ -121,9 +133,8 @@ class SuperDeduper():
 
 			# sample instance in ordered dict
 			stats_json[key] = {
-			 				   "Sd_PE_loss" + index: perc_loss,
-							   "Sd_SE_in" + index: json[key]["Single_end"]["in"],
-							   "Sd_SE_out" + index: json[key]["Single_end"]["out"],
+			 				   "Sd_PE_loss" + index: perc_pe_loss,
+			 				   "Sd_SE_loss" + index: perc_se_loss,
 							   "Sd_%_Duplicates" + index: perc_duplicates,
 							   "Sd_Notes" + index: json[key]["Program_details"]["options"]["notes"],
 							   "Sd_Duplicates": json[key]["Fragment"]["duplicate"],
@@ -131,7 +142,7 @@ class SuperDeduper():
 						 	  }
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json, perc_loss_total, index),
+		section = {"Table": self.table(stats_json, pe_total_loss, se_total_loss, index),
 				   "Duplicate Saturation": self.linegraph(stats_json),
 				   "Overview": overview_dict}
 

@@ -55,7 +55,7 @@ class AdapterTrimmer():
 		config = {'title': "HTStream: AdapterTrimmer Bp Composition Bargraph",
 				  'id': "htstream_adaptertrimmer_bargraph",
 				  'ylab' : "Samples",
-				  'cpswitch_c_active': False}
+				  'cpswitch_c_active': True}
 
 		# if no overlaps at all are present, return nothing
 		if avg_bp_trimmed == 0:
