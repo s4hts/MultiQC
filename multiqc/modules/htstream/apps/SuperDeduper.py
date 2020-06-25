@@ -48,7 +48,7 @@ class SuperDeduper():
 
 		# plot configurations, list of options in MultiQC docs
 		config = {'title': "HTStream: Duplicate Saturation",
-				  'xlab': "Total Reads", 'ylab': "Total Reads - Duplicates",
+				  'xlab': "Reads", 'ylab': "Reads - Duplicates",
 				  'extra_series': []}
 
 		# initialize data structures and variabe;s 
