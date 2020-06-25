@@ -22,17 +22,15 @@ class Overlapper():
 		# straight forward table construction.
 		headers = OrderedDict()
 
-		headers["Ov_PE_loss" + index] = {'title': "% PE Lost", 'namespace': "% PE Lost",'description': 'Percentage of Paired End Reads Lost', 'format': '{:,.2f}', 
-								 'suffix': '%', 'scale': 'Greens' }
 		headers["Ov_%_Overlapped" + index] = {'title': "% Overlapped", 
 									  'namespace': "% Overlapped",
 									  'description': 'Percentage of Reads with Overlap.',
 									  'suffix': '%',
 									  'format': '{:,.2f}',
-									  'scale': 'Blues'}
+									  'scale': 'Greens'}
 
 		if se_total_gain != 0:
-			headers["Ov_SE_gain" + index] = {'title': "% SE Gained", 'namespace': "% SE Gaine",'description': 'Percentage Increase of Single End Reads', 'format': '{:,.2f}', 
+			headers["Ov_SE_gain" + index] = {'title': "% SE Gained", 'namespace': "% SE Gained",'description': 'Percentage Increase of Single End Reads', 'format': '{:,.2f}', 
 											 'suffix': '%', 'scale': 'Blues' }
 
 		headers["Ov_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
@@ -165,7 +163,6 @@ class Overlapper():
 
 			# sample instance in dictionary
 			stats_json[key] = {
-							   "Ov_PE_loss" + index: perc_pe_loss,
 							   "Ov_SE_gain" + index: perc_se_gain,
 							   "Ov_%_Overlapped" + index: perc_overlapped,
 						 	   "Ov_Notes" + index: json[key]["Program_details"]["options"]["notes"],
