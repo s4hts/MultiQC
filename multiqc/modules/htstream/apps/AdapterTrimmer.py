@@ -52,7 +52,7 @@ class AdapterTrimmer():
 	def bargraph(self, json, avg_bp_trimmed):
 
 		# configuration dictionary for bar graph
-		config = {'title': "HTStream: AdapterTrimmer Bp Composition Bargraph",
+		config = {'title': "HTStream: Trimmed Bp Composition Bargraph",
 				  'id': "htstream_adaptertrimmer_bargraph",
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': True}
@@ -121,10 +121,8 @@ class AdapterTrimmer():
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
 								  "Bp_Lost": (bp_in - json[key]["Fragment"]["basepairs_out"]) / bp_in,
-								  "R1_Bp_Trim": json[key]["Paired_end"]["Read1"]["adapterBpTrim"] / bp_in,
-								  "R1_Read_Trim": json[key]["Paired_end"]["Read1"]["adapterTrim"] / frag_in,
-								  "R2_Bp_Trim": json[key]["Paired_end"]["Read2"]["adapterBpTrim"] / bp_in,
-								  "R2_Read_Trim": json[key]["Paired_end"]["Read2"]["adapterTrim"] / frag_in,
+								  "PE_Bp_Trim": (json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]) / bp_in,
+								  "PE_Read_Trim": (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"]) / frag_in,
 								  "SE_Bp_Trim": json[key]["Single_end"]["adapterBpTrim"] / bp_in,
 								  "SE_Read_Trim": json[key]["Single_end"]["adapterTrim"] / frag_in
 								  }
