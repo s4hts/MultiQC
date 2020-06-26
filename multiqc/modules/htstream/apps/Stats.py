@@ -34,7 +34,7 @@ class Stats():
 		headers["St_GC_Content" + index] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
 									'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
 		headers["St_N_Content" + index] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
-								   'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
+								   'format': '{:,.4f}', 'suffix': '%','scale': 'Blues'}
 		headers["St_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
