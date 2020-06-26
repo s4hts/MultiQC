@@ -203,7 +203,7 @@ class Stats():
 					        [0.3, '#1DC802'],
 					        [0.6, '#F3F943'],
 					        [1, '#E70808']
-					           ]
+					           ],
     			  }
 
 		read_header = " ".join(read.split("_")[1:3])

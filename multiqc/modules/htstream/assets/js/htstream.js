@@ -35,6 +35,7 @@ if (plot_id.includes('htstream_qbc_line')) {
 	on.style.display = 'block';
 	off.style.display = 'none';
 	var plot_div = on.querySelector('.hc-plot');
+
 	plot_graph(plot_div.id);
 
 }
