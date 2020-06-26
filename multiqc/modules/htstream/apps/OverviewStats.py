@@ -71,7 +71,7 @@ class OverviewStats():
 										  'format': '{:,.0f}', 'scale': color}
 
 
-		html = '<h4> Fragment Reduction </h4>'
+		html = '<br>\n<h4> Fragment Reduction </h4>'
 		if len(read_headers.keys()) < 2:
 			notice = "No Read Reducing Apps were found."
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -203,7 +203,7 @@ class OverviewStats():
 		table_html = self.table(json, app_list)
 		scatter_html, pca_data = self.hts_pca(json)
 
-		html = table_html + scatter_html
+		html = scatter_html + table_html 
 
 		return html, pca_data
 
