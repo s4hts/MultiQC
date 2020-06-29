@@ -55,7 +55,7 @@ class SuperDeduper():
 		# initialize data structures and variabe;s 
 		data = {}
 		invariant_saturation_dict = {}
-		html = ""
+		html = "<h4> Duplicate Saturation </h4>\n"
 
 		for key in json.keys():
 
@@ -73,7 +73,7 @@ class SuperDeduper():
 				for item in json[key]["Sd_Saturation"]:
 
 					data[key][item[0]] = item[0] - item[1] 
-
+		
 
 		# checks for any invariant samples and creates an alert div and table to  hold the data.
 		if len(invariant_saturation_dict.keys()) != 0:
@@ -128,8 +128,10 @@ class SuperDeduper():
 
 			overview_dict[key] = {
 								  "Output_Reads": json[key]["Fragment"]["out"],
-								  "Dups": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
-								  "Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
+								  "PE_reads_out": (json[key]["Paired_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "Percent_Duplicates": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
+								  "Percent_Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
 								 }
 
 			# sample instance in ordered dict

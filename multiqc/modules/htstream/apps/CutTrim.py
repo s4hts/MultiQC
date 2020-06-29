@@ -47,17 +47,18 @@ class CutTrim():
        							 {'name': "Read 2"},
        							 {'name': "Single End"}]
 				  }
-				  
+		
+		html = "<h4> CutTrim Trimmed Basepairs Composition </h4>\n"
+
 		# returns nothing if no reads were trimmed.
 		if bps == 0:
-			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			html += '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
 			return html
 
 		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
 			return html
 
-		html = ""
 
 		r1_data = {}
 		r2_data = {}
@@ -84,7 +85,9 @@ class CutTrim():
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
 
-		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
+		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
+
+		return html
 
 
 
@@ -116,7 +119,9 @@ class CutTrim():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"] 
+								 "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "Fraction_Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"]
 								 }
 
 			# sample dictionary entry

@@ -6,27 +6,57 @@ import math
 
 from . import htstream_utils
 from multiqc import config
-from multiqc.plots import table, scatter
+from multiqc.plots import table, linegraph, scatter
+
 
 class OverviewStats():
 
-	def table(self, json, app_list):
+	def composition_and_reduction(self, json, app_list, data_type):
 
+		line_config = {
+					  'smooth_points_sumcounts': False,
+					  'categories': True,
+					  'yCeiling': 100,
+					  'xlab': "Tool",
+					  'ylab': "Percentage",
+					  'colors': {
+				  			 "SE": "#1EC2D0",
+				  			 "PE": "#E8961B",
+				  			 	},
+					  'data_labels': []
+					  }
 
-		read_data = {}
-		bp_data = {}
+		if data_type == "read":
 
-		read_config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
-		bp_config = {'table_title': 'Basepair Reduction', 'id': "htstream_overview_bp_reduction"}
+			config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
+			line_config['title'] = "HTStream: Fragment Composition"
+			reducers = ["hts_SeqScreener", "hts_SuperDeduper", 
+						"hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
+			table_suffix = " (read)"
+			line_index = "_reads_out"
+			index = "Reads"
+			description = "Number of Output Fragments for "
+			html_title = " Fragment Reduction "
+			notice = "No Read Reducing Apps were found."
 
-		read_reducers = ["hts_SeqScreener", "hts_SuperDeduper", 
-						 "hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
-		bp_reducers = ["hts_AdapterTrimmer", "hts_CutTrim", 
-						 "hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
+		else:
+
+			config = {'table_title': 'Basepair Reduction', 'id': "htstream_overview_bp_reduction"}
+			line_config['title'] = "HTStream: Basepair Composition"
+			reducers = ["hts_AdapterTrimmer", "hts_CutTrim", 
+						"hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
+			table_suffix = " (bps)"
+			line_index = "_bps_out"
+			index = "Bp"
+			description = "Number of Output Bps for "
+			html_title = " Basepair Reduction "
+			notice = "No Read Reducing Apps were found."
+
+		table_data = {}
+		line_data_list = []
 
 		# Table constructor. Just like the MultiQC docs.
-		read_headers = OrderedDict()
-		bp_headers = OrderedDict()
+		headers = OrderedDict()
 
 		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
 
@@ -34,57 +64,67 @@ class OverviewStats():
 		samples = list(json[first_app].keys())
 
 		app_list = ["Pipeline Input"] + app_list
+		app_subsset = ["Pipeline Input"]
 
 		for samp in samples:
 
-			read_temp = {}
-			bp_temp = {}
-
+			temp = {}
+			line_data_temp = {"SE": {}, "PE": {}}
 
 			for app in app_list:
 
-				if app[:-2] in read_reducers:
-					read_temp[app + " (read)"] = json[app][samp]["Output_Reads"]
+				include = False
 
-				if app[:-2] in bp_reducers:
-					bp_temp[app + " (bps)"] = json[app][samp]["Output_Bp"]
+				if app[:-2] in reducers:
+					total = json[app][samp]["Output_" + index]
+					temp[app + table_suffix] = total
+					app_subsset.append(app)
+					include = True
 
-				if app == "Pipeline Input":
-					read_temp[app + " (read)"] = json[app][samp]["Input_Reads"]
-					bp_temp[app + " (bps)"] = json[app][samp]["Input_Bp"]
-
-
-
-			read_data[samp] = read_temp
-			bp_data[samp] = bp_temp
+				elif app == "Pipeline Input":
+					temp[app + table_suffix] = json[app][samp]["Input_" + index]
+					include = True
 
 
-		for i in range(len(app_list)):
+				if include == True:
 
-			app = app_list[i]
-			read_description = "Number of Output Fragments for " + app
-			bp_description = "Number of Output Bps for " + app
+					try:
+						line_data_temp["SE"][app] = json[app][samp]["SE" + line_index] 
+					except:
+						line_data_temp["SE"][app] = 0
+
+					try:
+						line_data_temp["PE"][app] = json[app][samp]["PE" + line_index]
+					except:
+						line_data_temp["PE"][app] = 0
+
+
+			table_data[samp] = temp
+			line_data_list.append(line_data_temp)
+			line_config['data_labels'].append({"name": samp, 'ylab': 'Percentage', 'xlab': 'Tool'})
+
+
+		for i in range(len(app_subsset)):
+
+			app = app_subsset[i]
 			color = color_rotations[i % 4]
-			read_headers[app + " (read)"] = {'title': app, 'namespace': app, 'description': read_description,
-											 'format': '{:,.0f}', 'scale': color}
-			bp_headers[app + " (bps)"] = {'title': app, 'namespace': app, 'description': bp_description, 
-										  'format': '{:,.0f}', 'scale': color}
+			headers[app + table_suffix] = {'title': app, 'namespace': app, 'description': description + app,
+										   'format': '{:,.0f}', 'scale': color}
 
 
-		html = '<br>\n<h4> Fragment Reduction </h4>'
-		if len(read_headers.keys()) < 2:
-			notice = "No Read Reducing Apps were found."
+		title = '<h4> {t} </h4>'.format(t=html_title)
+
+		if len(headers.keys()) < 2:
+			html = title + "\n<br>"
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
+			return html
+
 		else:	
-			html += table.plot(read_data, read_headers, read_config)
+			table_html = table.plot(table_data, headers, config)
+			line_html = linegraph.plot(line_data_list, line_config)
 
 
-		html += '<br>\n<h4> Basepair Reduction </h4>'
-		if len(bp_headers.keys()) < 2:
-			notice = "No Read Reducing Apps were found."
-			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
-		else:	
-			html += table.plot(bp_data, bp_headers, bp_config)
+		html = htstream_utils.composition_html(title, table_html, line_html, data_type) 
 
 		return 	html
 
@@ -97,8 +137,11 @@ class OverviewStats():
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)
 
-		exclude_list = ["Output_Reads", "Output_Bp"]
-		special_list = ["Hist_Med", "Hist_Max"]
+		exclude_list = ["Output_Reads", "Output_Bp", 
+						"PE_reads_out", "PE_bps_out",
+						"SE_reads_out", "SE_bps_out"]
+
+		special_list = ["Overlap_Length_Max", "Overlap_Length_Med"]
 
 		data = [[] for x in range(row_length)]
 
@@ -111,48 +154,11 @@ class OverviewStats():
 
 			for key in keys:
 
-				sample_json = json[key][sample]
-
-				if "hts_Stats" in key:
-
-					total_frags = sample_json["Output_Reads"]
-					total_bp = sample_json["Output_Bp"]
-					gc_content = sample_json["gc_content"] 
-					n_content = sample_json["n_content"] 
-
-					try:
-						fraction_se = sample_json["Read_Breakdown"]["Single_end"] / total_frags # fraction SE
-					except:
-						fraction_se = 0
-
-					try:
-						fraction_pe = sample_json["Read_Breakdown"]["Paired_end"] / total_frags # fraction PE
-					except:
-						fraction_pe = 0
-
-					temp = [
-							sample_json["total_Q30"] / total_bp, # fraction Q30
-							fraction_pe, 
-							fraction_se, 
-							gc_content, # GC Content
-							n_content # N Content
-							]
-				
-					if stats_bool == True:
-						stats_order += [key + ": Q30 Fraction",
-										key + ": Fraction PE",
-										key + ": Fraction SE",
-										key + ": GC Content",
-										key + ": N Content"]
-
-					data[x] += temp	
-
-				elif key != "Pipeline Input":
-
+				if key != "Pipeline Input":
+					sample_json = json[key][sample]
 					temp = []
 
 					for k, v in sample_json.items():
-
 						if k not in exclude_list:
 							temp.append(v)
 
@@ -192,7 +198,7 @@ class OverviewStats():
 		data = [pca_plot, loadings]
 
 		html = "<hr><h4> PCA Plot </h4>\n"
-		html += scatter.plot(data, config)
+		html += scatter.plot(data, config) +  "\n<br>"
 
 		
 		return html, raw_data
@@ -200,10 +206,12 @@ class OverviewStats():
 
 	def execute(self, json, app_list):
 
-		table_html = self.table(json, app_list)
+
+		read_html = self.composition_and_reduction(json, app_list, "read") +  "\n<br>"
+		bps_html = self.composition_and_reduction(json, app_list, "bp")
 		scatter_html, pca_data = self.hts_pca(json)
 
-		html = scatter_html + table_html 
+		html = scatter_html + read_html + bps_html 
 
 		return html, pca_data
 

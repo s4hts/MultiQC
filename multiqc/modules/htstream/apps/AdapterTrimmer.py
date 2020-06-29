@@ -57,13 +57,15 @@ class AdapterTrimmer():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': True}
 
+		html = "<h4> AdapterTrimmer Trimmed Basepairs Composition </h4>\n" 
+
 		# if no overlaps at all are present, return nothing
 		if avg_bp_trimmed == 0:
-			html = '<div class="alert alert-info"> No adapters were trimmed from samples. </div>'	
+			html += '<div class="alert alert-info"> No adapters were trimmed from samples. </div>'	
 			return html
 
 		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
 			return html
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.
@@ -82,7 +84,9 @@ class AdapterTrimmer():
 							  'color': '#D1ADC3'
 							 }
 
-		return bargraph.plot(json, categories, config)
+		html += bargraph.plot(json, categories, config)
+
+		return html
 
 
 	def execute(self, json, index):
@@ -120,11 +124,13 @@ class AdapterTrimmer():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Bp_Lost": (bp_in - json[key]["Fragment"]["basepairs_out"]) / bp_in,
-								  "PE_Bp_Trim": (json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]) / bp_in,
-								  "PE_Read_Trim": (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"]) / frag_in,
-								  "SE_Bp_Trim": json[key]["Single_end"]["adapterBpTrim"] / bp_in,
-								  "SE_Read_Trim": json[key]["Single_end"]["adapterTrim"] / frag_in
+								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "Fraction_Bp_Lost": (bp_in - json[key]["Fragment"]["basepairs_out"]) / bp_in,
+								  "Fraction_PE_Bp_Trimmed": (json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]) / bp_in,
+								  "Fraction_PE_Read_Trimmed": (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"]) / frag_in,
+								  "Fraction_SE_Bp_Trimmed": json[key]["Single_end"]["adapterBpTrim"] / bp_in,
+								  "Fraction_SE_Read_Trimmed": json[key]["Single_end"]["adapterTrim"] / frag_in
 								  }
 
 			# sample dictionary entry

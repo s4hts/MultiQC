@@ -114,9 +114,13 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 
 	wrapper_html += status_div 
 
+
+	line_btn_id = "htstream_qbc_line_{b}_{u}".format(b=btn_id, u=unique_id)
+	heat_btn_id = "htstream_qbc_heat_{b}_{u}".format(b=btn_id, u=unique_id)
+
 	wrapper_html += '<div class="btn-group hc_switch_group">\n'
-	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, {i})" id="htstream_qbc_line_{b}_{u}_btn">Linegraph</button>\n'.format(b=btn_id, i=index, u=unique_id)
-	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, {i})" id="htstream_qbc_heat_{b}_{u}_btn">Heatmaps</button></div>\n'.format(b=btn_id, i=index, u=unique_id)
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Linegraph</button>\n'.format(b=line_btn_id, t=heat_btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Heatmaps</button></div>\n'.format(b=heat_btn_id, t=line_btn_id)
 	wrapper_html += "<br></br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
@@ -204,6 +208,37 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 	html += notice
 
 	return html
+
+#######################################
+
+# pca plot
+
+def composition_html(title, table, linegraph, data_type):
+	
+	# section header
+	wrapper_html = title
+
+	table_btn_id = "htstream_comp_table_{b}".format(b=data_type)
+	line_btn_id = "htstream_comp_line_{b}".format(b=data_type)
+
+	wrapper_html += '<div class="btn-group hc_switch_group">\n'
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Reduction Table</button>\n'.format(b=table_btn_id, t=line_btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Composition Line Graph</button></div>\n'.format(b=line_btn_id, t=table_btn_id)
+	wrapper_html += "<br></br>"
+
+	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
+	# line graph div
+	wrapper_html += '<div id="{b}" class="htstream_fadein">'.format(b=table_btn_id)
+	wrapper_html += table + "</div>"
+
+	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
+	# line graph div
+	wrapper_html += '<div id="{b}" class="htstream_fadein" style="display:none;">'.format(b=line_btn_id)
+	wrapper_html += linegraph + "</div>"
+
+	final_html = wrapper_html 
+
+	return final_html 
 
 
 #######################################

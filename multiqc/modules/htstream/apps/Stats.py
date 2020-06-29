@@ -321,8 +321,9 @@ class Stats():
 			# html div attributes and text
 			name = key
 			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
+			suffix = "_heatmap_" + index
 
-			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, {i})" id="{pid}">{n}</button>\n'.format(a=active, i=index, pid=pid, n=name))
+			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, \'{s}\')" id="{pid}">{n}</button>\n'.format(a=active, s=suffix, pid=pid, n=name))
 
 	
 		status_div = htstream_utils.sample_status(status_dict)
@@ -412,22 +413,23 @@ class Stats():
 			#
 			# STATS FOR TABLE 
 			#
+			total_frags = json[key]["Fragment"]["out"]
+			total_bps = json[key]["Fragment"]["basepairs_out"]
 			gc_count = (json[key]["Fragment"]["base_composition"]["G"] + json[key]["Fragment"]["base_composition"]["C"])
-			gc_content = gc_count / json[key]["Fragment"]["basepairs_out"]
-			n_content = json[key]["Fragment"]["base_composition"]["N"] / json[key]["Fragment"]["basepairs_out"]
+			gc_content = gc_count / total_bps
+			n_content = json[key]["Fragment"]["base_composition"]["N"] / total_bps
 
-			stats_json[key] = {"St_Fragments_in" + index: json[key]["Fragment"]["in"],
+			stats_json[key] = {"St_Fragments_in" + index: total_frags,
 							   "St_GC_Content" + index: gc_content * 100 ,
 						       "St_N_Content" + index: n_content * 100 ,
 						       "St_Notes" + index: json[key]["Program_details"]["options"]["notes"]}
 
 
-			overview_stats[key] = {"Output_Reads": json[key]["Fragment"]["out"],
-								   "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								   "gc_content": gc_content,
-								   "n_content": n_content,
-								   "total_Q30": 0,
-								   "Read_Breakdown": {}}
+			overview_stats[key] = {"Output_Reads": total_frags,
+								   "Output_Bp": total_bps,
+								   "GC_Content": gc_content,
+								   "N_Content": n_content,
+								   "Q30_Fraction": 0}
 			#
 			# SINGLE END STATS
 			#
@@ -440,8 +442,10 @@ class Stats():
 				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
 				stats_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
 				
-				overview_stats[key]["total_Q30"] += json[key]["Single_end"]["total_Q30_basepairs"]
-				overview_stats[key]["Read_Breakdown"]["Single_end"] = json[key]["Single_end"]["in"]
+				overview_stats[key]["Q30_Fraction"] += (json[key]["Single_end"]["total_Q30_basepairs"] / total_bps)
+				overview_stats[key]["SE_Fraction"] = json[key]["Single_end"]["out"] / total_frags	
+				overview_stats[key]["SE_reads_out"] = overview_stats[key]["SE_Fraction"] * 100
+				overview_stats[key]["SE_bps_out"] = (json[key]["Single_end"]["basepairs_out"] / total_bps) * 100
 
 				SE_presence = True
 
@@ -465,8 +469,10 @@ class Stats():
 				stats_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
 
 
-				overview_stats[key]["total_Q30"] += json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]
-				overview_stats[key]["Read_Breakdown"]["Paired_end"] = json[key]["Paired_end"]["in"]				   
+				overview_stats[key]["Q30_Fraction"] += ((json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]) / total_bps)
+				overview_stats[key]["PE_Fraction"] = json[key]["Paired_end"]["out"] / total_frags			   
+				overview_stats[key]["PE_reads_out"] = (overview_stats[key]["PE_Fraction"]) * 100
+				overview_stats[key]["PE_bps_out"] = ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100
 
 				PE_presence = True
 

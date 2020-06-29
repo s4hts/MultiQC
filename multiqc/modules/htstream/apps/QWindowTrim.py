@@ -57,11 +57,12 @@ class QWindowTrim():
        							 {'name': "Single End"}]
 				  }
 
+		html = "<h4> QWindowTrim Trimmed Basepairs Composition </h4>\n" 
+
 		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
 			return html
 			
-		html = ""
 
 		r1_data = {}
 		r2_data = {}
@@ -80,7 +81,7 @@ class QWindowTrim():
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:
-			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			html += '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
 			return html
 
 
@@ -92,8 +93,9 @@ class QWindowTrim():
 		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
+		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
-		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
+		return html
 
 
 	def execute(self, json, index):
@@ -145,12 +147,14 @@ class QWindowTrim():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "R1_Bp_Trim_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
-								  "R1_Bp_Trim_Right": json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in, 
-								  "R2_Bp_Trim_Left": json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in, 
-								  "R2_Bp_Trim_Right": json[key]["Paired_end"]["Read2"]["rightTrim"] / bp_in, 
-								  "SE_Bp_Trim_Left": json[key]["Single_end"]["leftTrim"] / bp_in, 
-								  "SE_Bp_Trim_Right": json[key]["Single_end"]["rightTrim"] / bp_in, 
+								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "Fraction_R1_Bp_Trimmed_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
+								  "Fraction_R1_Bp_Trimmed_Right": json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in, 
+								  "Fraction_R2_Bp_Trimmed_Left": json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in, 
+								  "Fraction_R2_Bp_Trimmed_Right": json[key]["Paired_end"]["Read2"]["rightTrim"] / bp_in, 
+								  "Fraction_SE_Bp_Trimmed_Left": json[key]["Single_end"]["leftTrim"] / bp_in, 
+								  "Fraction_SE_Bp_Trimmed_Right": json[key]["Single_end"]["rightTrim"] / bp_in, 
 								  }
 
 			# sample dictionary entry

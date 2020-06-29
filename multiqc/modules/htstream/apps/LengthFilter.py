@@ -11,11 +11,6 @@ from multiqc.plots import table, bargraph
 #################################################
 
 
-
-# NOT YET IMPLEMENTED
-
-
-
 class LengthFilter():
 
 	def table(self, json, pe_total_loss, se_total_loss, pe_orphaned_total, index):
@@ -85,7 +80,9 @@ class LengthFilter():
 
 			overview_dict[key] = {
 								  "Output_Reads": frag_out,
-								  "Reads_Lost": reads_lost
+								  "PE_reads_out": (json[key]["Paired_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "Fraction_Reads_Lost": reads_lost
 								 }
 
 			# sample entry for stats dictionary

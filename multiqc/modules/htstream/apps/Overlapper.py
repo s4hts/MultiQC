@@ -47,13 +47,15 @@ class Overlapper():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': False}
 
+		html = "<h4> Overlap Composition </h4>\n"
+
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
-			html = '<div class="alert alert-info"> No overlaps present in samples. </div>'	
+			html += '<div class="alert alert-info"> No overlaps present in samples. </div>'	
 			return html
 
 		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
 			return html
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.
@@ -72,7 +74,9 @@ class Overlapper():
 							  'color': '#D1ADC3'
 							 }
 
-		return bargraph.plot(json, categories, config)
+		html += bargraph.plot(json, categories, config)
+
+		return html
 
 
 
@@ -95,9 +99,9 @@ class Overlapper():
 
 				multi_line[key][item[0]] = item[1]
 
+		html = "<h4> Overlapped Lengths </h4>\n" +linegraph.plot(multi_line, config)
 
-
-		return linegraph.plot(multi_line, config)
+		return html
 
 
 	def parse_histogram_stats(self, hist):
@@ -152,10 +156,12 @@ class Overlapper():
 
 			overview_dict[key] = {
 								  "Output_Reads": json[key]["Fragment"]["out"],
-								  "Hist_Max": parsed_hist_stats["Max"],
-								  "Hist_Med": parsed_hist_stats["Median"],
-								  "PE_Lost": (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Fragment"]["in"],
-								  "Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"],
+								  "PE_reads_out": (json[key]["Paired_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "Overlap_Length_Max": parsed_hist_stats["Max"],
+								  "Overlap_Length_Med": parsed_hist_stats["Median"],
+								  "Fraction_PE_Lost": (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Fragment"]["in"],
+								  "Fraction_Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"],
 								  "Sin": sins / json[key]["Fragment"]["in"],
 								  "Min": mins / json[key]["Fragment"]["in"],
 								  "Lin": lins / json[key]["Fragment"]["in"]

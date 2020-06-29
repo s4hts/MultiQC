@@ -188,9 +188,18 @@ class MultiqcModule(BaseMultiqcModule):
 
 				if pipeline_input == True:
 
+					total_frag = json[key][app]["Fragment"]["in"]
+					total_bps = json[key][app]["Fragment"]["basepairs_in"]
+					pe_bps = (json[key][app]["Paired_end"]["Read1"]["basepairs_in"] + json[key][app]["Paired_end"]["Read2"]["basepairs_in"])
+					se_bps = json[key][app]["Single_end"]["basepairs_in"]
+
 					self.overview_stats["Pipeline Input"][key] = {
-																 "Input_Reads": json[key][app]["Fragment"]["in"],
-																 "Input_Bp": json[key][app]["Fragment"]["basepairs_in"]
+																 "Input_Reads": total_frag,
+																 "Input_Bp": total_bps,
+																 "PE_reads_out": (json[key][app]["Paired_end"]["in"] / total_frag) * 100,
+																 "SE_reads_out": (json[key][app]["Single_end"]["in"] / total_frag) * 100,
+																 "PE_bps_out": (pe_bps / total_bps) * 100,
+																 "SE_bps_out": (se_bps / total_bps) * 100, 
 																 }
 					
 
@@ -216,7 +225,7 @@ class MultiqcModule(BaseMultiqcModule):
 					for title, section in section_dict.items():
 
 						if section != "" and title != "Overview":
-							html += section + '<br>\n'
+							html += section + "<br>\n"
 
 					# remove trailing space
 					html = html[:-5]

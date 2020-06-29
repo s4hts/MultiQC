@@ -58,16 +58,6 @@ class NTrimmer():
 
 	def bargraph(self, json, bps):
 
-		# returns nothing if no reads were trimmed.
-		if bps == 0:
-			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
-			return html
-
-		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
-			return html
-
-
 		# config dict for bar graph
 		config = {
 				  "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
@@ -79,7 +69,17 @@ class NTrimmer():
        							 {'name': "Single End"}]
 				  }
 
-		html = ""
+		html = "<h4> NTrimmer Trimmed Basepairs Composition </h4>\n"
+
+		# returns nothing if no reads were trimmed.
+		if bps == 0:
+			html = '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			return html
+
+		if len(json.keys()) > 150:
+			html = '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			return html
+
 
 		r1_data = {}
 		r2_data = {}
@@ -106,8 +106,9 @@ class NTrimmer():
 		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
+		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
-		return bargraph.plot([r1_data, r2_data, se_data], cats, config)
+		return html
 
 
 	def execute(self, json, index):
@@ -152,7 +153,9 @@ class NTrimmer():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"]
+								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"],
 								  }
 
 			# sample entry in stats dictionary
