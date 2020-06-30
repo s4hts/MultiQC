@@ -14,6 +14,7 @@ class OverviewStats():
 	def composition_and_reduction(self, json, app_list, data_type):
 
 		line_config = {
+					  'id': "htstream_overview_" + data_type + "composition",
 					  'smooth_points_sumcounts': False,
 					  'categories': True,
 					  'yCeiling': 100,

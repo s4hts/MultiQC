@@ -7,14 +7,25 @@ This checklist is for my own reference, as I forget the steps every time.
 4. Link the changelog subheading to the as yet non-existant release URL. Add date.
 5. Install the package again in `install` mode:
     ```bash
+<<<<<<< HEAD
     python setup.py install
+=======
+    pip install .
+>>>>>>> upstream/master
     ```
     * This removes the commit hash from the version number when MultiQC runs
 6. Run using test data
     * Check for any command line or javascript errors
     * Check version numbers are printed correctly
+<<<<<<< HEAD
 7. Create new demo reports for the website and upload.
     * Spot any previously unnoticed bugs and fix
+=======
+7. Create new demo reports for the website
+    * Comment out any config in `~/.multiqc_config.yaml`
+    * Spot any previously unnoticed bugs and fix
+    * Upload to the website and push change to Git
+>>>>>>> upstream/master
 8. Release on PyPI:
     ```bash
     rm -rf dist/
@@ -23,10 +34,17 @@ This checklist is for my own reference, as I forget the steps every time.
     ```
 9. Test that it pip installs:
     ```bash
+<<<<<<< HEAD
     conda create --name testing --yes python pip && source activate testing
     pip install multiqc
     multiqc .
     source deactivate && conda remove --name testing --all --yes && conda clean --all --yes
+=======
+    conda create --name testing --yes python pip && conda activate testing
+    pip install multiqc
+    multiqc .
+    conda deactivate && conda remove --name testing --all --yes && conda clean --all --yes
+>>>>>>> upstream/master
     ```
 10. Commit and push version updates
 11. Make a [release](https://github.com/ewels/MultiQC/releases) on GitHub - paste changelog section.

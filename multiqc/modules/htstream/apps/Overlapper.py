@@ -80,10 +80,11 @@ class Overlapper():
 
 
 
-	def linegraph(self, json):
+	def linegraph(self, json, index):
 
 		# config dictionary for "density" plots. Its a work in progress. 
-		config = {'title': "HTStream: Overlapped Lengths",
+		config = {'id': "htstream_overlapper_linegraph_" + index,
+				  'title': "HTStream: Overlapped Lengths",
 				  'ylab': "Counts", "xlab": "Overlap Lengths"}
 
 		# initialize data structures
@@ -185,7 +186,7 @@ class Overlapper():
 		# sections and function calls 
 		section = {"Table": self.table(stats_json, se_total_gain, index),
 				   "Overlap Composition": self.bargraph(stats_json, inserts),
-				   "Overlapped Lengths Density Plots": self.linegraph(stats_json),
+				   "Overlapped Lengths Density Plots": self.linegraph(stats_json, index),
 				   "Overview": overview_dict}
 				   
 		return section

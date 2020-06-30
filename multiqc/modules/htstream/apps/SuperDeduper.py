@@ -45,10 +45,11 @@ class SuperDeduper():
 
 
 
-	def linegraph(self, json):
+	def linegraph(self, json, index):
 
 		# plot configurations, list of options in MultiQC docs
-		config = {'title': "HTStream: Duplicate Saturation",
+		config = {'id': "htstream_superdedup_" + index,
+				  'title': "HTStream: Duplicate Saturation",
 				  'xlab': "Reads", 'ylab': "Reads - Duplicates",
 				  'extra_series': []}
 
@@ -145,7 +146,7 @@ class SuperDeduper():
 
 		# output dictionary, keys are section, value is function called for figure generation
 		section = {"Table": self.table(stats_json, pe_total_loss, se_total_loss, index),
-				   "Duplicate Saturation": self.linegraph(stats_json),
+				   "Duplicate Saturation": self.linegraph(stats_json, index),
 				   "Overview": overview_dict}
 
 		return section

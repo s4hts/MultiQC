@@ -42,14 +42,17 @@ class Stats():
 
 
 
-	def base_by_cycle(self, json, read):
+	def base_by_cycle(self, json, read, index):
 
 		title_read = " ".join(read.split("_")[1:3])
 
 		# config dictionary for line graph
-		config = {'title': "HTStream: Base by Cycle (" + title_read + ")",
+		config = {'id': "htstream_stats_base_" + read + "_" + index,
+				  'title': "HTStream: Base by Cycle (" + title_read + ")",
 				  'data_labels': [],
 				  'smooth_points_sumcounts': False,
+				  'ylab': "Percentage",
+				  'xlab': "Cycle",
 				  'yCeiling': 100,
 				  'categories': True,
 				  'colors': {
@@ -154,7 +157,7 @@ class Stats():
 
 
 			# this config file is for the individual line of the multiline graph
-			config["data_labels"].append({'name': key,'ylab': 'Percentage', 
+			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 
 										  'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 
 										  'smooth_points_sumcounts': False})
 
@@ -183,6 +186,7 @@ class Stats():
 
 		# config dictionary for mean Q score line graph
 		line_config = {
+				  'id': "htstream_stats_qbc_" + read + "_" + index,
 				  'smooth_points_sumcounts': False,
 				  'categories': True,
 				  'title': "HTStream: Mean Quality by Cycle (" + title_read + ")",
@@ -488,14 +492,14 @@ class Stats():
 
 		if PE_presence == True:
 			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
-			section["Base by Cycle (Paired End)"] = self.base_by_cycle(stats_json, "St_Paired_End_Base_by_Cycle")
+			section["Base by Cycle (Paired End)"] = self.base_by_cycle(stats_json, "St_Paired_End_Base_by_Cycle", index)
 			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(stats_json, "St_Paired_End_Quality_by_Cycle", index)
 
 
 		#only executres if single read data is detected
 		if SE_presence == True:
 			section["Read Length Histogram (Single End)"] = self.histogram(stats_json, "St_SE_histogram")
-			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle")
+			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle", index)
 			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle", index)
 
 	

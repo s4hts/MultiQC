@@ -7,12 +7,20 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+<<<<<<< HEAD
         python-version: [2.7, 3.6, 3.7]
+=======
+        python-version: [3.6, 3.7, 3.8]
+>>>>>>> upstream/master
 
     steps:
 
     # Check out MultiQC code
+<<<<<<< HEAD
     - uses: actions/checkout@v1
+=======
+    - uses: actions/checkout@v2
+>>>>>>> upstream/master
 
     # Set up Python
     - name: Set up Python ${{ matrix.python-version }}
@@ -23,12 +31,20 @@ jobs:
     # Update pip and install beautifulsoup4 for CI tests (CSP checking)
     - name: Install dependencies for CI tests
       run: |
+<<<<<<< HEAD
         python -m pip install --upgrade pip
         python -m pip install --upgrade beautifulsoup4
 
     # Install MultiQC
     - name: Install MultiQC
       run: python setup.py install
+=======
+        python -m pip install --upgrade pip setuptools beautifulsoup4
+
+    # Install MultiQC
+    - name: Install MultiQC
+      run: pip install .
+>>>>>>> upstream/master
 
     # Fetch the MultiQC test data
     - name: Download test data
@@ -42,6 +58,14 @@ jobs:
     - name: All modules / Custom report filename
       run: multiqc --lint test_data/data/modules/ --filename full_report.html
 
+<<<<<<< HEAD
+=======
+    - name: Filter out all filenames (confirm no report)
+      run: |
+        multiqc test_data/data/modules/ --filename all_ignored.html --ignore-samples '*'
+        [[ ! -f all_ignored.html ]]
+
+>>>>>>> upstream/master
     - name: File-list input of dirs
       run: |
         cd test_data
@@ -58,10 +82,18 @@ jobs:
         cd test_data
         multiqc -m star -o tests/multiqc_report_dev -t default_dev -k json --file-list data/special_cases/file_list.txt
 
+<<<<<<< HEAD
     - name: Empty directory
       run: |
         mkdir empty_dir
         multiqc -f empty_dir
+=======
+    - name: Empty directory (confirm no report)
+      run: |
+        mkdir empty_dir
+        multiqc -n empty empty_dir
+        [[ ! -f empty.html ]]
+>>>>>>> upstream/master
 
     - name: Test for missing CSPs
       run: python test/print_missing_csp.py --report full_report.html --whitelist CSP.txt
