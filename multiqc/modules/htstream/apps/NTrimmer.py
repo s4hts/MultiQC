@@ -155,7 +155,7 @@ class NTrimmer():
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
 								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
 								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
-								  "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"],
+								  "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"]
 								  }
 
 			# sample entry in stats dictionary

@@ -121,7 +121,7 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 	wrapper_html += '<div class="btn-group hc_switch_group">\n'
 	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Linegraph</button>\n'.format(b=line_btn_id, t=heat_btn_id)
 	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Heatmaps</button></div>\n'.format(b=heat_btn_id, t=line_btn_id)
-	wrapper_html += "<br></br>"
+	wrapper_html += "<br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
@@ -129,7 +129,7 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 	wrapper_html += line_plot + "</div>"
 
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
-	heatmap_html = '<div class="btn-group hc_switch_group">\n'
+	heatmap_html = '<br><div class="btn-group hc_switch_group">\n'
 
 	for buttons in button_list:
 		heatmap_html += buttons

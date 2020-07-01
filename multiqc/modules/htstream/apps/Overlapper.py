@@ -161,8 +161,8 @@ class Overlapper():
 								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
 								  "Overlap_Length_Max": parsed_hist_stats["Max"],
 								  "Overlap_Length_Med": parsed_hist_stats["Median"],
-								  "Fraction_PE_Lost": (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Fragment"]["in"],
-								  "Fraction_Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"],
+								  # "Fraction_PE_Lost": (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Fragment"]["in"],
+								  # "Fraction_Bp_Lost": (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_in"],
 								  "Sin": sins / json[key]["Fragment"]["in"],
 								  "Min": mins / json[key]["Fragment"]["in"],
 								  "Lin": lins / json[key]["Fragment"]["in"]

@@ -20,6 +20,8 @@ class OverviewStats():
 					  'yCeiling': 100,
 					  'xlab': "Tool",
 					  'ylab': "Percentage",
+					  'tt_decimals': "{point.y:.2f}'",
+					  'tt_suffix': "%",  
 					  'colors': {
 				  			 "SE": "#1EC2D0",
 				  			 "PE": "#E8961B",
@@ -171,8 +173,8 @@ class OverviewStats():
 			stats_bool = False
 
 		# prepe matrix
-		data = np.asarray(data).T
-		
+		data = np.array(data).T
+
 		# normalize 
 		data, stats_order, raw_data = htstream_utils.normalize(data, samples_list, stats_order, special_list)
 

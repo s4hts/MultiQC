@@ -14,20 +14,20 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
-	def table(self, json, se_presence, pe_presence, index):
+	def table(self, json, SE_json, PE_json, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
 		headers["St_Fragments_in" + index] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
 
-		if pe_presence == True:
+		if len(PE_json.keys()) != 0:
 			headers["St_R1_Q30" + index] = {'title': "% R1 Q30", 'namespace': "% R1 Q30", 'description': 'percentage of read 1 bps Q30 or greater', 
 											'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
 			headers["St_R2_Q30" + index] = {'title': "% R2 Q30", 'namespace': "% R2 Q30", 'description': 'percentage of read 2 bps Q30 or greater', 
 											'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
 
-		if se_presence == True:
+		if len(SE_json.keys()) != 0:
 			headers["St_SE_Q30" + index] = {'title': "% SE Q30", 'namespace': "% SE Q30", 'description': 'percentage of single end read bps Q30 or greater', 
 											'format': '{:,.2f}', 'suffix': '%', 'scale': 'Greens'}
 
@@ -75,11 +75,31 @@ class Stats():
 		read_header = " ".join(read.split("_")[1:3])
 
 		if read_header == "Paired End":
-			config['xPlotLines'] = [{'color': '#5D4B87', 
-									 "width": 1.5, 
-									 "value": 151, 
-									 "dashStyle": 'shortdash',
-									 "zIndex": 4}]
+
+			midpoint = 0
+			uniform_pe = True
+
+			for key in json.keys():
+
+				temp = (json[key][read][0]["shape"][-1] * 2) 
+
+				if midpoint == 0:
+					midpoint = temp
+
+				elif midpoint == temp:
+					midpoint = midpoint
+
+				else:
+					uniform_pe = False
+					break
+
+			if uniform_pe == True:
+				config['xPlotLines'] = [{'color': '#5D4B87', 
+										 "width": 1.5, 
+										 "value": (midpoint - 1) / 2, 
+										 "dashStyle": 'shortdash',
+										 "zIndex": 4}]
+
 				
 		# initalize data structures and important variables
 		data_list = []
@@ -212,12 +232,32 @@ class Stats():
 
 		read_header = " ".join(read.split("_")[1:3])
 
+		# check for uniform pe length
 		if read_header == "Paired End":
-			line_config['xPlotLines'] = [{'color': '#5D4B87', 
-										 "width": 1.5, 
-										 "value": 151, 
-										 "dashStyle": 'shortdash',
-										 "zIndex": 4}]
+
+			midpoint = 0
+			uniform_pe = True
+
+			for key in json.keys():
+
+				temp = (json[key][read][0]["shape"][-1] * 2) 
+
+				if midpoint == 0:
+					midpoint = temp
+
+				elif midpoint == temp:
+					midpoint = midpoint
+
+				else:
+					uniform_pe = False
+					break
+
+			if uniform_pe == True:
+				line_config['xPlotLines'] = [{'color': '#5D4B87', 
+											 "width": 1.5, 
+											 "value": (midpoint - 1) / 2, 
+											 "dashStyle": 'shortdash',
+											 "zIndex": 4}]
 
 
 		btn_id = "-".join(read.split("_")[:3]).lower()
@@ -410,6 +450,8 @@ class Stats():
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
+		SE_json = OrderedDict()
+		PE_json = OrderedDict()
 		overview_stats = {} 
 
 		for key in json.keys():
@@ -440,37 +482,43 @@ class Stats():
 			# only succeeds if json file contains single end information data in the last instance of hts_Stats,
 			#	opens gate for future processing of single end read stats.
 			try:
-				stats_json[key]["St_SE_Q30" + index] = ( json[key]["Single_end"]["total_Q30_basepairs"] / json[key]["Single_end"]["basepairs_in"] ) * 100 
-				stats_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
-				stats_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
-				stats_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
-				stats_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
+				SE_json[key] = {}
+				SE_json[key]["St_SE_Q30" + index] = ( json[key]["Single_end"]["total_Q30_basepairs"] / json[key]["Single_end"]["basepairs_in"] ) * 100 
+				SE_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
+				SE_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
+				SE_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
+				SE_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
 				
 				overview_stats[key]["Q30_Fraction"] += (json[key]["Single_end"]["total_Q30_basepairs"] / total_bps)
 				overview_stats[key]["SE_Fraction"] = json[key]["Single_end"]["out"] / total_frags	
 				overview_stats[key]["SE_reads_out"] = overview_stats[key]["SE_Fraction"] * 100
 				overview_stats[key]["SE_bps_out"] = (json[key]["Single_end"]["basepairs_out"] / total_bps) * 100
 
-				SE_presence = True
 
 			except:
-				SE_presence = False
+				overview_stats[key]["Q30_Fraction"] += 0
+				overview_stats[key]["SE_Fraction"] = 0
+				overview_stats[key]["SE_reads_out"] = 0
+				overview_stats[key]["SE_bps_out"] = 0
+
+				del SE_json[key]
+
 
 
 			#
 			# PAIRED END STATS
 			#
 			try:
-				# sample instance in ordered dict
-				stats_json[key]["St_R1_Q30" + index] = ( json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read1"]["basepairs_in"] ) * 100 
-				stats_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
-				stats_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
+				PE_json[key] = {}
+				PE_json[key]["St_R1_Q30" + index] = ( json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read1"]["basepairs_in"] ) * 100 
+				PE_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
+				PE_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
-				stats_json[key]["St_Paired_End_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
+				PE_json[key]["St_Paired_End_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
 																  json[key]["Paired_end"]["Read2"]["base_by_cycle"]]
-				stats_json[key]["St_Paired_End_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],
+				PE_json[key]["St_Paired_End_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],
 																 json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]]
-				stats_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
+				PE_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
 
 
 				overview_stats[key]["Q30_Fraction"] += ((json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]) / total_bps)
@@ -478,29 +526,31 @@ class Stats():
 				overview_stats[key]["PE_reads_out"] = (overview_stats[key]["PE_Fraction"]) * 100
 				overview_stats[key]["PE_bps_out"] = ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100
 
-				PE_presence = True
-
 			except:
-				PE_presence = False 
+				overview_stats[key]["Q30_Fraction"] += 0
+				overview_stats[key]["PE_Fraction"] = 0			   
+				overview_stats[key]["PE_reads_out"] = 0
+				overview_stats[key]["PE_bps_out"] = 0
 
+				del PE_json[key]
 
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json, SE_presence, PE_presence, index),
+		section = {"Table": self.table(stats_json, SE_json, PE_json, index),
 				   "Overview": overview_stats}
 
-		if PE_presence == True:
-			section["Read Length Histogram (Paried End)"] = self.histogram(stats_json, "St_PE_histogram")
-			section["Base by Cycle (Paired End)"] = self.base_by_cycle(stats_json, "St_Paired_End_Base_by_Cycle", index)
-			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(stats_json, "St_Paired_End_Quality_by_Cycle", index)
+		if len(PE_json.keys()) != 0:
+			section["Read Length Histogram (Paried End)"] = self.histogram(PE_json, "St_PE_histogram")
+			section["Base by Cycle (Paired End)"] = self.base_by_cycle(PE_json, "St_Paired_End_Base_by_Cycle", index)
+			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(PE_json, "St_Paired_End_Quality_by_Cycle", index)
 
 
 		#only executres if single read data is detected
-		if SE_presence == True:
-			section["Read Length Histogram (Single End)"] = self.histogram(stats_json, "St_SE_histogram")
-			section["Base by Cycle (Single End)"] = self.base_by_cycle(stats_json, "St_Single_End_Base_by_Cycle", index)
-			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(stats_json, "St_Single_End_Quality_by_Cycle", index)
+		if len(SE_json.keys()) != 0:
+			section["Read Length Histogram (Single End)"] = self.histogram(SE_json, "St_SE_histogram")
+			section["Base by Cycle (Single End)"] = self.base_by_cycle(SE_json, "St_Single_End_Base_by_Cycle", index)
+			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(SE_json, "St_Single_End_Quality_by_Cycle", index)
 
 	
 		return section 
