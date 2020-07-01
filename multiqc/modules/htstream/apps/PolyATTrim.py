@@ -85,8 +85,8 @@ class PolyATTrim():
 
 			overview_dict[key] = {
 								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "Fraction_PE_bps": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]),
-								  "Fraction_SE_bps": ( json[key]["Single_end"]["basepairs_out"] ) / json[key]["Fragment"]["basepairs_out"],
+								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "SE_bps_out": ( json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"] ) * 100,
 								  "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"]
 								  }
 
