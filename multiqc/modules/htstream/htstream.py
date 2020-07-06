@@ -249,9 +249,9 @@ class MultiqcModule(BaseMultiqcModule):
 				app = OverviewStats.OverviewStats()
 
 				description = "General statistics from the HTStream pipeline."
-				html, pca_data = app.execute(self.overview_stats, app_order)
+				html, radar_data = app.execute(self.overview_stats, app_order)
 					
-				self.write_data_file(pca_data, 'htstream_pca_raw_data')
+				self.write_data_file(radar_data, 'htstream_pca_raw_data')
 				
 				self.add_section(name = "Processing Overview",
 								 description = description,

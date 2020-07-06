@@ -132,9 +132,22 @@ class OverviewStats():
 		return 	html
 
 
-	def hts_pca(self, json):
+	def hts_radar(self, json):
 
-		pca_plot = {}
+		line_config = {
+					  'id': "htstream_overview_radar",
+					  'title': "HTStream: Radar Plot",
+					  'smooth_points_sumcounts': False,
+					  'categories': True,
+					  'yCeiling': 1,
+					  'xlab': "Tool",
+					  'ylab': "Value",
+					  'tt_decimals': "{point.y:.3f}'",  
+					  'data_labels': []
+					  }
+
+
+		# pca_plot = {}
 
 		keys = list(json.keys())
 		samples_list = list(json[keys[0]].keys())
@@ -176,32 +189,25 @@ class OverviewStats():
 		data = np.array(data).T
 
 		# normalize 
-		data, stats_order, raw_data = htstream_utils.normalize(data, samples_list, stats_order, special_list)
+		data, stats_order, raw_data = htstream_utils.normalize(data, samples_list, stats_order)
 
-		# pca 
-		data, loadings, pc_perc = htstream_utils.pca(data, stats_order)			
+		data_dict = {}
+
+		for x in range(len(samples_list)):
+
+			samp = samples_list[x]
+			data_dict[samp] = {}
+			values = data[:,x]
+
+			for y in range(len(values)):
+				data_dict[samp][stats_order[y]] = values[y]
 
 
-		for x in range(len(data[0])):
-
-			pca_plot[samples_list[x]] = {"x": data[0, x],
-										 "y": data[1, x]}
+			line_config['data_labels'].append({"name": samp, 'ylab': 'Value', 'xlab': 'Tool'})
 
 
-		config = {'title': "HTStream: PCA Plot",
-				  'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
-				  'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1]),
-				  'data_labels': [
-									{'name': 'Samples', 'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
-														'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])},
-									{'name': 'Loadings', 'xlab': "PC1" + " ({:.2f}%)".format(pc_perc[0]),
-														 'ylab': "PC2" + " ({:.2f}%)".format(pc_perc[1])}
-								  ]}
-
-		data = [pca_plot, loadings]
-
-		html = "<hr><h4> PCA Plot </h4>\n"
-		html += scatter.plot(data, config) +  "\n<br>"
+		html = "<hr><h4> Radar Plot </h4>\n"
+		html += linegraph.plot(data_dict, line_config) +  "\n<br>"
 
 		
 		return html, raw_data
@@ -212,9 +218,9 @@ class OverviewStats():
 
 		read_html = self.composition_and_reduction(json, app_list, "read") +  "\n<br>"
 		bps_html = self.composition_and_reduction(json, app_list, "bp")
-		scatter_html, pca_data = self.hts_pca(json)
+		radar_html, radar_data = self.hts_radar(json)
 
-		html = scatter_html + read_html + bps_html 
+		html = radar_html + read_html + bps_html 
 
-		return html, pca_data
+		return html, radar_data
 

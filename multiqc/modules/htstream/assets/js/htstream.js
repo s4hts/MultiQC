@@ -13,27 +13,33 @@ function htstream_div_switch(ele, suffix) {
 function htstream_plot_switch(ele, target) {
 
   var plot_id = ele.id.split("_btn")[0];
+  var on = $("#" + plot_id);
+  var off = $("#" + target)
 
-  var on = document.getElementById(plot_id);
-  var off = document.getElementById(target);
-
-  off.style.display = 'none';
-  on.style.display = 'block';
+  off.css('display', 'none');
+  on.css('display', 'block');
 
   if (plot_id.includes('htstream_qbc_heat') || plot_id.includes('htstream_comp_line_')) {
 
-  	var plot_div = on.querySelector('.hc-plot');
-  	plot_graph(plot_div.id);
+    var plot_div = on.find('.hc-plot');
+  	plot_graph(plot_div.attr('id'));
 
   }
 
 }
 
 
+function htstream_radar(ele) {
+  console.log("test");
+}
+
+
+
+
+
 function htstream_histogram(read, sample) {
 
-  var text = document.getElementsByClassName("htstream_histogram_content_" + read)[0].innerText;
-  var data = JSON.parse(text)[0];
+  var data = JSON.parse($(".htstream_histogram_content_" + read).text())[0];
 
   var container = "htstream_histogram_".concat(read);
   var title_read = read.split("_")[1];
@@ -99,7 +105,7 @@ function htstream_histogram(read, sample) {
   // high chart histogram function
   Highcharts.chart(container, {
     chart: {
-      type: 'column'
+      type: 'column',
     },
     title: {
       text: title
@@ -146,8 +152,27 @@ function htstream_histogram(read, sample) {
 
   }
 
-  $("document").ready(function() {
-     $('.active.hist_btn').trigger( "click" );
-  });
+
+// $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
+    
+//     $('*[id*=Base_by_Cycle]').each(function() {
+//       console.log($(this).parent().prev());
+//       $(this).parent().parent().css('display', 'block');
+//     });
+
+   
+
+//     // htstream_stats_base_St_Paired_End_Base_by_Cycle_1
+
+//     // This trigger is called when the Hide Samples filters change.
+//     // Two variables are given - an array of search strings
+//     // (f_texts) and a boolean saying whether the search should
+//     // be treated as a string or a regex (regex_mode)
+// });
+
+
+$("document").ready(function() {
+   $('.active.hist_btn').trigger( "click" );
+});
 
 

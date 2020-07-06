@@ -1,4 +1,4 @@
-import json
+import json, math
 import numpy as np
 
 #################################################
@@ -243,37 +243,39 @@ def composition_html(title, table, linegraph, data_type):
 
 #######################################
 
-# pca plot
+# radar plot
 
-def normalize(data, samples_list, stats_order, special_list):
+def normalize(data, samples_list, stats_order):
 
 	n, m = data.shape # rows, col
 	to_delete = []
 	raw_data = {}
 
-	# format dictionary for output pca stats (raw data)
+ 	# format dictionary for output pca stats (raw data)
 	for x in range(len(samples_list)):
 		raw_data[samples_list[x]] = dict(zip(stats_order, data[:,x]))
 
-	# normalize 
 	for x in range(n):
 
 		row = data[x,:]
-		mean = np.mean(row)
-		std = np.std(row)
 
 		# remove rows with no variation, also, mean center and normalize variance
 		if np.all(row == row[0]):
 			to_delete.append(x)
 
-		elif any(s in stats_order[x] for s in special_list):
-			data[x,:] = (row - mean) / 15
+		elif max(row) < 0.1 or max(row) > 1:
 
-		elif any(i > 1 for i in row):
-			data[x,:] = (row - mean) / std 
+			scale = math.floor(-1 * math.log10(max(row)))
+			row = row * (10 ** (scale))
 
-		else:
-			data[x,:] = (row - np.mean(row)) 
+			if scale > 1:
+				factor = "x 10^" + str(scale)
+			else:
+				factor = ""
+
+			stats_order[x] = stats_order[x] + factor
+
+		data[x,:] = row	
 
 
 	# remove indeterminant columns
@@ -281,62 +283,9 @@ def normalize(data, samples_list, stats_order, special_list):
 	for x in to_delete:	
 		data = np.delete(data, x, 0)
 		stats_order.remove(stats_order[x])
-		
+
 
 	return data, stats_order, raw_data
-
-
-#######################################
-
-# pca plot
-
-def pca(matrix, stats_order):
-
-	n, m = matrix.shape # rows, col
-
-	# sample cov
-	cov_mat = np.cov(matrix)
-
-	# for some reason, gives complex numbers, this ensures eigenvalues are real
-	eig_val_cov, eig_vec_cov = np.linalg.eig(cov_mat)
-	eig_val_cov = eig_val_cov.real
-	eig_vec_cov = eig_vec_cov.real
-
-	# creat pair list
-	eig_pairs = [(np.abs(eig_val_cov[i]), eig_vec_cov[:,i]) for i in range(len(eig_val_cov))]
-
-	# Sort the (eigenvalue, eigenvector) tuples from high to low
-	#eig_pairs, stats_order = (list(t) for t in zip(*sorted(zip(eig_pairs, stats_order), key=lambda x: x[0][0], reverse=True)))
-	eig_pairs.sort(key=lambda x: x[0], reverse=True)
-
-	# pc percentages
-	eig_sum = sum([eig_pairs[x][0] for x in range(len(eig_pairs))])
-	pc_perc = [(eig_pairs[0][0] / eig_sum) * 100, (eig_pairs[1][0] / eig_sum) * 100]
-
-
-	loadings = {}
-	for x in range(len(stats_order)):
-		loadings[stats_order[x]] = {'x': eig_pairs[0][1][x],
-									'y': eig_pairs[1][1][x],
-									"color": '#BE2C2C'}
-
-
-	# eigan vector matrix
-	matrix_w = np.hstack((eig_pairs[0][1].reshape(n,1), eig_pairs[1][1].reshape(n,1)))
-
-	# transform
-	transformed = matrix_w.T.dot(matrix)
-
-	# VALIDATION
-	# VERIFIED using PCA from sklearn.decomposition
-	# pca = PCA(n_components=2)
-	# transformed = pca.fit_transform(matrix.T)
-
-	return transformed, loadings, pc_perc
-
-
-
-
 
 
 
