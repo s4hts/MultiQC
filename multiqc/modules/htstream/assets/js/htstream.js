@@ -1,12 +1,14 @@
 function htstream_div_switch(ele, suffix) {
 
   var plot_id = ele.id.split("_b")[0].concat(suffix);
-  var plot_div = ele.parentNode.parentNode.querySelector('.hc-plot');
+  var parent_node = $(ele).closest('.htstream_fadein');
+  var plot_div = parent_node.find('.hc-plot');
 
-  plot_div.id = plot_id;
-  plot_div.className = "hc-plot not_rendered hc-heatmap";
+  plot_div.attr("id", plot_id);
+  plot_div.attr("class", "hc-plot not_rendered hc-heatmap");
 
   plot_graph(plot_id);
+
 }
 
 
@@ -14,27 +16,21 @@ function htstream_plot_switch(ele, target) {
 
   var plot_id = ele.id.split("_btn")[0];
   var on = $("#" + plot_id);
-  var off = $("#" + target)
+  var off = $("#" + target);
 
   off.css('display', 'none');
   on.css('display', 'block');
 
+
   if (plot_id.includes('htstream_qbc_heat') || plot_id.includes('htstream_comp_line_')) {
 
     var plot_div = on.find('.hc-plot');
-  	plot_graph(plot_div.attr('id'));
+    plot_graph(plot_div.attr('id'));
 
   }
 
+
 }
-
-
-function htstream_radar(ele) {
-  console.log("test");
-}
-
-
-
 
 
 function htstream_histogram(read, sample) {
@@ -153,26 +149,33 @@ function htstream_histogram(read, sample) {
   }
 
 
-// $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
-    
-//     $('*[id*=Base_by_Cycle]').each(function() {
-//       console.log($(this).parent().prev());
-//       $(this).parent().parent().css('display', 'block');
-//     });
+$(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
-   
+  // console.log(regex_mode);
+  
+  f_texts.push("Base: A", "Base: C", "Base: G", "Base: T", "Base: N");
 
-//     // htstream_stats_base_St_Paired_End_Base_by_Cycle_1
+  // $("document").ready(function() {
 
-//     // This trigger is called when the Hide Samples filters change.
-//     // Two variables are given - an array of search strings
-//     // (f_texts) and a boolean saying whether the search should
-//     // be treated as a string or a regex (regex_mode)
-// });
+  //   // Base by Cycle Break 
+  //   var div = $('*[id*=Base_by_Cycle]').parent().parent();
+  //   div.prev('.samples-hidden-warning').remove();
+  //   div.css('display', 'block');
+
+  //   var div = $('*[id*=htstream_qbc_heat]');
+  //   div.find('.samples-hidden-warning').remove();
+  //   div.find('.mqc_hcplot_plotgroup').css('display', 'block');
+  //   div.find('.hc-plot-wrapper').css('display', 'block');
+
+
+  // });
+
+});
 
 
 $("document").ready(function() {
-   $('.active.hist_btn').trigger( "click" );
+  $('.active.hist_btn').trigger( "click" );
 });
+
 
 

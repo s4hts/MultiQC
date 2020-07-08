@@ -14,27 +14,25 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
-	def table(self, json, SE_json, PE_json, index):
+	def table(self, json, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
-
-		headers["St_Fragments_in" + index] = {'title': "Input Reads", 'namespace': "Input Reads", 'description': 'Number of reads', 'format': '{:,.0f}', 'scale': "Greens"}
-
-		if len(PE_json.keys()) != 0:
-			headers["St_R1_Q30" + index] = {'title': "% R1 Q30", 'namespace': "% R1 Q30", 'description': 'percentage of read 1 bps Q30 or greater', 
-											'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
-			headers["St_R2_Q30" + index] = {'title': "% R2 Q30", 'namespace': "% R2 Q30", 'description': 'percentage of read 2 bps Q30 or greater', 
-											'format': '{:,.2f}', 'suffix': '%','scale': 'Blues'}
-
-		if len(SE_json.keys()) != 0:
-			headers["St_SE_Q30" + index] = {'title': "% SE Q30", 'namespace': "% SE Q30", 'description': 'percentage of single end read bps Q30 or greater', 
-											'format': '{:,.2f}', 'suffix': '%', 'scale': 'Greens'}
-
+		# "St_PE_Fraction" + index
+		headers["St_PE_Fraction" + index] = {'title': "% PE", 'namespace': "% PE", 'description': 'percentage of paried end reads', 'format': '{:,.0f}', 
+											 'format': '{:,.2f}', 'suffix': '%', 'scale': "Greens"}
+		headers["St_SE_Fraction" + index] = {'title': "% SE", 'namespace': "% SE", 'description': 'percentage of paried end reads', 'format': '{:,.0f}', 
+											 'format': '{:,.2f}', 'suffix': '%', 'scale': "RdPu"}
+		headers["St_R1_Q30" + index] = {'title': "% R1 Q30", 'namespace': "% R1 Q30", 'description': 'percentage of read 1 bps Q30 or greater', 
+										'format': '{:,.2f}', 'suffix': '%', 'scale': 'Blues'}
+		headers["St_R2_Q30" + index] = {'title': "% R2 Q30", 'namespace': "% R2 Q30", 'description': 'percentage of read 2 bps Q30 or greater', 
+										'format': '{:,.2f}', 'suffix': '%','scale': 'Greens'}
+		headers["St_SE_Q30" + index] = {'title': "% SE Q30", 'namespace': "% SE Q30", 'description': 'percentage of single end read bps Q30 or greater', 
+										'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
 		headers["St_GC_Content" + index] = {'title': "GC Content", 'namespace': "GC Content", 'description': 'Percentage of bps that are G or C', 
-									'format': '{:,.2f}', 'suffix': '%', 'scale': 'RdPu'}
+									'format': '{:,.2f}', 'suffix': '%', 'scale': 'Blues'}
 		headers["St_N_Content" + index] = {'title': "N Content", 'namespace': "N Content", 'description': 'Percentage of bps that are N',
-								   'format': '{:,.4f}', 'suffix': '%','scale': 'Blues'}
+								   'format': '{:,.4f}', 'suffix': '%','scale': 'Green'}
 		headers["St_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 
@@ -55,12 +53,14 @@ class Stats():
 				  'xlab': "Cycle",
 				  'yCeiling': 100,
 				  'categories': True,
+				  'tt_decimals': '{:,.2f}',
+				  'tt_suffix': "%",     
 				  'colors': {
-				  			 "A": "#B62612",
-				  			 "C": "#82A7E0",
-				  			 "G": "#0B8E0B",
-				  			 "T": "#DE7D00",
-				  			 "N": "black"
+				  			 "Base: A": "#B62612",
+				  			 "Base: C": "#82A7E0",
+				  			 "Base: G": "#0B8E0B",
+				  			 "Base: T": "#DE7D00",
+				  			 "Base: N": "black"
 				  			},
 				  'yPlotBands': [
 								{'from': 0, 'to': 40, 'color': '#c3e6c3'},
@@ -122,11 +122,11 @@ class Stats():
 
 
 			# initializes dat dict. Each key is a line in the graph
-			data = {"A": {},
-					"C": {},
-					"G": {},
-					"T": {},
-					"N": {}}
+			data = {"Base: A": {},
+					"Base: C": {},
+					"Base: G": {},
+					"Base: T": {},
+					"Base: N": {}}
 
 			# lists to iterate through
 			bases = json[key][read]["data"]
@@ -154,11 +154,11 @@ class Stats():
 				sample_max = max([sample_max, max(y_value_list)])
 
 				# add data to dictionary for each base
-				data["A"][i] = y_value_list[0]
-				data["C"][i] = y_value_list[1]
-				data["G"][i] = y_value_list[2]
-				data["T"][i] = y_value_list[3]
-				data["N"][i] = y_value_list[4]
+				data["Base: A"][i] = y_value_list[0]
+				data["Base: C"][i] = y_value_list[1]
+				data["Base: G"][i] = y_value_list[2]
+				data["Base: T"][i] = y_value_list[3]
+				data["Base: N"][i] = y_value_list[4]
 
 
 			# selects color to mark sample if a read has a region of low complextity
@@ -209,6 +209,7 @@ class Stats():
 				  'id': "htstream_stats_qbc_" + read + "_" + index,
 				  'smooth_points_sumcounts': False,
 				  'categories': True,
+				  'tt_decimals': '{:,.2f}',
 				  'title': "HTStream: Mean Quality by Cycle (" + title_read + ")",
 				  'xlab': "Cycle",
 				  'ylab': "Mean Q Score",
@@ -483,12 +484,14 @@ class Stats():
 			#	opens gate for future processing of single end read stats.
 			try:
 				SE_json[key] = {}
-				SE_json[key]["St_SE_Q30" + index] = ( json[key]["Single_end"]["total_Q30_basepairs"] / json[key]["Single_end"]["basepairs_in"] ) * 100 
 				SE_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
 				SE_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
 				SE_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
 				SE_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
-				
+
+				stats_json[key]["St_SE_Fraction" + index] = (json[key]["Single_end"]["out"] / total_frags) * 100
+				stats_json[key]["St_SE_Q30" + index] = ( json[key]["Single_end"]["total_Q30_basepairs"] / json[key]["Single_end"]["basepairs_in"] ) * 100
+
 				overview_stats[key]["Q30_Fraction"] += (json[key]["Single_end"]["total_Q30_basepairs"] / total_bps)
 				overview_stats[key]["SE_Fraction"] = json[key]["Single_end"]["out"] / total_frags	
 				overview_stats[key]["SE_reads_out"] = overview_stats[key]["SE_Fraction"] * 100
@@ -509,9 +512,7 @@ class Stats():
 			# PAIRED END STATS
 			#
 			try:
-				PE_json[key] = {}
-				PE_json[key]["St_R1_Q30" + index] = ( json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read1"]["basepairs_in"] ) * 100 
-				PE_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
+				PE_json[key] = {}	
 				PE_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
 				PE_json[key]["St_Paired_End_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
@@ -520,6 +521,9 @@ class Stats():
 																 json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]]
 				PE_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
 
+				stats_json[key]["St_PE_Fraction" + index] = (json[key]["Paired_end"]["out"] / total_frags) * 100
+				stats_json[key]["St_R1_Q30" + index] = ( json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read1"]["basepairs_in"] ) * 100 
+				stats_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
 
 				overview_stats[key]["Q30_Fraction"] += ((json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]) / total_bps)
 				overview_stats[key]["PE_Fraction"] = json[key]["Paired_end"]["out"] / total_frags			   
@@ -537,7 +541,7 @@ class Stats():
 
 
 		# output dictionary, keys are section, value is function called for figure generation
-		section = {"Table": self.table(stats_json, SE_json, PE_json, index),
+		section = {"Table": self.table(stats_json, index),
 				   "Overview": overview_stats}
 
 		if len(PE_json.keys()) != 0:

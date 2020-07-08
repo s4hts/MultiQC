@@ -200,9 +200,11 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 		html += '</div>\n\n'
 
+		html += '''<div class="hc-plot-wrapper">'''
+
 		data = "["+ json.dumps(data) +"]"
 
-		html += '''<div id="htstream_histogram_{r}_{u}" class="hc-plot"></div></div>'''.format(r = read, u = unique_id)
+		html += '''<div id="htstream_histogram_{r}_{u}" class="hc-plot"></div></div></div>'''.format(r = read, u = unique_id)
 		html += '''<script type="text/javascript" class="htstream_histogram_content_{r}_{u}">{d}</script>'''.format(r = read, u = unique_id, d = data) 
 
 	html += notice
@@ -269,7 +271,7 @@ def normalize(data, samples_list, stats_order):
 			row = row * (10 ** (scale))
 
 			if scale > 1:
-				factor = "x 10^" + str(scale)
+				factor = " x 10^" + str(scale)
 			else:
 				factor = ""
 
