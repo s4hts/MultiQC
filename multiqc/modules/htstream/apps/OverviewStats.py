@@ -206,7 +206,7 @@ class OverviewStats():
 			line_config['data_labels'].append({"name": samp, 'ylab': 'Value', 'xlab': 'Tool'})
 
 
-		html = "<hr><h4> Radar Plot </h4>\n"
+		html = "<hr><h4> Processing Statistics Radar Plot </h4>\n"
 		html += linegraph.plot(data_dict, line_config) +  "\n<br>"
 
 		
