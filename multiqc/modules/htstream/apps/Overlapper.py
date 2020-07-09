@@ -51,11 +51,11 @@ class Overlapper():
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
-			html += '<div class="alert alert-info"> No overlaps present in samples. </div>'	
+			html += '<div class="alert alert-info"> <strong>Notice:</strong> No overlaps present in samples. </div>'	
 			return html
 
 		if len(json.keys()) > 150:
-			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'	
 			return html
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.

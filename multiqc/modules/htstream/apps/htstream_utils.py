@@ -118,23 +118,22 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 	line_btn_id = "htstream_qbc_line_{b}_{u}".format(b=btn_id, u=unique_id)
 	heat_btn_id = "htstream_qbc_heat_{b}_{u}".format(b=btn_id, u=unique_id)
 
-	wrapper_html += '<div class="btn-group hc_switch_group">\n'
+	wrapper_html += '<div class="btn-group hc_switch_group" style="margin-bottom: 10px;">\n'
 	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Linegraph</button>\n'.format(b=line_btn_id, t=heat_btn_id)
 	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Heatmaps</button></div>\n'.format(b=heat_btn_id, t=line_btn_id)
-	wrapper_html += "<br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
-	wrapper_html += '<div id="htstream_qbc_line_{b}_{u}" class="htstream_fadein">'.format(b=btn_id, u=unique_id)
+	wrapper_html += '<div id="htstream_qbc_line_{b}_{u}" class="htstream_fadein" style="margin-top: -5px;">'.format(b=btn_id, u=unique_id)
 	wrapper_html += line_plot + "</div>"
 
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
-	heatmap_html = '<br><div class="btn-group hc_switch_group">\n'
+	heatmap_html = '<div class="btn-group hc_switch_group" style="margin-bottom: 20px; margin-top: 10px;">\n'
 
 	for buttons in button_list:
 		heatmap_html += buttons
 
-	heatmap_html += '</div>\n\n<br></br>\n\n'
+	heatmap_html += '</div>\n\n'
 	heatmap_html += heatmap
 
 	# heatmap div
@@ -152,6 +151,8 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 def primers_heatmap_html(unique_id, button_list, heatmap):
 
 	wrapper_html = '<h4> Primer Counts </h4>'
+	wrapper_html  += '''<div class="mqc_hcplot_plotgroup">'''
+	wrapper_html += '<div class="samples-hidden-warning alert alert-warning primers-alert" style="display: none"> <strong>Warning:</strong> Heatmap Not Available when Samples are Filtered.</div>'
 
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
 	heatmap_html = '<div class="btn-group hc_switch_group">\n'
@@ -163,8 +164,8 @@ def primers_heatmap_html(unique_id, button_list, heatmap):
 	heatmap_html += heatmap
 
 	# heatmap div
-	wrapper_html += '<div id="htstream_qbc_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
-	wrapper_html += heatmap_html + "</div>"
+	wrapper_html += '<div id="htstream_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
+	wrapper_html += heatmap_html + "</div></div>"
 
 	final_html = wrapper_html 
 

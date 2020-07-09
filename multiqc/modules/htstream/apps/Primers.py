@@ -29,7 +29,7 @@ class Primers():
 										   'namespace': "% Bp Lost",
 										   'description': 'Percentage of bps lost.',
 										   'suffix': '%',
-										   'format': '{:,.2f}',
+										   'format': '{:,.4f}',
 										   'scale': 'Greens'}
 		headers["Pr_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Number of basepairs lost', 'format': '{:,.0f}', 'scale': 'RdPu'}
 

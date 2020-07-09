@@ -19,7 +19,7 @@ class SuperDeduper():
 		headers = OrderedDict()
 
 		if (pe_total + se_total) == 0:
-			html = '<div class="alert alert-info"> No Duplicates in any sample. </div>'	
+			html = '<div class="alert alert-info"> <strong>Notice:</strong> No Duplicates in any sample. </div>'	
 			return html
 
 		headers["Sd_%_Duplicates" + index] = {'title': "% Duplicates", 
@@ -78,8 +78,6 @@ class SuperDeduper():
 
 		# checks for any invariant samples and creates an alert div and table to  hold the data.
 		if len(invariant_saturation_dict.keys()) != 0:
-			# notice
-			notice = 'Samples with uniform duplication numbers identified (displayed below). <br />'
 
 			# table
 			headers = OrderedDict()
@@ -87,6 +85,7 @@ class SuperDeduper():
 			headers["Sd_Duplicates"] = {'title': "Total Reads - Duplicates", 'namespace': "Duplicates", 'description': 'Number of Duplicates', 'format': '{:,.0f}', 'scale': 'RdPu'}
 			
 			# add to output html
+			notice = '<strong>Notice:</strong> Samples with uniform duplication numbers identified (displayed below). <br />'
 			html += '<div class="alert alert-info">{n}</div>'.format(n = notice)	
 			html += table.plot(invariant_saturation_dict, headers)
 			

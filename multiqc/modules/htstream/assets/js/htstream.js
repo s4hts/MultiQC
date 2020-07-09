@@ -1,3 +1,4 @@
+// Functions 
 function htstream_div_switch(ele, suffix) {
 
   var plot_id = ele.id.split("_b")[0].concat(suffix);
@@ -151,30 +152,48 @@ function htstream_histogram(read, sample) {
 
 $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
-  // console.log(regex_mode);
+  mode = $('.mqc_hidesamples_showhide:checked').val() == 'show' ? 'show' : 'hide';
+
+  console.log(mode);
+  if (mode == "hide") {
+
+    var f_add = [];
   
-  f_texts.push("Base: A", "Base: C", "Base: G", "Base: T", "Base: N");
+  } else {
 
-  // $("document").ready(function() {
+    var f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", "PE Reads", "SE Reads"];
 
-  //   // Base by Cycle Break 
-  //   var div = $('*[id*=Base_by_Cycle]').parent().parent();
-  //   div.prev('.samples-hidden-warning').remove();
-  //   div.css('display', 'block');
+  }
 
-  //   var div = $('*[id*=htstream_qbc_heat]');
-  //   div.find('.samples-hidden-warning').remove();
-  //   div.find('.mqc_hcplot_plotgroup').css('display', 'block');
-  //   div.find('.hc-plot-wrapper').css('display', 'block');
+  if (f_texts.length != 0) {
+    
+    // Disable Heatmaps (stats and primers)
+    $('*[id*=htstream_qbc_line]').filter(":button").click();
+    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
 
+    $('*[class*=primers-alert]').css('display', 'block');
+    $('*[id*=htstream_heat_primers]').css('display', 'none');
 
-  // });
+    for (i = 0; i < f_add.length; i++) { 
+      f_texts.push(f_add[i]);
+    }
+
+  } else {
+
+    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", false);
+
+    $('*[class*=primers-alert]').css('display', 'none');
+    $('*[id*=htstream_heat_primers]').css('display', 'block');
+
+  }
 
 });
 
 
 $("document").ready(function() {
+
   $('.active.hist_btn').trigger( "click" );
+
 });
 
 

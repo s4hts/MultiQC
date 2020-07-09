@@ -61,11 +61,11 @@ class AdapterTrimmer():
 
 		# if no overlaps at all are present, return nothing
 		if avg_bp_trimmed == 0:
-			html += '<div class="alert alert-info"> No adapters were trimmed from samples. </div>'	
+			html += '<div class="alert alert-info"> <strong>Notice:</strong> No adapters were trimmed from samples. </div>'	
 			return html
 
 		if len(json.keys()) > 150:
-			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-info"> <strong>Notice:</strong> Too many samples for bargraph. </div>'	
 			return html
 
 		# bargraph dictionary. Exact use of example in MultiQC docs.

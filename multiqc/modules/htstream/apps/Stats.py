@@ -202,6 +202,9 @@ class Stats():
 		#	back and forth between figure typs. There are workarounds, however, using
 		#	javascript and some clever organizations :).
 
+		def temp_split(string):
+			return string.split("hts")[0]
+
 		title_read = " ".join(read.split("_")[1:3])
 
 		# config dictionary for mean Q score line graph
@@ -222,6 +225,7 @@ class Stats():
 				   'xTitle': 'Cycle',
 				   'square' : False,
 				   'datalabels': False,
+
 				   'max': 1.0, 
 				   'colstops': [
 					        [0, '#FFFFFF'],
@@ -291,7 +295,7 @@ class Stats():
 							 	  }
 
 			# creates x and y axis labels for heatmap (categorical)
-			x_lab = [str(int(x) - 1) for x in json[key][read]["col_names"]]
+			x_lab = [ str(int(x) - 1) for x in json[key][read]["col_names"]]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
 
 			data = []

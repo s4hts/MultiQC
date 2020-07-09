@@ -18,7 +18,7 @@ class SeqScreener():
 		headers = OrderedDict()
 
 		if (pe_total + se_total) == 0:
-			html = '<div class="alert alert-info"> No hits in any sample. </div>'	
+			html = '<div class="alert alert-info"> <strong>Notice:</strong> No hits in any sample. </div>'	
 			return html
 
 		if pe_total != 0:

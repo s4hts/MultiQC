@@ -60,7 +60,7 @@ class QWindowTrim():
 		html = "<h4> QWindowTrim Trimmed Basepairs Composition </h4>\n" 
 
 		if len(json.keys()) > 150:
-			html += '<div class="alert alert-info"> Too many samples for bargraph. </div>'	
+			html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'	
 			return html
 			
 
@@ -81,7 +81,7 @@ class QWindowTrim():
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:
-			html += '<div class="alert alert-info"> No basepairs were trimmed from any sample. </div>'	
+			html += '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'	
 			return html
 
 

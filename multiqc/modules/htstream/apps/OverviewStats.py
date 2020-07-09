@@ -23,8 +23,8 @@ class OverviewStats():
 					  'tt_decimals': "{point.y:.2f}'",
 					  'tt_suffix': "%",  
 					  'colors': {
-				  			 "SE": "#1EC2D0",
-				  			 "PE": "#E8961B",
+				  			 "SE Reads": "#1EC2D0",
+				  			 "PE Reads": "#E8961B",
 				  			 	},
 					  'data_labels': []
 					  }
@@ -72,7 +72,7 @@ class OverviewStats():
 		for samp in samples:
 
 			temp = {}
-			line_data_temp = {"SE": {}, "PE": {}}
+			line_data_temp = {"SE Reads": {}, "PE Reads": {}}
 
 			for app in app_list:
 
@@ -92,14 +92,14 @@ class OverviewStats():
 				if include == True:
 
 					try:
-						line_data_temp["SE"][app] = json[app][samp]["SE" + line_index] 
+						line_data_temp["SE Reads"][app] = json[app][samp]["SE" + line_index] 
 					except:
-						line_data_temp["SE"][app] = 0
+						line_data_temp["SE Reads"][app] = 0
 
 					try:
-						line_data_temp["PE"][app] = json[app][samp]["PE" + line_index]
+						line_data_temp["PE Reads"][app] = json[app][samp]["PE" + line_index]
 					except:
-						line_data_temp["PE"][app] = 0
+						line_data_temp["PE Reads"][app] = 0
 
 
 			table_data[samp] = temp
