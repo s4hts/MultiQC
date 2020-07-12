@@ -123,9 +123,8 @@ class AdapterTrimmer():
 
 
 			overview_dict[key] = {
-								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
-								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
+								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
 								  "Fraction_Bp_Lost": (bp_in - json[key]["Fragment"]["basepairs_out"]) / bp_in,
 								  "Fraction_PE_Bp_Trimmed": (json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]) / bp_in,
 								  "Fraction_PE_Read_Trimmed": (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"]) / frag_in,

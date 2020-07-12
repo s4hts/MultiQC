@@ -16,12 +16,11 @@ class OverviewStats():
 		line_config = {
 					  'id': "htstream_overview_" + data_type + "composition",
 					  'smooth_points_sumcounts': False,
+					  'logswitch': True,
 					  'categories': True,
-					  'yCeiling': 100,
 					  'xlab': "Tool",
-					  'ylab': "Percentage",
-					  'tt_decimals': "{point.y:.2f}'",
-					  'tt_suffix': "%",  
+					  'ylab': "Counts",
+					  'tt_decimals': "{point.y:.0f}'",
 					  'colors': {
 				  			 "SE Reads": "#1EC2D0",
 				  			 "PE Reads": "#E8961B",
@@ -36,7 +35,6 @@ class OverviewStats():
 			reducers = ["hts_SeqScreener", "hts_SuperDeduper", 
 						"hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
 			table_suffix = " (read)"
-			line_index = "_reads_out"
 			index = "Reads"
 			description = "Number of Output Fragments for "
 			html_title = " Fragment Reduction "
@@ -49,8 +47,7 @@ class OverviewStats():
 			reducers = ["hts_AdapterTrimmer", "hts_CutTrim", 
 						"hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
 			table_suffix = " (bps)"
-			line_index = "_bps_out"
-			index = "Bp"
+			index = "Bps"
 			description = "Number of Output Bps for "
 			html_title = " Basepair Reduction "
 			notice = "No Read Reducing Apps were found."
@@ -67,49 +64,53 @@ class OverviewStats():
 		samples = list(json[first_app].keys())
 
 		app_list = ["Pipeline Input"] + app_list
-		app_subsset = ["Pipeline Input"]
+		app_subset = ["Pipeline Input"]
 
 		for samp in samples:
 
 			temp = {}
-			line_data_temp = {"SE Reads": {}, "PE Reads": {}}
+			line_data_temp = {"SE "  + index: {}, 
+							  "PE "  + index: {}}
 
 			for app in app_list:
 
 				include = False
 
 				if app[:-2] in reducers:
-					total = json[app][samp]["Output_" + index]
-					temp[app + table_suffix] = total
-					app_subsset.append(app)
+					total = json[app][samp]["PE_Output_" + index] + json[app][samp]["SE_Output_" + index]
+					app_subset.append(app)
+					prefix = "Output_"
 					include = True
 
 				elif app == "Pipeline Input":
-					temp[app + table_suffix] = json[app][samp]["Input_" + index]
+					total = json[app][samp]["PE_Input_" + index] + json[app][samp]["SE_Input_" + index]
+					prefix = "Input_"
 					include = True
 
 
 				if include == True:
 
-					try:
-						line_data_temp["SE Reads"][app] = json[app][samp]["SE" + line_index] 
-					except:
-						line_data_temp["SE Reads"][app] = 0
+					temp[app + table_suffix] = total
 
 					try:
-						line_data_temp["PE Reads"][app] = json[app][samp]["PE" + line_index]
+						line_data_temp["SE " + index][app] = json[app][samp]["SE_" + prefix + index]
 					except:
-						line_data_temp["PE Reads"][app] = 0
+						line_data_temp["SE " + index][app] = 0
+
+					try:
+						line_data_temp["PE " + index][app] = json[app][samp]["PE_" + prefix + index]
+					except:
+						line_data_temp["PE "  + index][app] = 0
 
 
 			table_data[samp] = temp
 			line_data_list.append(line_data_temp)
-			line_config['data_labels'].append({"name": samp, 'ylab': 'Percentage', 'xlab': 'Tool'})
+			line_config['data_labels'].append({"name": samp, 'ylab': 'Counts', 'xlab': 'Tool'})
 
 
-		for i in range(len(app_subsset)):
+		for i in range(len(app_subset)):
 
-			app = app_subsset[i]
+			app = app_subset[i]
 			color = color_rotations[i % 4]
 			headers[app + table_suffix] = {'title': app, 'namespace': app, 'description': description + app,
 										   'format': '{:,.0f}', 'scale': color}
@@ -153,11 +154,8 @@ class OverviewStats():
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)
 
-		exclude_list = ["Output_Reads", "Output_Bp", 
-						"PE_reads_out", "PE_bps_out",
-						"SE_reads_out", "SE_bps_out"]
-
-		special_list = ["Overlap_Length_Max", "Overlap_Length_Med"]
+		exclude_list = ["PE_Output_Reads", "PE_Output_Bps",
+						"SE_Output_Reads", "SE_Output_Bps"]
 
 		data = [[] for x in range(row_length)]
 

@@ -476,11 +476,11 @@ class Stats():
 						       "St_Notes" + index: json[key]["Program_details"]["options"]["notes"]}
 
 
-			overview_stats[key] = {"Output_Reads": total_frags,
-								   "Output_Bp": total_bps,
+			overview_stats[key] = {
 								   "GC_Content": gc_content,
 								   "N_Content": n_content,
-								   "Q30_Fraction": 0}
+								   "Q30_Fraction": 0
+								   }
 			#
 			# SINGLE END STATS
 			#
@@ -498,15 +498,16 @@ class Stats():
 
 				overview_stats[key]["Q30_Fraction"] += (json[key]["Single_end"]["total_Q30_basepairs"] / total_bps)
 				overview_stats[key]["SE_Fraction"] = json[key]["Single_end"]["out"] / total_frags	
-				overview_stats[key]["SE_reads_out"] = overview_stats[key]["SE_Fraction"] * 100
-				overview_stats[key]["SE_bps_out"] = (json[key]["Single_end"]["basepairs_out"] / total_bps) * 100
-
+				overview_stats[key]["SE_Output_Reads"] = json[key]["Single_end"]["out"]
+				overview_stats[key]["SE_Output_Bps"] = json[key]["Single_end"]["basepairs_out"] 
+				
 
 			except:
 				overview_stats[key]["Q30_Fraction"] += 0
 				overview_stats[key]["SE_Fraction"] = 0
-				overview_stats[key]["SE_reads_out"] = 0
-				overview_stats[key]["SE_bps_out"] = 0
+				overview_stats[key]["SE_Output_Reads"] = 0 
+				overview_stats[key]["SE_Output_Bps"] = 0
+
 
 				del SE_json[key]
 
@@ -530,15 +531,15 @@ class Stats():
 				stats_json[key]["St_R2_Q30" + index] = ( json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"] / json[key]["Paired_end"]["Read2"]["basepairs_in"] ) * 100 
 
 				overview_stats[key]["Q30_Fraction"] += ((json[key]["Paired_end"]["Read1"]["total_Q30_basepairs"] + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]) / total_bps)
-				overview_stats[key]["PE_Fraction"] = json[key]["Paired_end"]["out"] / total_frags			   
-				overview_stats[key]["PE_reads_out"] = (overview_stats[key]["PE_Fraction"]) * 100
-				overview_stats[key]["PE_bps_out"] = ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100
-
+				overview_stats[key]["PE_Fraction"] = json[key]["Paired_end"]["out"] / total_frags
+				overview_stats[key]["PE_Output_Reads"] = json[key]["Paired_end"]["out"]
+				overview_stats[key]["PE_Output_Bps"] = json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]
+				
 			except:
 				overview_stats[key]["Q30_Fraction"] += 0
-				overview_stats[key]["PE_Fraction"] = 0			   
-				overview_stats[key]["PE_reads_out"] = 0
-				overview_stats[key]["PE_bps_out"] = 0
+				overview_stats[key]["PE_Fraction"] = 0	
+				overview_stats[key]["PE_Output_Reads"] = 0
+				overview_stats[key]["PE_Output_Bps"] = 0 		   
 
 				del PE_json[key]
 

@@ -127,9 +127,8 @@ class SuperDeduper():
 			se_total_loss += perc_se_loss 
 
 			overview_dict[key] = {
-								  "Output_Reads": json[key]["Fragment"]["out"],
-								  "PE_reads_out": (json[key]["Paired_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
-								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "PE_Output_Reads": json[key]["Paired_end"]["out"],
+								  "SE_Output_Reads": json[key]["Single_end"]["out"],
 								  "Percent_Duplicates": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
 								  "Percent_Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
 								 }

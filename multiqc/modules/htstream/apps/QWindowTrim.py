@@ -146,9 +146,8 @@ class QWindowTrim():
 			bp_in = json[key]["Fragment"]["basepairs_in"]
 
 			overview_dict[key] = {
-								  "Output_Bp": json[key]["Fragment"]["basepairs_out"],
-								  "PE_bps_out": ( (json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"]) / json[key]["Fragment"]["basepairs_out"]) * 100,
-								  "SE_bps_out": (json[key]["Single_end"]["basepairs_out"] / json[key]["Fragment"]["basepairs_out"]) * 100,
+								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
+								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
 								  "Fraction_R1_Bp_Trimmed_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in, 
 								  "Fraction_R1_Bp_Trimmed_Right": json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in, 
 								  "Fraction_R2_Bp_Trimmed_Left": json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in, 

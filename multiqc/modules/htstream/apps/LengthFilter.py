@@ -51,8 +51,6 @@ class LengthFilter():
 
 		for key in json.keys():
 
-			frag_out = json[key]["Fragment"]["out"]
-
 			try:
 				reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
 			
@@ -79,9 +77,8 @@ class LengthFilter():
 			pe_orphaned_total += pe_orphaned
 
 			overview_dict[key] = {
-								  "Output_Reads": frag_out,
-								  "PE_reads_out": (json[key]["Paired_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
-								  "SE_reads_out": (json[key]["Single_end"]["out"] / json[key]["Fragment"]["out"]) * 100,
+								  "PE_Output_Reads": json[key]["Paired_end"]["out"],
+								  "SE_Output_Reads": json[key]["Single_end"]["out"],
 								  "Fraction_Reads_Lost": reads_lost
 								 }
 

@@ -161,7 +161,7 @@ $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
   
   } else {
 
-    var f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", "PE Reads", "SE Reads"];
+    var f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", "PE Reads", "SE Reads", "PE Bps", "SE Bps"];
 
   }
 

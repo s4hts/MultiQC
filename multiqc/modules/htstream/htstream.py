@@ -187,19 +187,28 @@ class MultiqcModule(BaseMultiqcModule):
 				stats_dict[key] = json[key][app]
 
 				if pipeline_input == True:
+ 
+					try:
+						pe_in_reads = json[key][app]["Paired_end"]["in"]
+						pe_in_bps = json[key][app]["Paired_end"]["Read1"]["basepairs_in"] + json[key][app]["Paired_end"]["Read2"]["basepairs_in"]
 
-					total_frag = json[key][app]["Fragment"]["in"]
-					total_bps = json[key][app]["Fragment"]["basepairs_in"]
-					pe_bps = (json[key][app]["Paired_end"]["Read1"]["basepairs_in"] + json[key][app]["Paired_end"]["Read2"]["basepairs_in"])
-					se_bps = json[key][app]["Single_end"]["basepairs_in"]
+					except:
+						pe_in_reads = 0 
+						pe_in_bps = 0 
+
+					try:
+						se_in_reads = json[key][app]["Single_end"]["in"]
+						se_in_bps = json[key][app]["Single_end"]["basepairs_in"]
+
+					except:
+						se_in_reads = 0 
+						se_in_bps = 0 
 
 					self.overview_stats["Pipeline Input"][key] = {
-																 "Input_Reads": total_frag,
-																 "Input_Bp": total_bps,
-																 "PE_reads_out": (json[key][app]["Paired_end"]["in"] / total_frag) * 100,
-																 "SE_reads_out": (json[key][app]["Single_end"]["in"] / total_frag) * 100,
-																 "PE_bps_out": (pe_bps / total_bps) * 100,
-																 "SE_bps_out": (se_bps / total_bps) * 100, 
+																 "PE_Input_Reads": pe_in_reads,
+																 "PE_Input_Bps": pe_in_bps,
+																 "SE_Input_Reads": se_in_reads,
+																 "SE_Input_Bps": se_in_bps
 																 }
 					
 
@@ -259,7 +268,6 @@ class MultiqcModule(BaseMultiqcModule):
 
 			except:
 			 	log.warning("Report Section for Processing Overview Failed.")
-
 
 
 
