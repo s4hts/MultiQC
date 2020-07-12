@@ -253,6 +253,9 @@ def normalize(data, samples_list, stats_order):
 	n, m = data.shape # rows, col
 	to_delete = []
 	raw_data = {}
+	factor_dict = {}
+
+	include_list = ["hts_Stats"]
 
  	# format dictionary for output pca stats (raw data)
 	for x in range(len(samples_list)):
@@ -260,23 +263,32 @@ def normalize(data, samples_list, stats_order):
 
 	for x in range(n):
 
-		row = data[x,:]
+		app = "_".join(stats_order[x].split(": ")[0].split("_")[:-1])
+		stat = stats_order[x].split(": ")[-1]
+		stat = app + "_" + stat
+
+		row = data[x,:]		
 
 		# remove rows with no variation, also, mean center and normalize variance
 		if np.all(row == row[0]):
 			to_delete.append(x)
+			continue
+
+		if stat in factor_dict.keys() and app in include_list:
+			scale = factor_dict[stat] 
 
 		elif max(row) < 0.1 or max(row) > 1:
-
 			scale = math.floor(-1 * math.log10(max(row)))
-			row = row * (10 ** (scale))
+			
+			if app in include_list:
+				factor_dict[stat] = scale
 
-			if scale > 1:
-				factor = " x 10^" + str(scale)
-			else:
-				factor = ""
+		else:
+			continue
 
-			stats_order[x] = stats_order[x] + factor
+		row = row * (10 ** (scale))
+		factor = " x 10^" + str(scale)
+		stats_order[x] = stats_order[x] + factor
 
 		data[x,:] = row	
 
