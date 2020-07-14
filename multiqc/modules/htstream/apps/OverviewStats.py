@@ -137,7 +137,7 @@ class OverviewStats():
 
 		line_config = {
 					  'id': "htstream_overview_radar",
-					  'title': "HTStream: Radar Plot",
+					  'title': "HTStream: Preprocessing Statistics",
 					  'smooth_points_sumcounts': False,
 					  'categories': True,
 					  'yCeiling': 1,
@@ -204,7 +204,7 @@ class OverviewStats():
 			line_config['data_labels'].append({"name": samp, 'ylab': 'Value', 'xlab': 'Tool'})
 
 
-		html = "<hr><h4> Processing Statistics Radar Plot </h4>\n"
+		html = "<hr><h4> Preprocessing Statistics </h4>\n"
 		html += linegraph.plot(data_dict, line_config) +  "\n<br>"
 
 		

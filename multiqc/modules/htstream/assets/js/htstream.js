@@ -1,4 +1,137 @@
 // Functions 
+
+//////////////////////////////////////////////////
+// Button Status Switcher
+
+function btn_disable() {
+
+  var exempt_list = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", 
+                     "PE Reads", "SE Reads", "PE Bps", "SE Bps", "Read 1", "Read 2", "Single End"]; 
+
+  var parent_div = $("#mqc-module-section-htstream"); 
+  var unfiltered_btn_divs = parent_div.find("[data-action='set_data'], *[id*=htstream_]");
+  var btn_divs = unfiltered_btn_divs.filter(":button").filter(":not(*[onClick*=htstream_plot_switch])");
+
+  $.each(btn_divs.get().reverse(), function(x, value) {
+
+    var btn_text = $(value).text();
+
+    if (global_mode == "show") {
+
+      if (global_regex) {
+
+        var show = false;
+
+        for (i = 0; i < user_hide_list.length; i++) { 
+
+          if (btn_text.match(user_hide_list[i])) {
+            $(value).prop("disabled", false);
+            show = true;
+            break;
+
+          }
+        }  
+        if (show == false  && !exempt_list.includes(btn_text)) {
+          $(value).prop("disabled", true);
+
+        }
+      } else {
+
+        if (global_hide_list.indexOf(btn_text) == -1 && exempt_list.indexOf(btn_text) == -1) {
+
+          $(value).prop("disabled", true);
+
+        } else {
+
+          $(value).prop("disabled", false);
+
+        }
+      }
+    } else {
+
+      if (global_regex) {
+
+         show = true;
+
+        for (i = 0; i < user_hide_list.length; i++) { 
+
+          if (btn_text.match(user_hide_list[i]) && !exempt_list.includes(btn_text)) {   
+            $(value).prop("disabled", true);
+            show = false;
+            break;
+
+          }
+        }
+
+        if (show == true) {
+          $(value).prop("disabled", false);
+
+        }  
+      } else {
+
+        if (global_hide_list.indexOf(btn_text) == -1 || exempt_list.indexOf(btn_text) != -1) {
+
+          $(value).prop("disabled", false);
+
+        } else {
+
+          $(value).prop("disabled", true);
+
+        }
+      }
+    }
+  });
+}
+
+function btn_activator() {
+  var parent_div = $("#mqc-module-section-htstream"); 
+  var btn_groups = parent_div.find(".hc_switch_group");
+
+  $.each(btn_groups, function(x, value) {
+
+    var btns = $(value).find(".btn");
+    var first = true;
+
+    for (i = 0; i < btns.length; i++) { 
+
+      var attr = $(btns[i]).attr('name');
+
+      if (typeof attr !== typeof undefined && first == true) {
+        $(btns[i]).addClass('active');
+        first = false;
+
+      } else {
+        $(btns[i]).removeClass('active');
+
+      }
+    }
+  });
+}
+
+
+//////////////////////////////////////////////////
+// Hide Heatmap Handler
+// function heatmap_handle(plot_div) {
+
+//   console.log(plot_div)
+
+//   if (heatmap_status != "none" ) {
+
+//     var plot_parent = plot_div.parent();
+//     plot_parent.css('display', 'block');
+//     plot_parent.siblings('.samples-hidden-warning').remove();
+//     console.log(plot_parent.siblings('.samples-hidden-warning'))
+//     plot_graph(plot_div.attr('id'));
+
+//   }
+
+// }
+
+
+
+//////////////////////////////////////////////////
+// Div and Plot Switches
+
 function htstream_div_switch(ele, suffix) {
 
   var plot_id = ele.id.split("_b")[0].concat(suffix);
@@ -12,7 +145,6 @@ function htstream_div_switch(ele, suffix) {
 
 }
 
-
 function htstream_plot_switch(ele, target) {
 
   var plot_id = ele.id.split("_btn")[0];
@@ -22,7 +154,6 @@ function htstream_plot_switch(ele, target) {
   off.css('display', 'none');
   on.css('display', 'block');
 
-
   if (plot_id.includes('htstream_qbc_heat') || plot_id.includes('htstream_comp_line_')) {
 
     var plot_div = on.find('.hc-plot');
@@ -30,9 +161,19 @@ function htstream_plot_switch(ele, target) {
 
   }
 
+ // if (plot_id.includes('htstream_qbc_heat') && global_mode == "show" && global_hide_list.length != 0) {
+
+ //    heatmap_status = plot_div;
+ //    var plot_parent = plot_div.parent();
+ //    console.log(plot_parent.siblings('.samples-hidden-warning'))://.remove();
+ //    heatmap_handle(heatmap_status);
+
+ //  }
 
 }
 
+//////////////////////////////////////////////////
+// Histogram 
 
 function htstream_histogram(read, sample) {
 
@@ -147,54 +288,78 @@ function htstream_histogram(read, sample) {
     series: series_var,
   });
 
-  }
+}
 
+
+//////////////////////////////////////////////////
+// Hide Samples Handler
+
+var global_hide_list = []; // global hide list
+var user_hide_list = [];
+var global_regex = false;
+var global_mode = "none";
+var heatmap_status = "none"
 
 $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
   mode = $('.mqc_hidesamples_showhide:checked').val() == 'show' ? 'show' : 'hide';
+  global_regex = regex_mode;
+  global_mode = mode;
 
-  console.log(mode);
   if (mode == "hide") {
 
     var f_add = [];
+    global_hide_list = f_add; 
   
   } else {
 
-    var f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", "PE Reads", "SE Reads", "PE Bps", "SE Bps"];
+    var primers_heatmap_samples = [];
+    var temp = [];
+    var primers_heatmap_id = Object.keys(mqc_plots).filter(s => s.includes('primers'));
+
+    for (i = 0; i < primers_heatmap_id.length; i++) { 
+      temp = mqc_plots[primers_heatmap_id[i]]["xcats"].concat(mqc_plots[primers_heatmap_id[i]]["ycats"]);
+      primers_heatmap_samples = primers_heatmap_samples.concat(temp);
+    
+    }
+
+    var f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", 
+                 "PE Reads", "SE Reads", "PE Bps", "SE Bps"];
+    f_add = f_add.concat(primers_heatmap_samples)
 
   }
 
   if (f_texts.length != 0) {
-    
-    // Disable Heatmaps (stats and primers)
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
+
     $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
 
-    $('*[class*=primers-alert]').css('display', 'block');
-    $('*[id*=htstream_heat_primers]').css('display', 'none');
+    user_hide_list = f_texts.slice();
 
     for (i = 0; i < f_add.length; i++) { 
       f_texts.push(f_add[i]);
     }
 
-  } else {
-
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", false);
-
-    $('*[class*=primers-alert]').css('display', 'none');
-    $('*[id*=htstream_heat_primers]').css('display', 'block');
+    global_hide_list = f_texts.slice();
 
   }
 
+  btn_disable();
+  btn_activator();
+  
+
 });
 
+//////////////////////////////////////////////////
+// Page Load Magix
 
 $("document").ready(function() {
 
-  $('.active.hist_btn').trigger( "click" );
+  $('.active.hist_btn').trigger("click");
 
 });
+
+
+
 
 
 

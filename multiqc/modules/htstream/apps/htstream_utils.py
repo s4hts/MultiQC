@@ -152,8 +152,7 @@ def primers_heatmap_html(unique_id, button_list, heatmap):
 
 	wrapper_html = '<h4> Primer Counts </h4>'
 	wrapper_html  += '''<div class="mqc_hcplot_plotgroup">'''
-	wrapper_html += '<div class="samples-hidden-warning alert alert-warning primers-alert" style="display: none"> <strong>Warning:</strong> Heatmap Not Available when Samples are Filtered.</div>'
-
+	
 	# The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
 	heatmap_html = '<div class="btn-group hc_switch_group">\n'
 
