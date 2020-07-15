@@ -223,7 +223,7 @@ def composition_html(title, table, linegraph, data_type):
 	table_btn_id = "htstream_comp_table_{b}".format(b=data_type)
 	line_btn_id = "htstream_comp_line_{b}".format(b=data_type)
 
-	wrapper_html += '<div class="btn-group hc_switch_group">\n'
+	wrapper_html += '<div class="btn-group hc_switch_group htstream_exempt">\n'
 	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Reduction Table</button>\n'.format(b=table_btn_id, t=line_btn_id)
 	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Composition Line Graph</button></div>\n'.format(b=line_btn_id, t=table_btn_id)
 	wrapper_html += "<br></br>"
@@ -245,7 +245,7 @@ def composition_html(title, table, linegraph, data_type):
 
 #######################################
 
-# radar plot
+# stats plot
 
 def normalize(data, samples_list, stats_order):
 
