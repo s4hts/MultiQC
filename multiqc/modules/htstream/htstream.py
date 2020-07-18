@@ -181,7 +181,6 @@ class MultiqcModule(BaseMultiqcModule):
 			# creat app specific dictionary, each entry will be a sample
 			stats_dict = OrderedDict()
 
-
 			for key in sample_keys:
 
 				stats_dict[key] = json[key][app]
@@ -246,7 +245,14 @@ class MultiqcModule(BaseMultiqcModule):
 					self.report_sections[app_name] = {'description': description,
 													  'html': html}
 
+					
+					section_dict.clear()
+					del section_dict
+					del html
 
+
+		stats_dict.clear()
+		del stats_dict
 
 		############################
 		# ADD SECTIONS TO FILE
@@ -258,9 +264,9 @@ class MultiqcModule(BaseMultiqcModule):
 				app = OverviewStats.OverviewStats()
 
 				description = "General statistics from the HTStream pipeline."
-				html, radar_data = app.execute(self.overview_stats, app_order)
+				html, stats_data = app.execute(self.overview_stats, app_order)
 					
-				self.write_data_file(radar_data, 'htstream_pca_raw_data')
+				self.write_data_file(stats_data, 'htstream_pca_raw_data')
 				
 				self.add_section(name = "Processing Overview",
 								 description = description,
@@ -270,7 +276,9 @@ class MultiqcModule(BaseMultiqcModule):
 			 	log.warning("Report Section for Processing Overview Failed.")
 
 
-
+		self.overview_stats.clear()
+		del self.overview_stats
+		
 		# add app sections
 		for section, content in self.report_sections.items():
 

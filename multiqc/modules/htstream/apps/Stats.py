@@ -120,6 +120,8 @@ class Stats():
 					 			   "col_names": json[key][read][0]["col_names"] + temp_col_name
 							 	  }
 
+				del temp_data
+				del temp_col_name
 
 			# initializes dat dict. Each key is a line in the graph
 			data = {"Base: A": {},
@@ -131,7 +133,6 @@ class Stats():
 			# lists to iterate through
 			bases = json[key][read]["data"]
 			positions = json[key][read]["col_names"]
-
 
 			# vairables containing max percentage reached by any nucleotide in the sample
 			#	This data is stored so it can be correctly marked in the sample check div.
@@ -175,7 +176,6 @@ class Stats():
 			status_dict[key] = sample_status
 
 
-
 			# this config file is for the individual line of the multiline graph
 			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 
 										  'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 
@@ -183,6 +183,7 @@ class Stats():
 
 			# append base by cycle to data for this to data list
 			data_list.append(data)
+
 
 		# this adds the html output of sample status. This function colors samples
 		html += htstream_utils.sample_status(status_dict)
@@ -294,6 +295,9 @@ class Stats():
 					 			   "shape": [json[key][read][0]["shape"][0], json[key][read][0]["shape"][-1] + json[key][read][1]["shape"][-1]]
 							 	  }
 
+				del temp_data
+				del temp_col_name
+
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = [ str(int(x) - 1) for x in json[key][read]["col_names"]]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
@@ -374,7 +378,7 @@ class Stats():
 
 			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, \'{s}\')" id="{pid}">{n}</button>\n'.format(a=active, s=suffix, pid=pid, n=name))
 
-	
+
 		status_div = htstream_utils.sample_status(status_dict)
 
 		line_plot = linegraph.plot(line_data, line_config)
@@ -544,23 +548,25 @@ class Stats():
 				del PE_json[key]
 
 
-
 		# output dictionary, keys are section, value is function called for figure generation
 		section = {"Table": self.table(stats_json, index),
 				   "Overview": overview_stats}
+
+		stats_json.clear()
 
 		if len(PE_json.keys()) != 0:
 			section["Read Length Histogram (Paried End)"] = self.histogram(PE_json, "St_PE_histogram")
 			section["Base by Cycle (Paired End)"] = self.base_by_cycle(PE_json, "St_Paired_End_Base_by_Cycle", index)
 			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(PE_json, "St_Paired_End_Quality_by_Cycle", index)
 
+		PE_json.clear()
 
 		#only executres if single read data is detected
 		if len(SE_json.keys()) != 0:
 			section["Read Length Histogram (Single End)"] = self.histogram(SE_json, "St_SE_histogram")
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(SE_json, "St_Single_End_Base_by_Cycle", index)
 			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(SE_json, "St_Single_End_Quality_by_Cycle", index)
-
+		
 	
 		return section 
 
