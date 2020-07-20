@@ -77,7 +77,7 @@ class NTrimmer():
 			return html
 
 		if len(json.keys()) > 150:
-			html = '<div class="alert alert-info"> <strong>Notice:</strong> Too many samples for bargraph. </div>'	
+			html = '<div class="alert alert-warning"> <strong>Notice:</strong> Too many samples for bargraph. </div>'	
 			return html
 
 

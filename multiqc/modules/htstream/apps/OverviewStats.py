@@ -133,10 +133,10 @@ class OverviewStats():
 		return 	html
 
 
-	def hts_radar(self, json):
+	def hts_line(self, json):
 
 		line_config = {
-					  'id': "htstream_overview_radar",
+					  'id': "htstream_overview_linechart",
 					  'title': "HTStream: Preprocessing Statistics",
 					  'smooth_points_sumcounts': False,
 					  'categories': True,
@@ -216,9 +216,9 @@ class OverviewStats():
 
 		read_html = self.composition_and_reduction(json, app_list, "read") +  "\n<br>"
 		bps_html = self.composition_and_reduction(json, app_list, "bp")
-		radar_html, radar_data = self.hts_radar(json)
+		line_html, line_data = self.hts_line(json)
 
-		html = radar_html + read_html + bps_html 
+		html = line_html + read_html + bps_html 
 
 		return html, radar_data
 

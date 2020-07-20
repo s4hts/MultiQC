@@ -20,6 +20,7 @@ from multiqc.modules.base_module import BaseMultiqcModule
 # Logger Initialization
 log = logging.getLogger(__name__)
 
+
 class MultiqcModule(BaseMultiqcModule):
 
 	def __init__(self):
@@ -42,7 +43,7 @@ class MultiqcModule(BaseMultiqcModule):
 		 # iterates through files found by "find_log_files" (located in base_module.py, re patterns found in search_patterns.yml)
 		for file in self.find_log_files('htstream'):
 
-			self.add_data_source(file) # write file to MultiQC souce file 
+			self.add_data_source(file) # write file to MultiQC source file 
 
 			self.s_name = file['s_name'] # sample name
 			self.file_data = self.parse_json(file['s_name'], file['f']) # parse stats file. Should return json directory of apps and their stats 
@@ -169,6 +170,7 @@ class MultiqcModule(BaseMultiqcModule):
 		############################
 		# GENERATE REPORT SECTIONS 
 
+
 		for i in range(len(app_order)):
 
 			app = app_order[i]
@@ -177,6 +179,7 @@ class MultiqcModule(BaseMultiqcModule):
 			if program not in self.programs.keys():
 				log.warning("hts_" + program + " is currently not supported by MultiQC: HTStrean. Apps currently supported: " + htstream_utils.key_print(self.programs))
 				continue
+	
 
 			# creat app specific dictionary, each entry will be a sample
 			stats_dict = OrderedDict()
@@ -265,12 +268,14 @@ class MultiqcModule(BaseMultiqcModule):
 
 				description = "General statistics from the HTStream pipeline."
 				html, stats_data = app.execute(self.overview_stats, app_order)
+
 					
 				self.write_data_file(stats_data, 'htstream_pca_raw_data')
 				
 				self.add_section(name = "Processing Overview",
 								 description = description,
 								 content = html) 
+
 
 			except:
 			 	log.warning("Report Section for Processing Overview Failed.")
