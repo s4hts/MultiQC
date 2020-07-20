@@ -220,5 +220,5 @@ class OverviewStats():
 
 		html = line_html + read_html + bps_html 
 
-		return html, radar_data
+		return html, line_data
 
