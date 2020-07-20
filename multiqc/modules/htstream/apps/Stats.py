@@ -516,7 +516,6 @@ class Stats():
 				del SE_json[key]
 
 
-
 			#
 			# PAIRED END STATS
 			#
@@ -567,6 +566,6 @@ class Stats():
 			section["Base by Cycle (Single End)"] = self.base_by_cycle(SE_json, "St_Single_End_Base_by_Cycle", index)
 			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(SE_json, "St_Single_End_Quality_by_Cycle", index)
 		
-	
+
 		return section 
 

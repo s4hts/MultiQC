@@ -14,7 +14,6 @@ from .apps import PolyATTrim, SeqScreener, SuperDeduper, Primers, Stats, Overvie
 from multiqc import config
 from multiqc.modules.base_module import BaseMultiqcModule
 
-
 #################################################
 
 # Logger Initialization
@@ -230,6 +229,7 @@ class MultiqcModule(BaseMultiqcModule):
 				if len(section_dict.keys()) != 0:
 
 					self.overview_stats[app_name] = section_dict["Overview"] 
+
 
 					# construct html for section
 					html = ""
