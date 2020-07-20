@@ -552,6 +552,7 @@ class Stats():
 				   "Overview": overview_stats}
 
 		stats_json.clear()
+		del stats_json
 
 		if len(PE_json.keys()) != 0:
 			section["Read Length Histogram (Paried End)"] = self.histogram(PE_json, "St_PE_histogram")
@@ -559,6 +560,7 @@ class Stats():
 			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(PE_json, "St_Paired_End_Quality_by_Cycle", index)
 
 		PE_json.clear()
+		del PE_json
 
 		#only executres if single read data is detected
 		if len(SE_json.keys()) != 0:
