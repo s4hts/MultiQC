@@ -24,11 +24,11 @@ class QWindowTrim():
 
 		headers["Qt_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Qt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Qt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Qt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Qt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 									  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 		headers["Qt_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bpss Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 
 										'format': '{:,.2f}', 'scale': 'Blues'}

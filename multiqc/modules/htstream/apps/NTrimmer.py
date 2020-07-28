@@ -29,11 +29,11 @@ class NTrimmer():
 			headers["Nt_BP_Lost" + index] = {'title': "Total Bp Lost", 'namespace': "Total Bp Lost", 'description': 'Total input bps (SE and PE) trimmed.',
 									 'format': '{:,.0f}', 'scale': 'Greens'}
 
-		headers["Nt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Nt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Nt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Nt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Nt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
+		headers["Nt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
 

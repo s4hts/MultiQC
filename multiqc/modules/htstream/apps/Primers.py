@@ -31,7 +31,6 @@ class Primers():
 										   'suffix': '%',
 										   'format': '{:,.4f}',
 										   'scale': 'Greens'}
-		headers["Pr_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Number of basepairs lost', 'format': '{:,.0f}', 'scale': 'RdPu'}
 
 		if total_flipped != 0:
 			headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
@@ -132,7 +131,6 @@ class Primers():
 
 			stats_json[key] = {
 							   "Pr_%_BP_Lost" + index: perc_bp_lost * 100,
-							   "Pr_BP_Lost" + index: bp_lost,
 							   "Pr_Primer_Counts" + index: json[key]["Fragment"]['primers_counts'],
 							   "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
 							   "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
