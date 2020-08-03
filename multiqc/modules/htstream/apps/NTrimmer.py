@@ -13,11 +13,11 @@ from multiqc.plots import table, bargraph
 class NTrimmer():
 
 
-	def table(self, json, bps, zeroes, index):
+	def table(self, json, overall_pe, overall_se, zeroes, index):
 
 		# Table construction. Taken from MultiQC docs.
 
-		if bps == 0:
+		if (overall_pe + overall_se) == 0:
 			return ""
 
 		headers = OrderedDict()
@@ -29,13 +29,16 @@ class NTrimmer():
 			headers["Nt_BP_Lost" + index] = {'title': "Total Bp Lost", 'namespace': "Total Bp Lost", 'description': 'Total input bps (SE and PE) trimmed.',
 									 'format': '{:,.0f}', 'scale': 'Greens'}
 
-		headers["Nt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
-									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-		headers["Nt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
-									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
-		headers["Nt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
-									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
+		if overall_pe != 0:
+			headers["Nt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
+										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
+			headers["Nt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
+										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
+
+		if overall_se != 0:
+			headers["Nt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
+										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
 		if zeroes == False:
 			headers["Nt_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
@@ -117,7 +120,8 @@ class NTrimmer():
 		overview_dict = {}
 
 		# accumulator variable. Used to prevent empty bargraphs 
-		trimmed_bps = 0
+		overall_pe = 0
+		overall_se = 0
 		zeroes = False
 
 		for key in json.keys():
@@ -140,13 +144,7 @@ class NTrimmer():
 
 			# number ofreads discarded
 			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"] 
-			
-			# number of trimmed reads by side
-			lefttrimmed_bps = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
-			rightrimmed_bps = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
 
-			# total number of trimmed reads.
-			sample_trimmed_bps = (lefttrimmed_bps + rightrimmed_bps)
 
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
@@ -175,11 +173,12 @@ class NTrimmer():
 							   "Nt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"]
 							  }
 
-			trimmed_bps += sample_trimmed_bps 
+			overall_pe += total_r1 + total_r2
+			overall_se += total_se 
 
 		# section and figure function calls
-		section = {"Table": self.table(stats_json, trimmed_bps, zeroes, index),
-				   "Trimmed Reads": self.bargraph(stats_json, trimmed_bps),
+		section = {"Table": self.table(stats_json, overall_pe, overall_se, zeroes, index),
+				   "Trimmed Reads": self.bargraph(stats_json, (overall_pe + overall_se)),
 				   "Overview": overview_dict}
 
 		return section
