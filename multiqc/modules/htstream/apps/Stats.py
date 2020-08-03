@@ -155,11 +155,11 @@ class Stats():
 				sample_max = max([sample_max, max(y_value_list)])
 
 				# add data to dictionary for each base
-				data["Base: A"][i] = y_value_list[0]
-				data["Base: C"][i] = y_value_list[1]
-				data["Base: G"][i] = y_value_list[2]
-				data["Base: T"][i] = y_value_list[3]
-				data["Base: N"][i] = y_value_list[4]
+				data["Base: A"][i + 1] = y_value_list[0]
+				data["Base: C"][i + 1] = y_value_list[1]
+				data["Base: G"][i + 1] = y_value_list[2]
+				data["Base: T"][i + 1] = y_value_list[3]
+				data["Base: N"][i + 1] = y_value_list[4]
 
 
 			# selects color to mark sample if a read has a region of low complextity
@@ -299,7 +299,7 @@ class Stats():
 				del temp_col_name
 
 			# creates x and y axis labels for heatmap (categorical)
-			x_lab = [ str(int(x) - 1) for x in json[key][read]["col_names"]]
+			x_lab = [ str(int(x)) for x in json[key][read]["col_names"]]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
 
 			data = []
@@ -326,9 +326,9 @@ class Stats():
 				total_score = sum([(int(p) * int(s)) for p, s in zip(temp, y_lab[::-1])])
 
 				# divides sum of total score by the number of cycles for avg fragments
-				line_data[key][pos] = total_score / temp_sum # total reads
+				line_data[key][pos + 1] = total_score / temp_sum # total reads
 
-				if line_data[key][pos] > 30:
+				if line_data[key][pos + 1] > 30:
 					num_above_q30 += 1
 
 

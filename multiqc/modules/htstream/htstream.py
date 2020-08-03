@@ -187,7 +187,7 @@ class MultiqcModule(BaseMultiqcModule):
 
 				stats_dict[key] = json[key][app]
 
-				if pipeline_input == True:
+				if pipeline_input == True and len(app_order) > 1:
  
 					try:
 						pe_in_reads = json[key][app]["Paired_end"]["in"]
@@ -261,7 +261,7 @@ class MultiqcModule(BaseMultiqcModule):
 		# ADD SECTIONS TO FILE
 
 		# add pipeline overview section if appropriate
-		if self.overview_stats != {}:
+		if self.overview_stats != {} and len(app_order) > 1:
 
 			try:
 				app = OverviewStats.OverviewStats()
