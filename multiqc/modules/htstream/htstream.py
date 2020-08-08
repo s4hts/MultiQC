@@ -42,20 +42,27 @@ class MultiqcModule(BaseMultiqcModule):
 		 # iterates through files found by "find_log_files" (located in base_module.py, re patterns found in search_patterns.yml)
 		for file in self.find_log_files('htstream'):
 
+			
+			s_name = self.clean_s_name(file['s_name'], file['root']) # sample name
+			
+			# do not parse excluded samples
+			if self.is_ignore_sample(s_name):
+			    continue
+
+			if s_name in self.data.keys():
+				log.debug("Duplicate sample name found! Overwriting: {}".format(file['s_name']))
+				
+
+			file_data = self.parse_json(file['s_name'], file['f']) # parse stats file. Should return json directory of apps and their stats 
+
 			self.add_data_source(file) # write file to MultiQC source file 
-
-			self.s_name = file['s_name'] # sample name
-			self.file_data = self.parse_json(file['s_name'], file['f']) # parse stats file. Should return json directory of apps and their stats 
-
-			self.data[self.s_name] = self.file_data # add sample and stats to OrderedDict
+			self.data[s_name] = file_data # add sample and stats to OrderedDict
 
 
 		# make sure samples are being processed 
 		if len(self.data) == 0:
 			raise UserWarning
 
-		# remove excluded samples 
-		self.data = self.ignore_samples(self.data)
 
 		# parse json containing stats on each sample
 		self.generate_reports(self.data) 
