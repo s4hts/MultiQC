@@ -19,6 +19,9 @@ from multiqc.modules.base_module import BaseMultiqcModule
 # Logger Initialization
 log = logging.getLogger(__name__)
 
+# Config Initialization
+hconfig = {}
+
 
 class MultiqcModule(BaseMultiqcModule):
 
@@ -29,7 +32,7 @@ class MultiqcModule(BaseMultiqcModule):
 		# Initialise the parent object
 		super(MultiqcModule, self).__init__(name='HTStream',
 		anchor='htstream', href='https://s4hts.github.io/HTStream/',
-		info=" quality control and processing pipeline for High Throughput Sequencing data ")
+		info=" quality control and processing pipeline for High Throughput Sequencing data.")
 
 
 		# Initialize ordered dictionary (key: samples, values: their respective json files)
@@ -62,6 +65,33 @@ class MultiqcModule(BaseMultiqcModule):
 		# make sure samples are being processed 
 		if len(self.data) == 0:
 			raise UserWarning
+		
+
+		# Parse Config File
+		hconfig = getattr(config, "htstream_config", {})
+
+		if "sample_colors" in hconfig.keys():
+
+			try:
+
+				color_file = hconfig["sample_colors"]
+				hconfig["sample_colors"] = {}
+
+				with open(color_file, "r") as f:
+					lines = f.readlines()
+
+					for line in lines:
+						if line.strip() != "":
+							split_line = line.split("\t")
+							hconfig["sample_colors"][split_line[0]] = split_line[1].strip()
+
+			except:			
+				log.warning("Sample Coloring file could not be parsed. Check for proper path and TSV format.")
+
+
+		hconfig["htstream_number_of_samples"] = len(self.data.keys())
+
+		self.intro += '<div id="htstream_config" style="display: none;">{}</div>'.format(json.dumps(hconfig))
 
 
 		# parse json containing stats on each sample
@@ -95,7 +125,6 @@ class MultiqcModule(BaseMultiqcModule):
 
 			app_dict = json.loads(f, object_pairs_hook=htstream_utils.resolve)
 			log.warning("Sample " + name + " uses old json format. Please update to a newer version of HTStream.")
-
 
 		return app_dict
 
@@ -277,7 +306,7 @@ class MultiqcModule(BaseMultiqcModule):
 				html, stats_data = app.execute(self.overview_stats, app_order)
 
 					
-				self.write_data_file(stats_data, 'htstream_pca_raw_data')
+				self.write_data_file(stats_data, 'htstream_raw_overview_data')
 				
 				self.add_section(name = "Processing Overview",
 								 description = description,

@@ -148,8 +148,6 @@ class OverviewStats():
 					  }
 
 
-		# pca_plot = {}
-
 		keys = list(json.keys())
 		samples_list = list(json[keys[0]].keys())
 		row_length = len(samples_list)

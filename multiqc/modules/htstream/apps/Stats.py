@@ -263,8 +263,8 @@ class Stats():
 											 "width": 1.5, 
 											 "value": (midpoint - 1) / 2, 
 											 "dashStyle": 'shortdash',
-											 "zIndex": 4}]
-
+											 "zIndex": 4}]	
+		
 
 		btn_id = "-".join(read.split("_")[:3]).lower()
 		unique_id = str(random() % 1000)[2:]

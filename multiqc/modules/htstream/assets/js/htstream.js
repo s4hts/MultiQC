@@ -316,8 +316,9 @@ var global_f_add = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N",
                     "PE Reads", "SE Reads", "PE Bps", "SE Bps"];
 
 var global_on_colors = ["#B62612", "#82A7E0", "#0B8E0B", "#DE7D00", "#000000",
-                        "#E8961B", "#E8961B", "#1EC2D0",  "#1EC2D0"];
+                        "#1EC2D0", "#EA8645", "#1EC2D0",  "#EA8645"];
 
+var sample_num;
 
 // Hide 
 $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
@@ -368,11 +369,11 @@ $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
 });
 
-
 // Highlight
 $(document).on('mqc_highlights', function(e, f_texts, f_cols, regex_mode){
 
-  if (f_texts.length != 0) {
+  
+  if (f_texts.length != 0 && f_texts.length != (1 + sample_num)) {
 
     $('*[id*=htstream_qbc_line]').filter(":button").click();
     $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
@@ -428,15 +429,29 @@ $(document).on('mqc_renamesamples', function(e, f_texts, t_texts, regex_mode){
 
 
 //////////////////////////////////////////////////
-// Page Load Magix
+// Page Load Magic
 
 $("document").ready(function() {
 
   $('.active.hist_btn').trigger("click");
+  
+  var data = JSON.parse($("#htstream_config").text());
+  var samples = Object.keys(data["sample_colors"]);
+  var colors = data["sample_colors"]
+  
+  sample_num = data["htstream_number_of_samples"];
+
+  if (samples.length != 0) {  
+
+    for (i = 0; i < samples.length; i++) {
+      $('#mqc_col_filters').append('<li style="color:'+colors[samples[i]]+';" id="'+samples[i]+'"><span class="hc_handle"><span></span><span></span></span><input class="f_text" value="'+samples[i]+'" /><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>');
+    
+    }
+   
+    $("#mqc_cols_apply").click();
+  }
 
 });
-
-
 
 
 
