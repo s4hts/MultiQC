@@ -31,13 +31,13 @@ class NTrimmer():
 
 
 		if overall_pe != 0:
-			headers["Nt_%_R1_BP_Lost" + index] = {'title': "% Bp Lost from R1", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
+			headers["Nt_%_R1_BP_Lost" + index] = {'title': "% R1 of Bp Lost", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
-			headers["Nt_%_R2_BP_Lost" + index] = {'title': "% Bp Lost from R2", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
+			headers["Nt_%_R2_BP_Lost" + index] = {'title': "% R2 of Bp Lost", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 
 		if overall_se != 0:
-			headers["Nt_%_SE_BP_Lost" + index] = {'title': "% Bp Lost from SE", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
+			headers["Nt_%_SE_BP_Lost" + index] = {'title': "% SE of Bp Lost", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
 		if zeroes == False:
