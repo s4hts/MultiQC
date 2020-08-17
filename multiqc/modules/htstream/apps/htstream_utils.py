@@ -261,6 +261,8 @@ def normalize(data, samples_list, stats_order):
 	for x in range(len(samples_list)):
 		raw_data[samples_list[x]] = dict(zip(stats_order, data[:,x]))
 
+
+
 	for x in range(n):
 
 		app = "_".join(stats_order[x].split(": ")[0].split("_")[:-1])
@@ -270,7 +272,11 @@ def normalize(data, samples_list, stats_order):
 		row = data[x,:]		
 
 		# remove rows with no variation, also, mean center and normalize variance
-		if np.all(row == row[0]):
+		if np.all(row == row[0]) and len(samples_list) > 1:
+			to_delete.append(x)
+			continue
+
+		elif np.all(row == 0):
 			to_delete.append(x)
 			continue
 
