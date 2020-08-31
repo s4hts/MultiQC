@@ -111,26 +111,6 @@ function btn_activator() {
 
 
 //////////////////////////////////////////////////
-// Hide Heatmap Handler
-// function heatmap_handle(plot_div) {
-
-//   console.log(plot_div)
-
-//   if (heatmap_status != "none" ) {
-
-//     var plot_parent = plot_div.parent();
-//     plot_parent.css('display', 'block');
-//     plot_parent.siblings('.samples-hidden-warning').remove();
-//     console.log(plot_parent.siblings('.samples-hidden-warning'))
-//     plot_graph(plot_div.attr('id'));
-
-//   }
-
-// }
-
-
-
-//////////////////////////////////////////////////
 // Div and Plot Switches
 
 function htstream_div_switch(ele, suffix) {
@@ -448,7 +428,4 @@ $("document").ready(function() {
   }
 
 });
-
-
-
 

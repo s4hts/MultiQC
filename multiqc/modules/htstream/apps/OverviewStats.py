@@ -29,6 +29,8 @@ class OverviewStats():
 					  'data_labels': []
 					  }
 
+
+		# Define variables so code is less messy later
 		if data_type == "read":
 
 			config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
@@ -51,10 +53,12 @@ class OverviewStats():
 			html_title = " Basepair Reduction "
 			notice = "No Read Reducing Apps were found."
 
+
 		# Initialize some variables
 		table_data = {}
 		line_data_list = []
 		headers = OrderedDict()
+
 
 		# Initialize some more variables
 		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
@@ -105,6 +109,7 @@ class OverviewStats():
 			line_config['data_labels'].append({"name": samp, 'ylab': 'Counts', 'xlab': 'Tool'})
 
 
+		# create header section for table
 		for i in range(len(app_subset)):
 
 			app = app_subset[i]
@@ -115,6 +120,7 @@ class OverviewStats():
 
 		title = '<h4> {t} </h4>'.format(t=html_title)
 
+		# if no apps found in section, create alert div, otherwise, create plots
 		if len(headers.keys()) < 2:
 			html = title + "\n<br>"
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
@@ -125,6 +131,7 @@ class OverviewStats():
 			line_html = linegraph.plot(line_data_list, line_config)
 
 
+		# add htmls
 		html = htstream_utils.composition_html(title, table_html, line_html, data_type) 
 
 		return 	html
@@ -157,6 +164,8 @@ class OverviewStats():
 		stats_order = []
 		stats_bool = True
 
+
+		# iterate through data and find usable apps
 		for x in range(row_length):
 
 			sample = samples_list[x]
@@ -178,14 +187,17 @@ class OverviewStats():
 
 			stats_bool = False
 
+
 		# prepe matrix
 		data = np.array(data).T
 
 		# normalize 
 		data, stats_order, raw_data = htstream_utils.normalize(data, samples_list, stats_order)
 
+
 		data_dict = {}
 
+		# add data points for each sample
 		for x in range(len(samples_list)):
 
 			samp = samples_list[x]
@@ -198,7 +210,7 @@ class OverviewStats():
 
 			line_config['data_labels'].append({"name": samp, 'ylab': 'Value', 'xlab': 'Tool'})
 
-
+		# add html
 		html = "<hr><h4> Preprocessing Statistics </h4>\n"
 		html += linegraph.plot(data_dict, line_config) +  "\n<br>"
 
