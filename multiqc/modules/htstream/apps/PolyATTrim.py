@@ -12,6 +12,12 @@ from multiqc.plots import table, bargraph
 
 class PolyATTrim():
 
+
+	def __init__(self):
+		self.info = "Attempts to trim poly-A and poly-T sequences from the end of reads."
+		self.type = "bp_reducer"
+
+
 	def table(self, json, overall_pe, overall_se, zeroes, index):
 
 		# Table construction. Taken from MultiQC docs.

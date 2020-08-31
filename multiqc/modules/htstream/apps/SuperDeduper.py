@@ -13,6 +13,11 @@ from multiqc.plots import table, linegraph
 class SuperDeduper():
 
 
+	def __init__(self):
+		self.info = "A reference free duplicate read removal tool."
+		self.type = "read_reducer"
+
+
 	def table(self, json, pe_total, se_total, index):
 
 		# striaght forward table function, right from MultiQC documentation
@@ -42,7 +47,6 @@ class SuperDeduper():
 
 
 		return table.plot(json, headers)
-
 
 
 	def linegraph(self, json, index):

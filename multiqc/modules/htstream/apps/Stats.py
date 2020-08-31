@@ -14,6 +14,10 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
+	def __init__(self):
+		self.info = "Generates a JSON formatted file containing a set of statistical measures about the input read data."
+		self.type = "both"
+
 	def table(self, json, index):
 
 		# striaght forward table function, right from MultiQC documentation

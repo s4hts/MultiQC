@@ -11,6 +11,7 @@ from multiqc.plots import table, linegraph, scatter
 
 class OverviewStats():
 
+
 	def composition_and_reduction(self, json, app_list, data_type):
 
 		line_config = {
@@ -32,8 +33,7 @@ class OverviewStats():
 
 			config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
 			line_config['title'] = "HTStream: Fragment Composition"
-			reducers = ["hts_SeqScreener", "hts_SuperDeduper", 
-						"hts_Overlapper", "hts_LengthFilter", "hts_Stats"]
+			reducers = json["details"]["read_reducer"]
 			table_suffix = " (read)"
 			index = "Reads"
 			description = "Number of Output Fragments for "
@@ -44,27 +44,24 @@ class OverviewStats():
 
 			config = {'table_title': 'Basepair Reduction', 'id': "htstream_overview_bp_reduction"}
 			line_config['title'] = "HTStream: Basepair Composition"
-			reducers = ["hts_AdapterTrimmer", "hts_CutTrim", 
-						"hts_NTrimmer", "hts_QWindowTrim", "hts_PolyATTrim", "hts_Stats"]
+			reducers = json["details"]["bp_reducer"]
 			table_suffix = " (bps)"
 			index = "Bps"
 			description = "Number of Output Bps for "
 			html_title = " Basepair Reduction "
 			notice = "No Read Reducing Apps were found."
 
+		# Initialize some variables
 		table_data = {}
 		line_data_list = []
-
-		# Table constructor. Just like the MultiQC docs.
 		headers = OrderedDict()
 
+		# Initialize some more variables
 		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
-
-		first_app = list(json.keys())[0]
-		samples = list(json[first_app].keys())
-
+		samples = list(json["Pipeline Input"].keys())
 		app_list = ["Pipeline Input"] + app_list
 		app_subset = ["Pipeline Input"]
+
 
 		for samp in samples:
 
@@ -76,7 +73,7 @@ class OverviewStats():
 
 				include = False
 
-				if app[:-2] in reducers:
+				if app[4:-2] in reducers:
 					total = json[app][samp]["PE_Output_" + index] + json[app][samp]["SE_Output_" + index]
 					app_subset.append(app)
 					prefix = "Output_"
@@ -166,7 +163,7 @@ class OverviewStats():
 
 			for key in keys:
 
-				if key != "Pipeline Input":
+				if key != "Pipeline Input" and key != "details":
 					sample_json = json[key][sample]
 					temp = []
 

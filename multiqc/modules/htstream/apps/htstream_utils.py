@@ -31,6 +31,37 @@ def resolve(pairs):
 	return  resolved_dict
 
 
+#################################################
+
+# Json and stats parsing functions
+
+def parse_json(name, f):
+
+	app_dict = {}
+	apps = json.loads(f)
+
+	try:
+
+		# Allows for multiple instances of app
+		for a in apps:
+			i = 1
+			app_name = a["Program_details"]["program"] + "_" + str(i)
+
+			while app_name in app_dict.keys():
+				i += 1
+				app_name = a["Program_details"]["program"] + "_" + str(i)
+
+			app_dict[app_name] = a	
+
+	except:
+
+		# Used to parse older json files. Will likely be removed in future.
+		app_dict = json.loads(f, object_pairs_hook=resolve)
+		log.warning("Sample " + name + " uses old json format. Please update to a newer version of HTStream.")
+
+	return app_dict
+
+
 #######################################
 
 # prints keys in a pretty way
@@ -45,7 +76,6 @@ def key_print(dictionary):
 	string = string[:-2] + "."
 
 	return  string 
-
 
 
 #######################################
@@ -98,6 +128,7 @@ def sample_status(samples):
 
 	return notice
 
+
 #######################################
 
 # Quality by Base html formatter
@@ -145,6 +176,7 @@ def qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heat
 
 	return final_html 
 
+
 #######################################
 
 # Primers heatmap html formatter
@@ -170,7 +202,6 @@ def primers_heatmap_html(unique_id, button_list, heatmap):
 	final_html = wrapper_html 
 
 	return final_html 
-
 
 
 #######################################
@@ -212,9 +243,10 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 	return html
 
+
 #######################################
 
-# pca plot
+# composition plot
 
 def composition_html(title, table, linegraph, data_type):
 	
@@ -246,7 +278,7 @@ def composition_html(title, table, linegraph, data_type):
 
 #######################################
 
-# stats plot
+# scale overview linegraph plot
 
 def normalize(data, samples_list, stats_order):
 

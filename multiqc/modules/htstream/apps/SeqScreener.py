@@ -12,6 +12,12 @@ from multiqc.plots import table
 
 class SeqScreener():
 
+
+	def __init__(self):
+		self.info = "A simple sequence screening tool which uses a kmer lookup approach to identify reads from an unwanted source."
+		self.type = "read_reducer"		
+
+
 	def table(self, json, pe_total, se_total, index):
 
 		# Basic table constructor. See MultiQC docs.
@@ -34,7 +40,6 @@ class SeqScreener():
 		headers["Ss_Notes" + index] = {'title': "Notes", 'namespace': 'Notes', 'description': 'Notes'}
 
 		return table.plot(json, headers)
-
 
 
 	def execute(self, json, index):

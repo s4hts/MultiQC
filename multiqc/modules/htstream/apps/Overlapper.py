@@ -15,6 +15,12 @@ log = logging.getLogger(__name__)
 
 class Overlapper():
 
+
+	def __init__(self):
+		self.info = "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."
+		self.type = "read_reducer"
+
+
 	def table(self, json, se_total_gain, index):
 
 		config = {'namespace': 'overlapper'}
@@ -36,7 +42,6 @@ class Overlapper():
 		headers["Ov_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
-
 
 
 	def bargraph(self, json, inserts):
@@ -77,7 +82,6 @@ class Overlapper():
 		html += bargraph.plot(json, categories, config)
 
 		return html
-
 
 
 	def linegraph(self, json, index):

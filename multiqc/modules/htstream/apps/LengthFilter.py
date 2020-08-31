@@ -13,6 +13,12 @@ from multiqc.plots import table, bargraph
 
 class LengthFilter():
 
+
+	def __init__(self):
+		self.info = "Discards reads below a minimum length threshold."
+		self.type = "read_reducer"
+	
+
 	def table(self, json, pe_total_loss, se_total_loss, pe_orphaned_total, index):
 
 	# Basic table constructor. See MultiQC docs.

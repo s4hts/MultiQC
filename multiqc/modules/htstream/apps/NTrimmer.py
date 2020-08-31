@@ -13,6 +13,11 @@ from multiqc.plots import table, bargraph
 class NTrimmer():
 
 
+	def __init__(self):
+		self.info = "Trims reads to the longest subsequence that contains no N's."
+		self.type = "bp_reducer"
+
+
 	def table(self, json, overall_pe, overall_se, zeroes, index):
 
 		# Table construction. Taken from MultiQC docs.
@@ -56,7 +61,6 @@ class NTrimmer():
 		headers["Nt_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
-
 
 
 	def bargraph(self, json, bps):

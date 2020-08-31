@@ -12,13 +12,14 @@ from multiqc.plots import table, heatmap
 
 #################################################
 
-'''
-##################
-This tool is currently a work in progress 
-##################
-'''
 
 class Primers():
+
+
+	def __init__(self):
+		self.info = "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."
+		self.type = "bp_reducer"		
+
 
 	def table(self, json, index, total_flipped):
 
@@ -38,7 +39,6 @@ class Primers():
 		headers["Pr_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
-
 
 
 	def heatmap(self, json, index):

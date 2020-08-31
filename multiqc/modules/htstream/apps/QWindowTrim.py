@@ -13,6 +13,11 @@ from multiqc.plots import table, bargraph
 class QWindowTrim():
 
 
+	def __init__(self):
+		self.info = "Uses a sliding window approach to remove the low quality ends of reads."
+		self.type = "bp_reducer"		
+	
+
 	def table(self, json, pe_bps, se_bps, index):
 
 		# Table construction. Taken from MultiQC docs.

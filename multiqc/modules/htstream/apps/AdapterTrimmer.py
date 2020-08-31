@@ -12,6 +12,12 @@ from multiqc.plots import table, bargraph
 
 class AdapterTrimmer():
 
+
+	def __init__(self):
+		self.info = "Trims adapters which are sequenced when the fragment insert length is shorter than the read length."
+		self.type = "bp_reducer"
+
+
 	def table(self, json, total, zeroes, index):
 
 		# Table constructor. Just like the MultiQC docs.
@@ -48,6 +54,7 @@ class AdapterTrimmer():
 		headers["At_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
+
 
 	def bargraph(self, json, avg_bp_trimmed):
 
@@ -93,7 +100,6 @@ class AdapterTrimmer():
 
 		stats_json = OrderedDict()
 		overview_dict = {}
-
 		total = 0
 		zeroes = False
 
@@ -120,7 +126,6 @@ class AdapterTrimmer():
 
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
-
 
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],

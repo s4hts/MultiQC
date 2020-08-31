@@ -12,6 +12,12 @@ from multiqc.plots import table, bargraph
 
 class CutTrim():
 
+
+	def __init__(self):
+		self.info = "Trims a fixed number of bases from the 5' and/or 3' end of each read."
+		self.type = "bp_reducer"
+	
+
 	def table(self, json, overall_pe, overall_se, index):
 
 		# returns nothing if no reads were trimmed.
@@ -38,6 +44,7 @@ class CutTrim():
 		headers["Ct_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
+
 
 	def bargraph(self, json, bps):
 
@@ -94,12 +101,10 @@ class CutTrim():
 		return html
 
 
-
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
-
 		overall_pe = 0
 		overall_se = 0
 
