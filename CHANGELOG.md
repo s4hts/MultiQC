@@ -19,10 +19,20 @@
     * Fixed bug affecting inputs with taxa levels other than Phylum ([#1217](https://github.com/ewels/MultiQC/issues/1217))
 * **MALT**
     * Fix y-axis labelling in bargraphs
+* **mosdepth**
+    * Enable prepending of directory to sample names
 * **Picard**
     * Fix `HsMetrics` bait percentage columns ([#1212](https://github.com/ewels/MultiQC/issues/1212))
 * **PycoQC**
     * Log10 x-axis for _Read Length_ plot ([#1214](https://github.com/ewels/MultiQC/issues/1214))
+* **fgbio**
+    * Fix `ErrorRateByReadPosition` to calculate `ymax` not just on the overall `error_rate`, but also specific base errors (ex. `a_to_c_error_rate`, `a_to_g_error_rate`, ...).  ([#1215](https://github.com/ewels/MultiQC/pull/1251))
+
+#### New Custom Content features
+
+* General Stats custom content now gives a log message
+* If `id` is not set in `JSON` or `YAML` files, it defaults to the sample name instead of just `custom_content`
+* Data from `JSON` or `YAML` now has `data` keys (sample names) run through the `clean_s_name()` function to apply sample name cleanup
 
 #### Bug Fixes
 
