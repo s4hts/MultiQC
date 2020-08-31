@@ -25,6 +25,8 @@ class OverviewStats():
 					  'colors': {
 				  			 "SE Reads": "#1EC2D0",
 				  			 "PE Reads": "#E8961B",
+				  			 "SE Bps": "#1EC2D0",
+				  			 "PE Bps": "#E8961B",
 				  			 	},
 					  'data_labels': []
 					  }

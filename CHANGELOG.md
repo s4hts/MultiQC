@@ -8,6 +8,8 @@
 
 * [**HOPS**](https://www.github.com/rhubler/HOPS)
   * Post-alignment ancient DNA analysis tool for MALT
+* [**HTStream**](https://github.com/s4hts/HTStream)
+    * A high throughput sequence read preprocessing toolset using a streaming approach facilitated by Linux pipes
 
 #### Module updates
 
@@ -134,8 +136,6 @@ to break. If you haven't already, **you need to switch to Python 3 now**.
     * Relatedness checking and QC for BAM/CRAM/VCF for cancer, DNA, BS-Seq, exome, etc.
 * [**VarScan2**](https://github.com/dkoboldt/varscan)
     * Variant calling and somatic mutation/CNV detection for next-generation sequencing data
-* [**HTStream**](https://github.com/s4hts/HTStream)
-    * A high throughput sequence read preprocessing toolset using a streaming approach facilitated by Linux pipes
 
 #### Module updates:
 
