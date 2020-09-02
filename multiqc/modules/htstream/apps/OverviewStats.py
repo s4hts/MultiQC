@@ -14,66 +14,78 @@ class OverviewStats():
 
 	def composition_and_reduction(self, json, app_list, data_type):
 
-		line_config = {
-					  'id': "htstream_overview_" + data_type + "composition",
-					  'smooth_points_sumcounts': False,
-					  'logswitch': True,
-					  'categories': True,
-					  'xlab': "Tool",
-					  'ylab': "Counts",
-					  'tt_decimals': "{point.y:.0f}'",
-					  'colors': {
-				  			 "SE Reads": "#1EC2D0",
-				  			 "PE Reads": "#E8961B",
-				  			 "SE Bps": "#1EC2D0",
-				  			 "PE Bps": "#E8961B",
+
+		line_config_1 = {
+						 'id': "htstream_overview_" + data_type + "_reduction",
+						 'smooth_points_sumcounts': False,
+						 'logswitch': False,
+						 'categories': True,
+						 'xlab': "Tool",
+						 'ylab': "Counts",
+						 'tt_decimals': "{point.y:.0f}'",
+					  	}
+
+
+		line_config_2 = {
+						 'id': "htstream_overview_" + data_type + "composition",
+						 'smooth_points_sumcounts': False,
+						 'logswitch': True,
+						 'categories': True,
+						 'xlab': "Tool",
+						 'ylab': "Counts",
+						 'tt_decimals': "{point.y:.0f}'",
+						 'colors': {
+				  					"SE Reads": "#1EC2D0",
+				  					"PE Reads": "#E8961B",
+				  					"SE Bps": "#1EC2D0",
+				  					"PE Bps": "#E8961B",
 				  			 	},
-					  'data_labels': []
-					  }
+						 'data_labels': []
+					  	}
+
+
 
 
 		# Define variables so code is less messy later
 		if data_type == "read":
-
-			config = {'table_title': 'Fragment Reduction', 'id': "htstream_overview_read_reduction"}
-			line_config['title'] = "HTStream: Fragment Composition"
+			html_title = "Fragment Reduction"
+			line_config_1['title'] = "HTStream: " + html_title
+			line_config_2['title'] = "HTStream: Fragment Composition"
 			reducers = json["details"]["read_reducer"]
-			table_suffix = " (read)"
 			index = "Reads"
-			description = "Number of Output Fragments for "
-			html_title = " Fragment Reduction "
 			notice = "No Read Reducing Apps were found."
 
 		else:
-
-			config = {'table_title': 'Basepair Reduction', 'id': "htstream_overview_bp_reduction"}
-			line_config['title'] = "HTStream: Basepair Composition"
+			html_title = 'Basepair Reduction'
+			line_config_1['title'] = "HTStream: " + html_title
+			line_config_2['title'] = "HTStream: Basepair Composition"
 			reducers = json["details"]["bp_reducer"]
-			table_suffix = " (bps)"
 			index = "Bps"
-			description = "Number of Output Bps for "
-			html_title = " Basepair Reduction "
 			notice = "No Read Reducing Apps were found."
 
 
-		# Initialize some variables
-		table_data = {}
-		line_data_list = []
-		headers = OrderedDict()
+		# Containers for line graph data 
+		reducing_line = {}
+		composition_data_list = []
 
 
-		# Initialize some more variables
-		color_rotations = ['Greens', 'RdPu', 'Blues', 'Oranges']
+		# Initialize lists for sample and app order
 		samples = list(json["Pipeline Input"].keys())
-		app_list = ["Pipeline Input"] + app_list
+		app_list = ["Pipeline Input"] + app_list # preserves order of elements
 		app_subset = ["Pipeline Input"]
 
 
 		for samp in samples:
 
-			temp = {}
-			line_data_temp = {"SE "  + index: {}, 
-							  "PE "  + index: {}}
+			# dictionaries for line graphs
+			reducing_line[samp] = {}
+			composition_line = {"SE "  + index: {}, 
+								"PE "  + index: {}}
+
+
+			# Iterate through app list, if desired app is found,
+			#   grab total read counts and se/pe compisiton
+			#   and add them to line graphs.
 
 			for app in app_list:
 
@@ -93,48 +105,40 @@ class OverviewStats():
 
 				if include == True:
 
-					temp[app + table_suffix] = total
+					reducing_line[samp][app] = total
 
 					try:
-						line_data_temp["SE " + index][app] = json[app][samp]["SE_" + prefix + index]
+						composition_line["SE " + index][app] = json[app][samp]["SE_" + prefix + index]
 					except:
-						line_data_temp["SE " + index][app] = 0
+						composition_line["SE " + index][app] = 0
 
 					try:
-						line_data_temp["PE " + index][app] = json[app][samp]["PE_" + prefix + index]
+						composition_line["PE " + index][app] = json[app][samp]["PE_" + prefix + index]
 					except:
-						line_data_temp["PE "  + index][app] = 0
+						composition_line["PE "  + index][app] = 0
 
 
-			table_data[samp] = temp
-			line_data_list.append(line_data_temp)
-			line_config['data_labels'].append({"name": samp, 'ylab': 'Counts', 'xlab': 'Tool'})
+			composition_data_list.append(composition_line)
+			line_config_2['data_labels'].append({"name": samp, 'ylab': 'Counts', 'xlab': 'Tool'})
 
 
-		# create header section for table
-		for i in range(len(app_subset)):
-
-			app = app_subset[i]
-			color = color_rotations[i % 4]
-			headers[app + table_suffix] = {'title': app, 'namespace': app, 'description': description + app,
-										   'format': '{:,.0f}', 'scale': color}
-
-
+		# Construct html sections
 		title = '<h4> {t} </h4>'.format(t=html_title)
 
+
 		# if no apps found in section, create alert div, otherwise, create plots
-		if len(headers.keys()) < 2:
+		if len(app_subset) < 2:
 			html = title + "\n<br>"
 			html = '<div class="alert alert-info">{n}</div>'.format(n = notice)	
 			return html
 
 		else:	
-			table_html = table.plot(table_data, headers, config)
-			line_html = linegraph.plot(line_data_list, line_config)
+			line_1_html = linegraph.plot(reducing_line, line_config_1)
+			line_2_html = linegraph.plot(composition_data_list, line_config_2)
 
 
 		# add htmls
-		html = htstream_utils.composition_html(title, table_html, line_html, data_type) 
+		html = htstream_utils.composition_html(title, line_1_html, line_2_html, data_type) 
 
 		return 	html
 

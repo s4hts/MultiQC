@@ -248,28 +248,28 @@ def stats_histogram_html(read, data, unique_id, button_list, notice):
 
 # composition plot
 
-def composition_html(title, table, linegraph, data_type):
+def composition_html(title, line_1, line_2, data_type):
 	
 	# section header
 	wrapper_html = title
 
-	table_btn_id = "htstream_comp_table_{b}".format(b=data_type)
-	line_btn_id = "htstream_comp_line_{b}".format(b=data_type)
+	line_1_btn_id = "htstream_comp_table_{b}".format(b=data_type)
+	line_2_btn_id = "htstream_comp_line_{b}".format(b=data_type)
 
 	wrapper_html += '<div class="btn-group hc_switch_group htstream_exempt">\n'
-	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Reduction Table</button>\n'.format(b=table_btn_id, t=line_btn_id)
-	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Composition Line Graph</button></div>\n'.format(b=line_btn_id, t=table_btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm active" onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Reduction Line Graph</button>\n'.format(b=line_1_btn_id, t=line_2_btn_id)
+	wrapper_html += '<button class="btn btn-default btn-sm " onclick="htstream_plot_switch(this, \'{t}\')" id="{b}_btn">Composition Line Graph</button></div>\n'.format(b=line_2_btn_id, t=line_1_btn_id)
 	wrapper_html += "<br></br>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
-	wrapper_html += '<div id="{b}" class="htstream_fadein">'.format(b=table_btn_id)
-	wrapper_html += table + "</div>"
+	wrapper_html += '<div id="{b}" class="htstream_fadein">'.format(b=line_1_btn_id)
+	wrapper_html += line_1 + "</div>"
 
 	# this is where the previous html is added to the wrapper html (two separate divs that can be toggled for each graph)
 	# line graph div
-	wrapper_html += '<div id="{b}" class="htstream_fadein" style="display:none;">'.format(b=line_btn_id)
-	wrapper_html += linegraph + "</div>"
+	wrapper_html += '<div id="{b}" class="htstream_fadein" style="display:none;">'.format(b=line_2_btn_id)
+	wrapper_html += line_2 + "</div>"
 
 	final_html = wrapper_html 
 
