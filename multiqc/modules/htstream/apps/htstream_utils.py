@@ -206,46 +206,6 @@ def primers_heatmap_html(unique_id, button_list, heatmap):
 
 #######################################
 
-# Quality by Base html formatter
-
-def stats_histogram_html(read, data, unique_id, button_list, notice):
-
-
-	header_dict = {"PE": "Paried End",
-				   "R1": "Read 1",
-				   "R2": "Read 2",
-				   "SE": "Single End"}
-
-
-	read_header = header_dict[" ".join(read.split("_")[1:2])]
-
-
-	html = '<h4>Read Length Histogram: '+ read_header + '</h4>'
-
-	if data != {}:
-
-		html += '''<div class="mqc_hcplot_plotgroup">'''
-		html += '<div class="btn-group hc_switch_group">\n'
-
-		for buttons in button_list:
-			html += buttons
-
-		html += '</div>\n\n'
-
-		html += '''<div class="hc-plot-wrapper">'''
-
-		data = "["+ json.dumps(data) +"]"
-
-		html += '''<div id="htstream_histogram_{r}_{u}" class="hc-plot"></div></div></div>'''.format(r = read, u = unique_id)
-		html += '''<script type="text/javascript" class="htstream_histogram_content_{r}_{u}">{d}</script>'''.format(r = read, u = unique_id, d = data) 
-
-	html += notice
-
-	return html
-
-
-#######################################
-
 # composition plot
 
 def composition_html(title, line_1, line_2, data_type):
@@ -294,14 +254,14 @@ def normalize(data, samples_list, stats_order):
 		raw_data[samples_list[x]] = dict(zip(stats_order, data[:,x]))
 
 
-
 	for x in range(n):
 
 		app = "_".join(stats_order[x].split(": ")[0].split("_")[:-1])
 		stat = stats_order[x].split(": ")[-1]
 		stat = app + "_" + stat
 
-		row = data[x,:]		
+		row = data[x,:]	
+
 
 		# remove rows with no variation, also, mean center and normalize variance
 		if np.all(row == row[0]) and len(samples_list) > 1:

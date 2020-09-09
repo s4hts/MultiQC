@@ -401,63 +401,81 @@ class Stats():
 
 		read_code = read_keys[read]
 
-		data = {}
-		invariant_dict = {}
-		button_list = []
-		first = True
-		notice_html = ""
+
+		#############################################
+
 		unique_id = str(random() % 1000)[2:]
 
-		# iterates over all samples in input dictionary
-		for key in json.keys():
-			
-			dict_key = key + "_" + unique_id
-			data[dict_key] = []
 
-			for x in range(len(json[key][read])):
+		# config dictionary for heatmaps
+		heat_pconfig = {'id' : "htstream_" + unique_id + "_" + read,
+				   'title': "HTStream:  Read Length Heatmap (" +  read_code + ")",
+				   'yTitle': 'Sample',
+				   'xTitle': 'Length',
+				   'square' : False,
+				   'datalabels': False,
 
-				max_reads = max([item[0] for item in json[key][read][x]]) + 1
+				   'max': 1.0, 
+				   'colstops': [
+					        [0, '#FFFFFF'],
+					        [0.3, '#F8D527'],
+					        [0.6, '#F8A627'],
+					        [1, '#E70808']
+					           ],
+    			  }
 
-				current = 10
-				bins = []
-				values = []
 
-				while current < max_reads:
-					values.append(0)
-					bins.append(current)
-					current += 1
+		readlength_data = []
+		lengths = []
+		samples = []
+		max_length = 0 
 
-				# populate smaple dictionary with read length and its frequency
-				for item in json[key][read][x]:
+		for samp in json.keys():
 
-					for x in range(len(bins) - 1, -1, -1):
-
-						if item[0] == bins[x]:
-							values[x] += item[1]
-							break
-							
-
-				data[dict_key].append({"bins": bins, "vals": values})
-
-				if read_keys[read] == "SE":
-					data[dict_key] = data[dict_key][-1]
-
-			if first == True:
-				active = "active" # button is default active
-				first = False # shuts off first gat
+			if read_code == "SE":
+				read_lengths = json[samp][read][0]
+				total = json[samp]["St_SE_in"]
+				min_length = read_lengths[0][0]
 
 			else:
-				active = "" # button is default off 
+				read_lengths = json[samp][read][0]
+				total = json[samp]["St_PE_in"]
+				r2 = [ [read_lengths[-1][0] + x[0], x[1]] for x in json[samp][read][1]] 
 
-			# # html div attributes and text
-			pid  = "htstream_stats_" + read + "_" + key + "_" + unique_id + "_btn"
-			read_id = read + "_" + unique_id
-			button_list.append('<button class="btn btn-default btn-sm hist_btn {a}" onclick="htstream_histogram(\'{r}\', \'{s}_{u}\')" id="{p}">{s}</button>\n'.format(a=active, r=read_id, u=unique_id, s=key, p=pid))
+				# concat reads
+				read_lengths += r2 
+				min_length = read_lengths[0][0]
 
-		html = htstream_utils.stats_histogram_html(read, data, unique_id, button_list, notice_html)
+			lengths = [i for i in range(1, read_lengths[-1][0] + 1)]	
+			data = []
+
+			# check if max read length is longest, if not update length of lists 
+			if max_length < read_lengths[-1][0]:
+
+				max_length = read_lengths[-1][0]
+				lengths = [i for i in range(1, max_length + 1)]
+
+				for data in readlength_data:
+
+					while len(data) < max_length:
+
+						data.append(0)
+
+
+			for length in read_lengths:
+
+				while len(data) != length[0] - 1:
+					data.append(0)
+
+				data.append(length[1] / total)
+
+			
+			readlength_data.append(data)
+			samples.append(samp)
+
+		html = heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
 
 		return html
-
 
 
 	def execute(self, json, index):
