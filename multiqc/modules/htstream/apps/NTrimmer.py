@@ -76,7 +76,7 @@ class NTrimmer():
        							 {'name': "Single End"}]
 				  }
 
-		html = "<h4> NTrimmer Trimmed Basepairs Composition </h4>\n"
+		html = "<h4> NTrimmer: Trimmed Basepairs Composition </h4>\n"
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:

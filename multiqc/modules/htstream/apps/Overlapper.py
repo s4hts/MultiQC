@@ -52,7 +52,7 @@ class Overlapper():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': False}
 
-		html = "<h4> Overlap Composition </h4>\n"
+		html = "<h4> Overlapper: Overlap Composition </h4>\n"
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
@@ -104,7 +104,7 @@ class Overlapper():
 
 				multi_line[key][item[0]] = item[1]
 
-		html = "<h4> Overlapped Lengths </h4>\n" +linegraph.plot(multi_line, config)
+		html = "<h4> Overlapper: Overlapped Lengths </h4>\n" +linegraph.plot(multi_line, config)
 
 		return html
 

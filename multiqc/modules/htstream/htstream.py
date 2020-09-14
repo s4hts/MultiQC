@@ -285,7 +285,11 @@ class MultiqcModule(BaseMultiqcModule):
 		for section, content in report_sections.items():
 
 				temp_list = section.split("_")
-				name = temp_list[0] + "_" + temp_list[1] + " " + temp_list[-1]
+
+				if temp_list[-1] == "1":
+					name = temp_list[0] + "_" + temp_list[1]
+				else:
+					name = temp_list[0] + "_" + temp_list[1] + " " + temp_list[-1]
 
 				try:
 					self.add_section(name = name,

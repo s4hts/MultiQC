@@ -44,41 +44,57 @@ class Stats():
 
 
 
-	def base_by_cycle(self, json, read, index):
+	def base_by_cycle(self, json, read):
 
-		title_read = " ".join(read.split("_")[1:3])
+		read_keys = {"St_PE_Base_by_Cycle": "PE",
+					 "St_SE_Base_by_Cycle": "SE"}
 
-		# config dictionary for line graph
-		config = {'id': "htstream_stats_base_" + read + "_" + index,
-				  'title': "HTStream: Base by Cycle (" + title_read + ")",
-				  'data_labels': [],
+
+		read_code = read_keys[read]
+		unique_id = str(random() % 1000)[5:]
+
+
+		config = {'id': "htstream_stats_entropy_" + read + "_" + unique_id,
+				  'title': "HTStream: Base by Cycle (" + read_code + ")",
 				  'smooth_points_sumcounts': False,
-				  'ylab': "Percentage",
+				  'ylab': "Avg. Distance from 25%",
 				  'xlab': "Cycle",
-				  'yCeiling': 100,
 				  'categories': True,
 				  'tt_decimals': '{:,.2f}',
-				  'tt_suffix': "%",     
-				  'colors': {
-				  			 "Base: A": "#B62612",
-				  			 "Base: C": "#82A7E0",
-				  			 "Base: G": "#0B8E0B",
-				  			 "Base: T": "#DE7D00",
-				  			 "Base: N": "black"
-				  			},
 				  'yPlotBands': [
-								{'from': 0, 'to': 40, 'color': '#c3e6c3'},
-								{'from': 40, 'to': 60, 'color': '#e6dcc3'},
-								{'from': 60, 'to': 100, 'color': '#e6c3c3'},
+								{'from': 0, 'to': 8, 'color': '#c3e6c3'},
+								{'from': 8, 'to': 35, 'color': '#e6dcc3'},
+								{'from': 35, 'to': 100, 'color': '#e6c3c3'},
 								]
 
 				  }
 
+		samp_config = {'id': "htstream_stats_base_line_" + read + "_" + unique_id,
+					  'title': "HTStream: Base by Cycle (" + read_code + ")",
+					  'data_labels': [],
+					  'smooth_points_sumcounts': False,
+					  'ylab': "Percentage",
+					  'xlab': "Cycle",
+					  'yCeiling': 100,
+					  'categories': True,
+					  'tt_decimals': '{:,.2f}',
+					  'tt_suffix': "%",     
+					  'colors': {
+					  			 "Base: A": "#B62612",
+					  			 "Base: C": "#82A7E0",
+					  			 "Base: G": "#0B8E0B",
+					  			 "Base: T": "#DE7D00",
+					  			 "Base: N": "black"
+					  			},
+					  'yPlotBands': [
+									{'from': 0, 'to': 40, 'color': '#c3e6c3'},
+									{'from': 40, 'to': 60, 'color': '#e6dcc3'},
+									{'from': 60, 'to': 100, 'color': '#e6c3c3'},
+									]
+						}
 
-		# header read type
-		read_header = " ".join(read.split("_")[1:3])
 
-		if read_header == "Paired End":
+		if read_code == "PE":
 
 			midpoint = 0
 			uniform_pe = True
@@ -104,128 +120,95 @@ class Stats():
 										 "dashStyle": 'shortdash',
 										 "zIndex": 4}]
 
-				
-		# initalize data structures and important variables
+
+		line_data = {}
 		data_list = []
-		status_dict = {}
 
-		# section header
-		html = '<h4> Base by Cycle: ' + read_header + '</h4>'
+		for samp in json.keys():
 
-		for key in json.keys():
-
-			if read_header == "Paired End":
-
-				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(5) ]
-				temp_col_name = [ str(int(x) + int(json[key][read][0]["col_names"][-1]) ) for x in json[key][read][1]["col_names"]]
-
-				json[key][read] = {
-					 			   "data": temp_data,
-					 			   "col_names": json[key][read][0]["col_names"] + temp_col_name
-							 	  }
-
-				del temp_data
-				del temp_col_name
-
-			# initializes dat dict. Each key is a line in the graph
-			data = {"Base: A": {},
-					"Base: C": {},
-					"Base: G": {},
-					"Base: T": {},
-					"Base: N": {}}
-
-			# lists to iterate through
-			bases = json[key][read]["data"]
-			positions = json[key][read]["col_names"]
-
-			# vairables containing max percentage reached by any nucleotide in the sample
-			#	This data is stored so it can be correctly marked in the sample check div.
-			sample_status = None
-			sample_max = 0
-
-			# iterates through every position
-			for i in range(len(positions)):
-
-				# total base calls at that position, for some reason, this is not equal to the number 
-				#	of input reads? Potential error. 
-				total = bases[0][i] + bases[1][i] + bases[2][i] + bases[3][i] + bases[4][i]
-
-				# list of values for heatmap, just cleaner to put them in a list before hand
-				y_value_list = [(bases[0][i] / total) * 100, (bases[1][i] / total) * 100, 
-								(bases[2][i] / total) * 100, (bases[3][i] / total) * 100,
-								(bases[4][i] / total) * 100]
-
-				# take max for position and compare it to max for entire sample
-				sample_max = max([sample_max, max(y_value_list)])
-
-				# add data to dictionary for each base
-				data["Base: A"][i + 1] = y_value_list[0]
-				data["Base: C"][i + 1] = y_value_list[1]
-				data["Base: G"][i + 1] = y_value_list[2]
-				data["Base: T"][i + 1] = y_value_list[3]
-				data["Base: N"][i + 1] = y_value_list[4]
+			line_data[samp] = {}
+			samp_data = {"Base: A": {},
+						 "Base: C": {},
+						 "Base: G": {},
+						 "Base: T": {},
+						 "Base: N": {}}
 
 
-			# selects color to mark sample if a read has a region of low complextity
-			if sample_max >= 60:
-				sample_status = 'FAIL'
+			if read_code == "PE":
+				data = [ json[samp][read][0]["data"][x] + json[samp][read][1]["data"][x] for x in range(5) ]
 
-			elif sample_max >= 40:
-				sample_status = 'QUESTIONABLE'
 
 			else:
-				sample_status = 'PASS'
+				data = json[samp][read]["data"]
 
-			# adds color to sample in color dictionary
-			status_dict[key] = sample_status
+
+			bases = len(data[0])
+
+			for i in range(bases):
+
+				total = sum([base[i] for base in data])
+
+				samp_data["Base: A"][i + 1] = (data[0][i] / total) * 100
+				samp_data["Base: C"][i + 1] = (data[1][i] / total) * 100
+				samp_data["Base: G"][i + 1] = (data[2][i] / total) * 100
+				samp_data["Base: T"][i + 1] = (data[3][i] / total) * 100
+				samp_data["Base: N"][i + 1] = (data[4][i] / total) * 100
+								
+				avg = sum([ abs(((data[x][i] / total) * 100) - 25) for x in range(4) ]) / 4
+
+				line_data[samp][i + 1] = avg
+
 
 
 			# this config file is for the individual line of the multiline graph
-			config["data_labels"].append({'name': key, 'ylab': 'Percentage', 
-										  'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 
-										  'smooth_points_sumcounts': False})
+			samp_config["data_labels"].append({'name': samp, 'ylab': 'Percentage', 
+											   'xlab': 'Cycle', 'yCeiling': 100, 'categories': True, 
+											   'smooth_points_sumcounts': False})
 
 			# append base by cycle to data for this to data list
-			data_list.append(data)
+			data_list.append(samp_data)
 
 
-		# this adds the html output of sample status. This function colors samples
-		html += htstream_utils.sample_status(status_dict)
+		line_1 = linegraph.plot(line_data, config)
+		line_2 = linegraph.plot(data_list, samp_config)
 
-		# add line graphs
-		html += linegraph.plot(data_list, config)
+		html = htstream_utils.base_by_cycle_html(read_code,
+												 unique_id,
+												 line_1,
+												 line_2)
+
+
 
 		return html
 
 
 
-	def quality_by_cycle(self, json, read, index):
+	def quality_by_cycle(self, json, read):
 
-		# Here is the most complicated figure implementation in this module.
-		#	The issues here are that MultiQC had limited options for displaying 
-		#	multiple figures if its a heatmap. Also, it doesnt allow you to switch
-		#	back and forth between figure typs. There are workarounds, however, using
-		#	javascript and some clever organizations :).
+	
+		read_keys = {"St_PE_Quality_by_Cycle": "PE",
+					 "St_SE_Quality_by_Cycle": "SE"}
 
-		def temp_split(string):
-			return string.split("hts")[0]
 
-		title_read = " ".join(read.split("_")[1:3])
+		read_code = read_keys[read]
+		unique_id = str(random() % 1000)[5:]
 
 		# config dictionary for mean Q score line graph
 		line_config = {
-				  'id': "htstream_stats_qbc_" + read + "_" + index,
+				  'id': "htstream_stats_qbc_line_" + read_code + "_" + unique_id,
 				  'smooth_points_sumcounts': False,
 				  'categories': True,
 				  'tt_decimals': '{:,.2f}',
-				  'title': "HTStream: Mean Quality by Cycle (" + title_read + ")",
+				  'title': "HTStream: Mean Quality by Cycle (" + read_code + ")",
 				  'xlab': "Cycle",
 				  'ylab': "Mean Q Score",
+				  'colors': {}
 				  }
 
+
 		# config dictionary for heatmaps
-		heat_pconfig = {'id' : "",
-				   'title': "HTStream: Quality by Cycle (" + title_read + ")",
+		heat_pconfig = {
+				   'title': "HTStream: Quality by Cycle (" + read_code + ")",
 				   'yTitle': 'Q Score',
 				   'xTitle': 'Cycle',
 				   'square' : False,
@@ -240,10 +223,9 @@ class Stats():
 					           ],
     			  }
 
-		read_header = " ".join(read.split("_")[1:3])
 
-		# check for uniform pe length
-		if read_header == "Paired End":
+		# check for uniform pe length, if so, add midpoint line to denote paired end reads.
+		if read_code == "PE":
 
 			midpoint = 0
 			uniform_pe = True
@@ -270,10 +252,8 @@ class Stats():
 											 "zIndex": 4}]	
 		
 
-		btn_id = "-".join(read.split("_")[:3]).lower()
-		unique_id = str(random() % 1000)[2:]
+
 		line_data = {}
-		status_dict = {}
 		first = True
 		button_list = []
 
@@ -284,9 +264,9 @@ class Stats():
 			line_data[key] = {}
 
 			# creates unique heatmap id that can be queired later by js.
-			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_heatmap_" + index
+			heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key + "_" + unique_id
 
-			if read_header == "Paired End":
+			if read_code == "PE":
 
 				length = len(json[key][read][0]["data"])
 				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(length) ]
@@ -340,13 +320,13 @@ class Stats():
 			q30_gate = (num_above_q30 / cycles) 
 
 			if q30_gate < 0.6:
-				status_dict[key] = "FAIL"
+				line_config['colors'][key] = "#E16B6B"
 
 			elif q30_gate < 0.8:
-				status_dict[key] = "QUESTIONABLE"
+				line_config['colors'][key] = "#E8A243"
 
 			else:
-				status_dict[key] = 'PASS'
+				line_config['colors'][key] = "#78D578"
 
 
 			# populates data dictionaries for heatmap
@@ -377,44 +357,35 @@ class Stats():
 
 			# html div attributes and text
 			name = key
-			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
-			suffix = "_heatmap_" + index
+			pid = heat_pconfig["id"] + "_btn"
 
-			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, \'{s}\')" id="{pid}">{n}</button>\n'.format(a=active, s=suffix, pid=pid, n=name))
+			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
 
-
-		status_div = htstream_utils.sample_status(status_dict)
 
 		line_plot = linegraph.plot(line_data, line_config)
 
-		html = htstream_utils.qual_by_cycle_html(read, status_div, line_plot, unique_id, button_list, heatmap_html, index)
+		html = htstream_utils.qual_by_cycle_html(read_code, line_plot, unique_id, button_list, heatmap_html)
 
 		return html
 
 
 
-	def histogram(self, json, read):
+	def read_length(self, json, read):
 
-		read_keys = {"St_PE_histogram": "PE",
-					 "St_SE_histogram": "SE"}
-
+		read_keys = {"St_PE_Read_Lengths": "PE",
+					 "St_SE_Read_Lengths": "SE"}
 
 		read_code = read_keys[read]
-
-
-		#############################################
-
-		unique_id = str(random() % 1000)[2:]
+		unique_id = str(random() % 1000)[5:]
 
 
 		# config dictionary for heatmaps
-		heat_pconfig = {'id' : "htstream_" + unique_id + "_" + read,
+		heat_pconfig = {'id' : "htstream_stats_read_lengths_" + read_code + "_" + unique_id,
 				   'title': "HTStream:  Read Length Heatmap (" +  read_code + ")",
 				   'yTitle': 'Sample',
 				   'xTitle': 'Length',
 				   'square' : False,
 				   'datalabels': False,
-
 				   'max': 1.0, 
 				   'colstops': [
 					        [0, '#FFFFFF'],
@@ -429,14 +400,15 @@ class Stats():
 		lengths = []
 		samples = []
 		max_length = 0 
+		min_length = 0
 
 		for samp in json.keys():
 
+			# paired end reads require the histograms be concatenated
 			if read_code == "SE":
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_SE_in"]
-				min_length = read_lengths[0][0]
-
+				
 			else:
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_PE_in"]
@@ -444,36 +416,65 @@ class Stats():
 
 				# concat reads
 				read_lengths += r2 
-				min_length = read_lengths[0][0]
 
-			lengths = [i for i in range(1, read_lengths[-1][0] + 1)]	
+	
 			data = []
+
+
+			# populate data 
+			for length in read_lengths:
+
+				data.append(length[1] / total)
+
 
 			# check if max read length is longest, if not update length of lists 
 			if max_length < read_lengths[-1][0]:
 
 				max_length = read_lengths[-1][0]
-				lengths = [i for i in range(1, max_length + 1)]
 
-				for data in readlength_data:
+				for i in range(len(readlength_data)):
 
-					while len(data) < max_length:
+					temp = readlength_data[i]
 
-						data.append(0)
+					if len(temp) < (max_length - min_length): 
+
+						readlength_data[i] = temp + [0] * (len(temp) - (max_length - min_length))  
 
 
-			for length in read_lengths:
+			# check if min read length is longest
+			if min_length > read_lengths[0][0] or min_length == 0:
 
-				while len(data) != length[0] - 1:
-					data.append(0)
+				min_length = read_lengths[0][0]
 
-				data.append(length[1] / total)
+				for i in range(len(readlength_data)):
+
+					temp = readlength_data[i]
+
+					if len(temp) < (max_length - min_length): 
+
+						readlength_data[i] = [0] * (len(temp) - (max_length - min_length)) + temp  
+
 
 			
 			readlength_data.append(data)
 			samples.append(samp)
 
-		html = heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
+
+		lengths = [i for i in range(min_length, max_length + 1)]
+
+
+		if read_code == "PE":
+			read = "Paired End"
+
+		else:
+			read = "Single End"
+
+
+		html = '<h4> Read Lengths: ' + read + ' </h4>'
+		html += '''<p> Distribution of read lengths for each sample. </p>'''
+
+
+		html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
 
 		return html
 
@@ -514,9 +515,9 @@ class Stats():
 			#	opens gate for future processing of single end read stats.
 			try:
 				SE_json[key] = {}
-				SE_json[key]["St_SE_histogram"] = [json[key]["Single_end"]["readlength_histogram"]]
-				SE_json[key]["St_Single_End_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
-				SE_json[key]["St_Single_End_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
+				SE_json[key]["St_SE_Read_Lengths"] = [json[key]["Single_end"]["readlength_histogram"]]
+				SE_json[key]["St_SE_Base_by_Cycle"] = json[key]["Single_end"]["base_by_cycle"]
+				SE_json[key]["St_SE_Quality_by_Cycle"] = json[key]["Single_end"]["qualities_by_cycle"]
 				SE_json[key]["St_SE_in"] = json[key]["Single_end"]["in"]
 
 				stats_json[key]["St_SE_Fraction" + index] = (json[key]["Single_end"]["out"] / total_frags) * 100
@@ -543,11 +544,11 @@ class Stats():
 			#
 			try:
 				PE_json[key] = {}	
-				PE_json[key]["St_PE_histogram"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
+				PE_json[key]["St_PE_Read_Lengths"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
-				PE_json[key]["St_Paired_End_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
+				PE_json[key]["St_PE_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
 																  json[key]["Paired_end"]["Read2"]["base_by_cycle"]]
-				PE_json[key]["St_Paired_End_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],
+				PE_json[key]["St_PE_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],
 																 json[key]["Paired_end"]["Read2"]["qualities_by_cycle"]]
 				PE_json[key]["St_PE_in"] = json[key]["Paired_end"]["in"]
 
@@ -573,22 +574,18 @@ class Stats():
 		section = {"Table": self.table(stats_json, index),
 				   "Overview": overview_stats}
 
-		stats_json.clear()
-		del stats_json
 
 		if len(PE_json.keys()) != 0:
-			section["Read Length Histogram (Paried End)"] = self.histogram(PE_json, "St_PE_histogram")
-			section["Base by Cycle (Paired End)"] = self.base_by_cycle(PE_json, "St_Paired_End_Base_by_Cycle", index)
-			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(PE_json, "St_Paired_End_Quality_by_Cycle", index)
+			section["Read Length Histogram (Paried End)"] = self.read_length(PE_json, "St_PE_Read_Lengths")
+			section["Base by Cycle (Paired End)"] = self.base_by_cycle(PE_json, "St_PE_Base_by_Cycle")
+			section["Quality by Cycle (Paired End)"] = self.quality_by_cycle(PE_json, "St_PE_Quality_by_Cycle")
 
-		PE_json.clear()
-		del PE_json
-
+		
 		#only executres if single read data is detected
 		if len(SE_json.keys()) != 0:
-			section["Read Length Histogram (Single End)"] = self.histogram(SE_json, "St_SE_histogram")
-			section["Base by Cycle (Single End)"] = self.base_by_cycle(SE_json, "St_Single_End_Base_by_Cycle", index)
-			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(SE_json, "St_Single_End_Quality_by_Cycle", index)
+			section["Read Length Histogram (Single End)"] = self.read_length(SE_json, "St_SE_Read_Lengths")
+			section["Base by Cycle (Single End)"] = self.base_by_cycle(SE_json, "St_SE_Base_by_Cycle")
+			section["Quality by Cycle (Single End)"] = self.quality_by_cycle(SE_json, "St_SE_Quality_by_Cycle")
 		
 
 		return section 

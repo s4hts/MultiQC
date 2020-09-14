@@ -67,7 +67,7 @@ class QWindowTrim():
        							 {'name': "Single End"}]
 				  }
 
-		html = "<h4> QWindowTrim Trimmed Basepairs Composition </h4>\n" 
+		html = "<h4> QWindowTrim: Trimmed Basepairs Composition </h4>\n" 
 
 		if len(json.keys()) > 150:
 			html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'	

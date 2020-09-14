@@ -64,7 +64,7 @@ class AdapterTrimmer():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': True}
 
-		html = "<h4> AdapterTrimmer Trimmed Basepairs Composition </h4>\n" 
+		html = "<h4> AdapterTrimmer: Trimmed Basepairs Composition </h4>\n" 
 
 		# if no overlaps at all are present, return nothing
 		if avg_bp_trimmed == 0:

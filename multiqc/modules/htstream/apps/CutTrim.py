@@ -59,7 +59,7 @@ class CutTrim():
        							 {'name': "Single End"}]
 				  }
 		
-		html = "<h4> CutTrim Trimmed Basepairs Composition </h4>\n"
+		html = "<h4> CutTrim: Trimmed Basepairs Composition </h4>\n"
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:

@@ -115,7 +115,7 @@ function btn_activator() {
 
 function htstream_div_switch(ele, suffix) {
 
-  var plot_id = ele.id.split("_b")[0].concat(suffix);
+  var plot_id = ele.id.split("_btn")[0];
   var parent_node = $(ele).closest('.htstream_fadein');
   var plot_div = parent_node.find('.hc-plot');
 
@@ -135,12 +135,10 @@ function htstream_plot_switch(ele, target) {
   off.css('display', 'none');
   on.css('display', 'block');
 
-  if (plot_id.includes('htstream_qbc_heat') || plot_id.includes('htstream_comp_line_')) {
+  var plot_div = on.find('.hc-plot');
+  plot_graph(plot_div.attr('id'));
 
-    var plot_div = on.find('.hc-plot');
-    plot_graph(plot_div.attr('id'));
-
-  }
+}
 
 
 //////////////////////////////////////////////////
@@ -281,8 +279,11 @@ $(document).on('mqc_renamesamples', function(e, f_texts, t_texts, regex_mode){
 
 $("document").ready(function() {
 
-  $('.active.hist_btn').trigger("click");
-  
+  // $('*[class*=btn]').each(function(x, ele) {
+  //   console.log(ele);
+  //   //plot_graph(ele.id, undefined, 100000);
+  // });
+
   var data = JSON.parse($("#htstream_config").text());
   var samples = Object.keys(data["sample_colors"]);
   var colors = data["sample_colors"]

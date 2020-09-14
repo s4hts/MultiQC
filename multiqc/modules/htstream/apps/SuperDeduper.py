@@ -60,7 +60,7 @@ class SuperDeduper():
 		# initialize data structures and variabe;s 
 		data = {}
 		invariant_saturation_dict = {}
-		html = "<h4> Duplicate Saturation </h4>\n"
+		html = "<h4> SuperDeduper: Duplicate Saturation </h4>\n"
 
 		for key in json.keys():
 
