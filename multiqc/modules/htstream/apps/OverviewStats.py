@@ -123,7 +123,14 @@ class OverviewStats():
 
 
 		# Construct html sections
-		title = '<h4> {t} </h4>'.format(t=html_title)
+		header = '<h4> {t} </h4>'.format(t=html_title)
+		header += '''<p> Provides scaled statistics collected throughout the preprocessing pipeline, highlighting variable statistics across experiment. </p>'''
+
+		btn_label_1 = "Reduction"
+		btn_label_2 = "Composition"
+
+		line_1_id = "htstream_comp_table_{b}".format(b=data_type)
+		line_2_id = "htstream_comp_line_{b}".format(b=data_type)
 
 
 		# if no apps found in section, create alert div, otherwise, create plots
@@ -137,8 +144,11 @@ class OverviewStats():
 			line_2_html = linegraph.plot(composition_data_list, line_config_2)
 
 
-		# add htmls
-		html = htstream_utils.composition_html(title, line_1_html, line_2_html, data_type) 
+		# add html
+		html = htstream_utils.multi_plot_html(header, 
+											  btn_label_1, btn_label_2,
+											  line_1_id, line_2_id,
+											  line_1_html, line_2_html) 
 
 		return 	html
 

@@ -47,7 +47,9 @@ class Stats():
 	def base_by_cycle(self, json, read):
 
 		read_keys = {"St_PE_Base_by_Cycle": "PE",
-					 "St_SE_Base_by_Cycle": "SE"}
+					 "St_SE_Base_by_Cycle": "SE",
+					 "PE": "Paired End",
+				     "SE": "Single End"}
 
 
 		read_code = read_keys[read]
@@ -57,7 +59,7 @@ class Stats():
 		config = {'id': "htstream_stats_entropy_" + read + "_" + unique_id,
 				  'title': "HTStream: Base by Cycle (" + read_code + ")",
 				  'smooth_points_sumcounts': False,
-				  'ylab': "Avg. Distance from 25%",
+				  'ylab': "Avg. Difference from 25%",
 				  'xlab': "Cycle",
 				  'categories': True,
 				  'tt_decimals': '{:,.2f}',
@@ -169,14 +171,26 @@ class Stats():
 			data_list.append(samp_data)
 
 
+		header_html = '<h4> Base by Cycle: ' + read_keys[read_code] + '</h4>'
+		header_html += '''<p> Provides a measure of the uniformity of a distribution. The higher the average is at a certain position,
+							the more unequal the base pair composition. N's are excluded from this calculation. </p>'''
+
+		btn_label_1 = "Avg. Diff. from  25%"
+		btn_label_2 = "Base by Cycle"
+
+
+		line_1_id = "htstream_stats_entropy_{r}_{b}".format(r=read_code, b=unique_id)
+		line_2_id = "htstream_stats_base_line_{r}_{b}".format(r=read_code, b=unique_id)
+
+
 		line_1 = linegraph.plot(line_data, config)
 		line_2 = linegraph.plot(data_list, samp_config)
 
-		html = htstream_utils.base_by_cycle_html(read_code,
-												 unique_id,
-												 line_1,
-												 line_2)
 
+		html = htstream_utils.multi_plot_html(header_html,
+											  btn_label_1, btn_label_2,
+											  line_1_id, line_2_id,
+											  line_1, line_2)
 
 
 		return html
@@ -187,7 +201,9 @@ class Stats():
 
 	
 		read_keys = {"St_PE_Quality_by_Cycle": "PE",
-					 "St_SE_Quality_by_Cycle": "SE"}
+					 "St_SE_Quality_by_Cycle": "SE",
+					 "PE": "Paired End",
+				     "SE": "Single End"}
 
 
 		read_code = read_keys[read]
@@ -362,11 +378,31 @@ class Stats():
 			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
 
 
-		line_plot = linegraph.plot(line_data, line_config)
+		# section heade
+		header_html = '<h4> Quality by Cycle: ' + read_keys[read_code] + '</h4>'
+		header_html += '''<p> Mean quality score for each position along the read. 
+							  Sample is colored red if less than 60% of bps have mean score of at least Q30, 
+							  orange if between 60% and 80%, and green otherwise.</p>'''
 
-		html = htstream_utils.qual_by_cycle_html(read_code, line_plot, unique_id, button_list, heatmap_html)
+		btn_label_1 = "Mean Quality"
+		btn_label_2 = "Quality by Cycle"
+
+
+		line_1_id = "htstream_qbc_line_{r}_{u}".format(r=read_code, u=unique_id)
+		line_2_id = "htstream_qbc_heat_{r}_{u}".format(r= read_code, u=unique_id)
+
+
+		line_plot = linegraph.plot(line_data, line_config)
+		heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
+
+		html = htstream_utils.multi_plot_html(header_html,
+											  btn_label_1, btn_label_2,
+											  line_1_id, line_2_id,
+											  line_plot, heatmap_plot,
+											  exempt=False)
 
 		return html
+
 
 
 

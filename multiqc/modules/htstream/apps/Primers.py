@@ -103,9 +103,21 @@ class Primers():
 
 			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, {i})" id="{pid}">{n}</button>\n'.format(a=active, i=index, pid=pid, n=name))
 
-		html = htstream_utils.primers_heatmap_html(unique_id, button_list, heatmap_html)
 
-		return html
+		heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
+
+
+		wrapper_html = '<h4> Primers: Primer Counts </h4>'
+		wrapper_html += 
+
+		# Heatmaps
+		wrapper_html  += '''<div class="mqc_hcplot_plotgroup">'''
+		wrapper_html += '<div id="htstream_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
+		wrapper_html += heatmap_plot + "</div></div>"
+
+		final_html = wrapper_html 
+
+		return wrapper_html
 
 
 	def execute(self, json, index):
