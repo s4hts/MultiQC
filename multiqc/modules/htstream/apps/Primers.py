@@ -108,7 +108,7 @@ class Primers():
 
 
 		wrapper_html = '<h4> Primers: Primer Counts </h4>'
-		wrapper_html += 
+		wrapper_html += '''<p>Heatmap indicating abundance of primer combinations.</p>'''
 
 		# Heatmaps
 		wrapper_html  += '''<div class="mqc_hcplot_plotgroup">'''
