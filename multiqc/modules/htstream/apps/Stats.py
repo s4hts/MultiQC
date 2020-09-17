@@ -229,7 +229,7 @@ class Stats():
 				   'xTitle': 'Cycle',
 				   'square' : False,
 				   'datalabels': False,
-
+				   'xcats_samples': False, 
 				   'max': 1.0, 
 				   'colstops': [
 					        [0, '#FFFFFF'],
@@ -422,6 +422,7 @@ class Stats():
 				   'xTitle': 'Length',
 				   'square' : False,
 				   'datalabels': False,
+				   'xcats_samples': False, 
 				   'max': 1.0, 
 				   'colstops': [
 					        [0, '#FFFFFF'],
@@ -436,69 +437,74 @@ class Stats():
 		lengths = []
 		samples = []
 		max_length = 0 
-		min_length = 0
+
+		uniform = True
 
 		for samp in json.keys():
 
 			# paired end reads require the histograms be concatenated
 			if read_code == "SE":
+
+				if len(json[samp][read][0]) == 1:
+					uniform = True
+				else:
+					uniform = False
+
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_SE_in"]
 				
 			else:
+
+				if len(json[samp][read][0]) + len(json[samp][read][1]) == 2:
+					uniform = True
+				else:
+					uniform = False
+
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_PE_in"]
-				r2 = [ [read_lengths[-1][0] + x[0], x[1]] for x in json[samp][read][1]] 
+				r2 = [[read_lengths[-1][0] + x[0], x[1]] for x in json[samp][read][1]] 
 
 				# concat reads
 				read_lengths += r2 
-
 	
-			data = []
-
-
-			# populate data 
-			for length in read_lengths:
-
-				data.append(length[1] / total)
 
 
 			# check if max read length is longest, if not update length of lists 
 			if max_length < read_lengths[-1][0]:
 
 				max_length = read_lengths[-1][0]
+				data = [0 for i in range(0, max_length)]
 
 				for i in range(len(readlength_data)):
 
 					temp = readlength_data[i]
 
-					if len(temp) < (max_length - min_length): 
+					if len(temp) < len(data): 
 
-						readlength_data[i] = temp + [0] * (len(temp) - (max_length - min_length))  
+						readlength_data[i] = temp + [0] * (len(temp) - len(data))  
 
 
-			# check if min read length is longest
-			if min_length > read_lengths[0][0] or min_length == 0:
+			# populate data 
+			for lst in read_lengths:
 
-				min_length = read_lengths[0][0]
-
-				for i in range(len(readlength_data)):
-
-					temp = readlength_data[i]
-
-					if len(temp) < (max_length - min_length): 
-
-						readlength_data[i] = [0] * (len(temp) - (max_length - min_length)) + temp  
-
+				data[lst[0] - 1] = lst[1] / total
 
 			
 			readlength_data.append(data)
 			samples.append(samp)
 
+		# X Labels
+		lengths = [i for i in range(1, max_length + 1)]
 
-		lengths = [i for i in range(min_length, max_length + 1)]
+		# Title
+		html = '<h4> Read Lengths: ' + read + ' </h4>'
 
+		# If uniform read distributions
+		if uniform == True:
+			html += '\n<div class="alert alert-info"> <strong>Notice:</strong> Read lengths were uniform across samples. </div>'	
+			return html
 
+		# read type
 		if read_code == "PE":
 			read = "Paired End"
 
@@ -506,9 +512,7 @@ class Stats():
 			read = "Single End"
 
 
-		html = '<h4> Read Lengths: ' + read + ' </h4>'
 		html += '''<p> Distribution of read lengths for each sample. </p>'''
-
 
 		html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
 
@@ -582,6 +586,7 @@ class Stats():
 				PE_json[key] = {}	
 				PE_json[key]["St_PE_Read_Lengths"] = [json[key]["Paired_end"]["Read1"]["readlength_histogram"],
 													  json[key]["Paired_end"]["Read2"]["readlength_histogram"]]
+
 				PE_json[key]["St_PE_Base_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["base_by_cycle"],
 																  json[key]["Paired_end"]["Read2"]["base_by_cycle"]]
 				PE_json[key]["St_PE_Quality_by_Cycle"] = [json[key]["Paired_end"]["Read1"]["qualities_by_cycle"],

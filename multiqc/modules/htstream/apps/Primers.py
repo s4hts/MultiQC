@@ -48,6 +48,8 @@ class Primers():
 					   'title': "HTStream: Primers Heatmap",
 					   'square' : False,
 					   'datalabels': False,
+					   'xcats_samples': False, 
+					   'ycats_samples': False, 
 					   'colstops': [
 						        [0, '#FFFFFF'],
 						        [1, '#1DC802']
@@ -86,10 +88,11 @@ class Primers():
 
 			# if this is the first sample process, lucky them, they get to be shown first and marked as active.
 			#	This step is necessary otherwise, the plot div is not initialized. The additional calls to the 
-			#	heatmap function are simply to add the data to the internal jsons used by MultiQC.
+			#	heatmap function are simply to add the data to the internal jsons used by MultiQC
 			if first == True:
 				active = "active" # button is default active
-				first = False # shuts off first gat
+				first = False # shuts off first gate
+
 				heatmap_html = heatmap.plot(data, labs, labs, heat_pconfig)
 
 			else:

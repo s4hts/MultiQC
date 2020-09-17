@@ -195,9 +195,6 @@ $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
   if (f_texts.length != 0) {
 
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
-
     user_hide_list = f_texts.slice();
 
     for (i = 0; i < f_add.length; i++) { 
@@ -206,12 +203,7 @@ $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
     hide_list = f_texts.slice();
 
-  } else {
-
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", false);
-
-  }
+  } 
 
   btn_disable(mode, regex, hide_list, user_hide_list);
   btn_activator();
@@ -222,18 +214,6 @@ $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 // Highlight
 $(document).on('mqc_highlights', function(e, f_texts, f_cols, regex_mode){
 
-  
-  if (f_texts.length != 0 && f_texts.length != (1 + sample_num)) {
-
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
-
-  } else {
-
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", false);
-
-  }
  
   var always_on = global_f_add; 
   var always_on_colors = global_on_colors;
@@ -249,18 +229,7 @@ $(document).on('mqc_highlights', function(e, f_texts, f_cols, regex_mode){
 
 // Rename
 $(document).on('mqc_renamesamples', function(e, f_texts, t_texts, regex_mode){
-
-  if (f_texts.length != 0) {
-
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", true);
-
-  } else {
-
-    $('*[id*=htstream_qbc_line]').filter(":button").click();
-    $('*[id*=htstream_qbc_heat]').filter(":button").prop("disabled", false);
-
-  }
+  
     
   var primers_on = get_primers();
   var always_on = global_f_add.concat(primers_on);
@@ -279,12 +248,9 @@ $(document).on('mqc_renamesamples', function(e, f_texts, t_texts, regex_mode){
 
 $("document").ready(function() {
 
-  // $('*[class*=btn]').each(function(x, ele) {
-  //   console.log(ele);
-  //   //plot_graph(ele.id, undefined, 100000);
-  // });
 
   var data = JSON.parse($("#htstream_config").text());
+
   var samples = Object.keys(data["sample_colors"]);
   var colors = data["sample_colors"]
   
