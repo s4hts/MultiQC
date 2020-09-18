@@ -12,16 +12,20 @@ from multiqc.plots import table, bargraph
 
 class QWindowTrim():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Uses a sliding window approach to remove the low quality ends of reads."
 		self.type = "bp_reducer"		
 	
 
+	########################
+	# Table Function
 	def table(self, json, pe_bps, se_bps, index):
 
 		# Table construction. Taken from MultiQC docs.
 
+		# If no SE and BP lost, dont add table
 		if (pe_bps + se_bps) == 0:
 			return ""
 
@@ -30,12 +34,14 @@ class QWindowTrim():
 		headers["Qt_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 		
+		# If PE data, add cols
 		if pe_bps != 0:
 			headers["Qt_%_R1_BP_Lost" + index] = {'title': "% R1 of Bp Lost", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 										  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 			headers["Qt_%_R2_BP_Lost" + index] = {'title': "% R2 of Bp Lost", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 										  'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 
+		# If SE data, add cols
 		if se_bps != 0:
 			headers["Qt_%_SE_BP_Lost" + index] = {'title': "% SE of Bp Lost", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 										  'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
@@ -49,11 +55,14 @@ class QWindowTrim():
 									 'format': '{:,.2f}',
 									 'scale': 'Oranges'
 									}
+
 		headers["Qt_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
+	########################
+	# Bargraph Function
 	def bargraph(self, json, bps, index):
 
 		# config dict for bar graph
@@ -67,17 +76,19 @@ class QWindowTrim():
        							 {'name': "Single End"}]
 				  }
 
+		# Header 
 		html = "<h4> QWindowTrim: Trimmed Basepairs Composition </h4>\n" 
 
+		# If too many samples, don't add bargraph
 		if len(json.keys()) > 150:
 			html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'	
 			return html
 			
-
 		r1_data = {}
 		r2_data = {}
 		se_data = {}
 
+		# Construct data for multidataset bargraph
 		for key in json:
 
 			r1_data[key] = {"LT_R1": json[key]["Qt_Left_Trimmed_R1"],
@@ -94,7 +105,7 @@ class QWindowTrim():
 			html += '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'	
 			return html
 
-
+		# Create categories for multidataset bargraph
 		cats = [OrderedDict(), OrderedDict(), OrderedDict()]
 		cats[0]["LT_R1"] =   {'name': 'Left Trimmmed'}
 		cats[0]["RT_R1"] =  {'name': 'Right Trimmmed'}
@@ -103,11 +114,14 @@ class QWindowTrim():
 		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
+		# Create bargraph
 		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 		return html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -121,6 +135,7 @@ class QWindowTrim():
 
 			total_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) 
 
+			# If no bps lost, prevent zero division
 			if total_bp_lost == 0:
 				perc_bp_lost = 0
 				total_r1 = 0 
@@ -131,6 +146,7 @@ class QWindowTrim():
 			else:
 				perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
 
+				# Will fail if no PE data
 				try:
 					total_r1 = ( (json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]) / total_bp_lost ) * 100
 					total_r2 = ( (json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]) / total_bp_lost) * 100
@@ -143,7 +159,7 @@ class QWindowTrim():
 					total_r2 = 0
 					total_pe = 0
 					
-
+				# Will fail if no SE data
 				try:
 					total_se = ( (json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]) / total_bp_lost ) * 100
 					left_se_trimmed = json[key]["Single_end"]["leftTrim"]
@@ -155,6 +171,7 @@ class QWindowTrim():
 
 			bp_in = json[key]["Fragment"]["basepairs_in"]
 
+			# overview data
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
 								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],

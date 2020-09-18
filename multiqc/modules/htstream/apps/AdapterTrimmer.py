@@ -12,23 +12,27 @@ from multiqc.plots import table, bargraph
 
 class AdapterTrimmer():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Trims adapters which are sequenced when the fragment insert length is shorter than the read length."
 		self.type = "bp_reducer"
 
 
+	########################
+	# Table Function
 	def table(self, json, total, zeroes, index):
 
 		# Table constructor. Just like the MultiQC docs.
 
+		# If total is zero, no need for a plot
 		if total == 0:
 			return ""
 		
 		headers = OrderedDict()
 
+		# Some columns have SUPER small values, add raw counts instead of percentages
 		if zeroes == False:
-
 			headers["At_%_BP_Lost" + index] = {'title': "% Bp Lost",
 										'namespace': "% Bp Lost",
 										'description': 'Percentage of Input bps (SE and PE) trimmed.',
@@ -43,19 +47,20 @@ class AdapterTrimmer():
 										'format': '{:,.2f}',
 										'scale': 'Blues'
 										}
-
+		
 		else:
-
 			headers["At_BP_Lost" + index] = {'title': "Bp Lost", 'namespace': "Bp Lost", 'description': 'Input bps (SE and PE) trimmed.', 'scale': 'RdPu', 'format': '{:,.0f}'}
 			headers["At_Adapters" + index] = {'title': "Adapters", 'namespace': "Adapters", 'description': 'Reads (SE and PE) with an Adapter', 'scale': 'Blues', 'format': '{:,.0f}'}
 
-
+		# More columns
 		headers["At_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of basepairs trimmed from reads', 'format': '{:,.2f}', 'scale': 'Oranges'}
 		headers["At_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
 		return table.plot(json, headers)
 
 
+	########################
+	# Bargraphs Function
 	def bargraph(self, json, avg_bp_trimmed):
 
 		# configuration dictionary for bar graph
@@ -64,6 +69,7 @@ class AdapterTrimmer():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': True}
 
+		# Title
 		html = "<h4> AdapterTrimmer: Trimmed Basepairs Composition </h4>\n" 
 
 		# if no overlaps at all are present, return nothing
@@ -71,6 +77,7 @@ class AdapterTrimmer():
 			html += '<div class="alert alert-info"> <strong>Notice:</strong> No adapters were trimmed from samples. </div>'	
 			return html
 
+		# If too many samples, forget about it.
 		if len(json.keys()) > 150:
 			html += '<div class="alert alert-warning"> <strong>Notice:</strong> Too many samples for bargraph. </div>'	
 			return html
@@ -78,24 +85,19 @@ class AdapterTrimmer():
 		# bargraph dictionary. Exact use of example in MultiQC docs.
 		categories  = OrderedDict()
 
-		categories['At_R1'] = {
-							  'name': 'Read 1',
-							  'color': '#779BCC'
-							 }
-		categories['At_R2'] = {
-							  'name': 'Read 2',
-							  'color': '#C3C3C3'
-							 }
-		categories['At_SE'] = {
-							  'name': 'Single End',
-							  'color': '#D1ADC3'
-							 }
+		# Colors for sections
+		categories['At_R1'] = {'name': 'Read 1', 'color': '#779BCC'}
+		categories['At_R2'] = {'name': 'Read 2', 'color': '#C3C3C3'}
+		categories['At_SE'] = {'name': 'Single End', 'color': '#D1ADC3'}
 
+		# Create bargrpah
 		html += bargraph.plot(json, categories, config)
 
 		return html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -113,7 +115,8 @@ class AdapterTrimmer():
 			bp_trimmed = json[key]["Single_end"]["adapterBpTrim"] + json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"] # total basepairs trimmed
 			perc_bp_lost = ( (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / bp_in ) * 100
 
-			# if adapter trim is zero, so is the percentage and the avg basepair trimmed. This prevents division by zero error
+			# if adapter trim is zero, so is the percentage and the avg basepair trimmed.
+			#   This prevents division by zero error.
 			if adapter_reads == 0:
 				perc_adapters = 0
 				avg_bp_trimmed = 0
@@ -122,11 +125,14 @@ class AdapterTrimmer():
 				perc_adapters = (adapter_reads / frag_in) * 100
 				avg_bp_trimmed = (bp_trimmed / adapter_reads)
 
+			# Accumulate avg bp trimmed
 			total += avg_bp_trimmed
 
+			# If percentages are small, use raw counts
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
 
+			# Overview stats
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
 								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],

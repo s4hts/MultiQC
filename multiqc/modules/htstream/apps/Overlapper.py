@@ -11,19 +11,18 @@ from multiqc.plots import table, bargraph, linegraph
 
 #################################################
 
-log = logging.getLogger(__name__)
-
 class Overlapper():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."
 		self.type = "read_reducer"
 
 
+	########################
+	# Table Function
 	def table(self, json, se_total_gain, index):
-
-		config = {'namespace': 'overlapper'}
 
 		# straight forward table construction.
 		headers = OrderedDict()
@@ -35,6 +34,7 @@ class Overlapper():
 									  'format': '{:,.2f}',
 									  'scale': 'Greens'}
 
+		# If SE were gained, add col
 		if se_total_gain != 0:
 			headers["Ov_SE_gain" + index] = {'title': "% SE Gained", 'namespace': "% SE Gained",'description': 'Percentage Increase of Single End Reads', 'format': '{:,.2f}', 
 											 'suffix': '%', 'scale': 'Blues' }
@@ -44,6 +44,8 @@ class Overlapper():
 		return table.plot(json, headers)
 
 
+	########################
+	# Bargraph Function
 	def bargraph(self, json, inserts):
 
 		# configuration dictionary for bar graph
@@ -52,6 +54,7 @@ class Overlapper():
 				  'ylab' : "Samples",
 				  'cpswitch_c_active': False}
 
+		# Header 
 		html = "<h4> Overlapper: Overlap Composition </h4>\n"
 
 		# if no overlaps at all are present, return nothing
@@ -59,6 +62,7 @@ class Overlapper():
 			html += '<div class="alert alert-info"> <strong>Notice:</strong> No overlaps present in samples. </div>'	
 			return html
 
+		# If too many samples, dont plot
 		if len(json.keys()) > 150:
 			html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'	
 			return html
@@ -66,24 +70,19 @@ class Overlapper():
 		# bargraph dictionary. Exact use of example in MultiQC docs.
 		categories  = OrderedDict()
 
-		categories['Ov_Sins'] = {
-							  'name': 'Short Inserts',
-							  'color': '#779BCC'
-							 }
-		categories['Ov_Mins'] = {
-							  'name': 'Medium Inserts',
-							  'color': '#C3C3C3'
-							 }
-		categories['Ov_Lins'] = {
-							  'name': 'Long Inserts',
-							  'color': '#D1ADC3'
-							 }
+		# Create blocks for bargrapph
+		categories['Ov_Sins'] = {'name': 'Short Inserts', 'color': '#779BCC'}
+		categories['Ov_Mins'] = {'name': 'Medium Inserts', 'color': '#C3C3C3'}
+		categories['Ov_Lins'] = {'name': 'Long Inserts', 'color': '#D1ADC3'}
 
+		# create plot
 		html += bargraph.plot(json, categories, config)
-
+		
 		return html
 
 
+	########################
+	# Linegraph Function
 	def linegraph(self, json, index):
 
 		# config dictionary for "density" plots. Its a work in progress. 
@@ -108,7 +107,8 @@ class Overlapper():
 
 		return html
 
-
+	########################
+	# Function for parsing histogram in files
 	def parse_histogram_stats(self, hist):
 
 		hist_stats = {"Max": 0,
@@ -116,6 +116,7 @@ class Overlapper():
 
 		median_list = []
 
+		# Find median and max of list in files
 		for item in hist:
 			median_list.append(item[0])
 
@@ -128,6 +129,8 @@ class Overlapper():
 		return hist_stats
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -143,22 +146,26 @@ class Overlapper():
 			mins = json[key]["Fragment"]["inserts"]["medium"]
 			lins = json[key]["Fragment"]["inserts"]["long"]
 
+			# Total overlap types
 			overlapped_sum = (sins + mins + lins)
 
 			# the INFAMOUS percent overlapped 
 			perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
 			perc_pe_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]) * 100
 			
+			# if no single end, prevent zero division
 			if json[key]["Single_end"]["in"] == 0:
 				perc_se_gain = 0
 
 			else:
 				perc_se_gain = ((json[key]["Single_end"]["out"] - json[key]["Single_end"]["in"]) / json[key]["Single_end"]["in"]) * 100
 
+			# total SE gain
 			se_total_gain += perc_se_gain
 
 			parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
 
+			# Overview stats
 			overview_dict[key] = {
 								  "PE_Output_Reads": json[key]["Paired_end"]["out"],
 								  "SE_Output_Reads": json[key]["Single_end"]["out"],

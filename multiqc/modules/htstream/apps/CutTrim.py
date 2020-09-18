@@ -12,12 +12,15 @@ from multiqc.plots import table, bargraph
 
 class CutTrim():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Trims a fixed number of bases from the 5' and/or 3' end of each read."
 		self.type = "bp_reducer"
 	
 
+	########################
+	# Table Function
 	def table(self, json, overall_pe, overall_se, index):
 
 		# returns nothing if no reads were trimmed.
@@ -31,12 +34,14 @@ class CutTrim():
 		headers["Ct_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 								   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 		
+		# If PE columns are not empty, add cols
 		if overall_pe != 0:
 			headers["Ct_%_R1_BP_Lost" + index] = {'title': "% R1 of Bp Lost", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 			headers["Ct_%_R2_BP_Lost" + index] = {'title': "% R2 of Bp Lost", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
+		# If SE columns are not empty, add cols
 		if overall_se != 0:
 			headers["Ct_%_SE_BP_Lost" + index] = {'title': "% SE of Bp Lost", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
@@ -46,6 +51,8 @@ class CutTrim():
 		return table.plot(json, headers)
 
 
+	########################
+	# Bargraph Function
 	def bargraph(self, json, bps):
 
 		# config dict for bar graph
@@ -59,6 +66,7 @@ class CutTrim():
        							 {'name': "Single End"}]
 				  }
 		
+		# Header
 		html = "<h4> CutTrim: Trimmed Basepairs Composition </h4>\n"
 
 		# returns nothing if no reads were trimmed.
@@ -75,6 +83,7 @@ class CutTrim():
 		r2_data = {}
 		se_data = {}
 
+		# Create Dictionarys for multidataset bargraphs
 		for key in json:
 
 			r1_data[key] = {"LT_R1": json[key]["Ct_Left_Trimmed_R1"],
@@ -86,7 +95,7 @@ class CutTrim():
 			se_data[key] = {"LT_SE": json[key]["Ct_Left_Trimmed_SE"],
 						    "RT_SE": json[key]["Ct_Right_Trimmed_SE"]}
 
-
+		# Categories for multidataset bargraphs
 		cats = [OrderedDict(), OrderedDict(), OrderedDict()]
 		cats[0]["LT_R1"] =   {'name': 'Left Trimmmed'}
 		cats[0]["RT_R1"] =  {'name': 'Right Trimmmed'}
@@ -95,12 +104,14 @@ class CutTrim():
 		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
-
+		# Create bargraph
 		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 		return html
 
 
+	########################
+	# MainFunction
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -112,6 +123,7 @@ class CutTrim():
 			
 			total_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) 
 
+			# If nothing lost, set these variables to zero so no division by zero
 			if total_bp_lost == 0:
 				perc_bp_lost  = 0
 				total_r1 = 0 
@@ -120,15 +132,15 @@ class CutTrim():
 
 			else:
 				perc_bp_lost = ( total_bp_lost / json[key]["Fragment"]["basepairs_in"] ) * 100
-
 				total_r1 = ( (json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]) / total_bp_lost ) * 100
 				total_r2 = ( (json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]) / total_bp_lost) * 100
 				total_se = ( (json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]) / total_bp_lost ) * 100
 				
-
+			# accomulate total removed
 			overall_pe += total_r1 + total_r1
 			overall_se += total_se
 
+			# Overview stats
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
 								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],

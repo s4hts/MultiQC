@@ -10,15 +10,17 @@ from multiqc.plots import table, bargraph
 
 #################################################
 
-
 class LengthFilter():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Discards reads below a minimum length threshold."
 		self.type = "read_reducer"
 	
 
+	########################
+	# Table Function
 	def table(self, json, pe_total_loss, se_total_loss, pe_orphaned_total, index):
 
 	# Basic table constructor. See MultiQC docs.
@@ -46,23 +48,28 @@ class LengthFilter():
 		return table.plot(json, headers)
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
 		overview_dict = {}
 
+		# Accumulator vars
 		pe_total_loss = 0
 		se_total_loss = 0
 		pe_orphaned_total = 0
 
 		for key in json.keys():
 
+			# try to calculate reads lost, prevent division by zero
 			try:
 				reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
 			
 			except:
 				reads_lost = 0
 
+			# try to calculate %  PE reads lost and PE orphaned, prevent division by zero
 			try:
 				pe_perc_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
 				pe_orphaned = ((json[key]["Paired_end"]["Read1"]["discarded"] + json[key]["Paired_end"]["Read2"]["discarded"]) / json[key]["Paired_end"]["in"])  * 100
@@ -71,13 +78,14 @@ class LengthFilter():
 				pe_perc_loss = 0
 				pe_orphaned = 0
 
+			# Calculates % SE lost, prevents zero division
 			if json[key]["Single_end"]["in"] == 0:
 				se_perc_loss = 0
 
 			else:
 				se_perc_loss = (json[key]["Single_end"]["discarded"] / json[key]["Single_end"]["in"])  * 100
 
-
+			# Accumulators accumulating, lol
 			pe_total_loss += pe_perc_loss
 			se_total_loss += se_perc_loss
 			pe_orphaned_total += pe_orphaned

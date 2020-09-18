@@ -3,91 +3,106 @@
 //////////////////////////////////////////////////
 // Button Status Switcher
 
+////////////////////////
+// Button Disabler
 function btn_disable(mode, regex, hide_list, user_hide_list) {
 
+  // List of example buttons / items, this will be pretty much constant throughout life of HTStream
   var exempt_list = ["Base: A", "Base: C", "Base: G", "Base: T", "Base: N", 
                      "PE Reads", "SE Reads", "PE Bps", "SE Bps", "Read 1", "Read 2", "Single End"]; 
 
+  // Find htstream report section and appropriate buttons
   var parent_div = $("#mqc-module-section-htstream"); 
   var unfiltered_btn_divs = parent_div.find("[data-action='set_data'], *[id*=htstream_]");
   var btn_divs = unfiltered_btn_divs.filter(":button").filter(":not(*[onClick*=htstream_plot_switch])");
 
+  // Disable buttons that are not in exempt list or specifically listed to hide by MultiQC
   $.each(btn_divs.get().reverse(), function(x, value) {
 
     var btn_text = $(value).text();
 
+    // Mode, show or hide
     if (mode == "show") {
 
+      // Is regex on 
       if (regex) {
 
         var show = false;
-
+        
+        // Iterate throughlist
         for (i = 0; i < user_hide_list.length; i++) { 
 
+          // Show specified buttons (regex)
           if (btn_text.match(user_hide_list[i])) {
             $(value).prop("disabled", false);
             show = true;
             break;
-
           }
+        
         }  
+        
+        // Hide buttons not included in exempt and specified lists
         if (show == false  && !exempt_list.includes(btn_text)) {
           $(value).prop("disabled", true);
-
         }
+
       } else {
 
+        // Show specified buttons, disable nonspecified
         if (hide_list.indexOf(btn_text) == -1 && exempt_list.indexOf(btn_text) == -1) {
-
           $(value).prop("disabled", true);
-
+        
         } else {
-
           $(value).prop("disabled", false);
-
         }
       }
-    } else {
 
+    } else {
+      
+      // Regex?
       if (regex) {
 
-         show = true;
+        show = true;
 
+        // Iterate through buttons
         for (i = 0; i < user_hide_list.length; i++) { 
 
+          // If button matches pattern (regex), disable.
           if (btn_text.match(user_hide_list[i]) && !exempt_list.includes(btn_text)) { 
             $(value).prop("disabled", true);
             show = false;
             break;
-
           }
         }
 
+        // Show nonmatching ones
         if (show == true) {
           $(value).prop("disabled", false);
-
         }  
+
       } else {
 
+        // Show specified buttons, disable nonspecified
         if (hide_list.indexOf(btn_text) == -1 || exempt_list.indexOf(btn_text) != -1) {
-
           $(value).prop("disabled", false);
 
         } else {
-
           $(value).prop("disabled", true);
-
         }
       }
     }
   });
 }
 
+////////////////////////
+// Button Activator
 function btn_activator() {
 
+  // Find htstream report section and find target buttons
   var parent_div = $("#mqc-module-section-htstream"); 
   var btn_groups = parent_div.find(".hc_switch_group").filter(":not(*[class*=htstream_exempt])");
 
+  // Disable and activate appropriate buttons in the list
   $.each(btn_groups, function(x, value) {
 
     var btns = $(value).find(".btn");
@@ -113,50 +128,39 @@ function btn_activator() {
 //////////////////////////////////////////////////
 // Div and Plot Switches
 
-function htstream_div_switch(ele, suffix) {
+////////////////////////
+// Div Switch
+function htstream_div_switch(ele) {
 
+  // Get ID of button, get corresponding plot divs.
   var plot_id = ele.id.split("_btn")[0];
   var parent_node = $(ele).closest('.htstream_fadein');
   var plot_div = parent_node.find('.hc-plot');
 
+  // Change div attributes
   plot_div.attr("id", plot_id);
   plot_div.attr("class", "hc-plot not_rendered hc-heatmap");
 
+  // Plot chart (usually heatmaps)
   plot_graph(plot_id);
-
 }
 
+////////////////////////
+// Plot Switch
 function htstream_plot_switch(ele, target) {
 
+  // Get ID of button and find ID's of corresponding on and off divs.
   var plot_id = ele.id.split("_btn")[0];
   var on = $("#" + plot_id);
   var off = $("#" + target);
 
+  // Hide corresponding divs
   off.css('display', 'none');
   on.css('display', 'block');
 
+  // Find plot div and plot data
   var plot_div = on.find('.hc-plot');
   plot_graph(plot_div.attr('id'));
-
-}
-
-
-//////////////////////////////////////////////////
-// Get Primers "Samples"
-
-function get_primers() {
-
-  var primers_heatmap_samples = [];
-  var temp = [];
-  var primers_heatmap_id = Object.keys(mqc_plots).filter(s => s.includes('primers'));
-
-  for (i = 0; i < primers_heatmap_id.length; i++) { 
-      temp = mqc_plots[primers_heatmap_id[i]]["xcats"].concat(mqc_plots[primers_heatmap_id[i]]["ycats"]);
-      primers_heatmap_samples = primers_heatmap_samples.concat(temp);
-    
-  }
-
-  return primers_heatmap_samples;
 }
 
 //////////////////////////////////////////////////
@@ -170,101 +174,86 @@ var global_on_colors = ["#B62612", "#82A7E0", "#0B8E0B", "#DE7D00", "#000000",
 
 var sample_num;
 
+////////////////////////
 // Hide 
 $(document).on('mqc_hidesamples', function(e, f_texts, regex_mode){
 
+  // Deduce mode
   mode = $('.mqc_hidesamples_showhide:checked').val() == 'show' ? 'show' : 'hide';
-  regex = regex_mode;
 
+  // Initialize hide arrrays
   var hide_list = []; 
   var user_hide_list = [];
 
-  if (mode == "hide") {
-
-    var f_add = [];
-    hide_list = f_add; 
-  
-  } else {
-
+  // Mode is show, add always on list
+  if (mode != "hide") {
     var f_add = global_f_add;
-    primers_heatmap_samples = get_primers();
-
-    f_add = f_add.concat(primers_heatmap_samples);
-
   }
 
   if (f_texts.length != 0) {
 
     user_hide_list = f_texts.slice();
 
+    // Iterate through list to find buttons to disable
     for (i = 0; i < f_add.length; i++) { 
       f_texts.push(f_add[i]);
     }
 
     hide_list = f_texts.slice();
-
   } 
 
-  btn_disable(mode, regex, hide_list, user_hide_list);
+  // Call functions to disable certain buttons
+  btn_disable(mode, regex_mode, hide_list, user_hide_list);
   btn_activator();
-  
-
 });
 
+////////////////////////
 // Highlight
 $(document).on('mqc_highlights', function(e, f_texts, f_cols, regex_mode){
 
- 
-  var always_on = global_f_add; 
-  var always_on_colors = global_on_colors;
-
-
-  for (i = 0; i <  always_on.length; i++) { 
-      f_texts.push(always_on[i]);
-      f_cols.push(always_on_colors[i]);
+  // Iterate through and add highlights for constant samples and colors
+  for (i = 0; i <  global_f_add.length; i++) { 
+      f_texts.push(global_f_add[i]);
+      f_cols.push(global_on_colors[i]);
     }
-
 });
 
-
+////////////////////////
 // Rename
 $(document).on('mqc_renamesamples', function(e, f_texts, t_texts, regex_mode){
   
-    
-  var primers_on = get_primers();
-  var always_on = global_f_add.concat(primers_on);
-  var always_on_transform = always_on;
-
-  for (i = 0; i <  always_on.length; i++) { 
-      f_texts.push(always_on[i]);
-      t_texts.push(always_on_transform[i]);
+  // Itereate through and add to list (f_texts)
+  for (i = 0; i <  global_f_add.length; i++) { 
+      f_texts.push(global_f_add[i]);
+      t_texts.push(global_f_add[i]);
     }
-
 });
 
 
 //////////////////////////////////////////////////
 // Page Load Magic
-
 $("document").ready(function() {
 
-
+  // parse included div with extra configs
   var data = JSON.parse($("#htstream_config").text());
 
-  var samples = Object.keys(data["sample_colors"]);
-  var colors = data["sample_colors"]
-  
-  sample_num = data["htstream_number_of_samples"];
+  if(data["sample_colors"] != null){
 
-  if (samples.length != 0) {  
-
-    for (i = 0; i < samples.length; i++) {
-      $('#mqc_col_filters').append('<li style="color:'+colors[samples[i]]+';" id="'+samples[i]+'"><span class="hc_handle"><span></span><span></span></span><input class="f_text" value="'+samples[i]+'" /><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>');
+    // Check for added sample coloring configurations
+    var samples = Object.keys(data["sample_colors"]);
+    var colors = data["sample_colors"]
     
-    }
-   
-    $("#mqc_cols_apply").click();
-  }
+    sample_num = data["htstream_number_of_samples"];
 
+    // Add html coloring samples through MultiQC recolor infrastructure 
+    if (samples.length != 0) {  
+
+      for (i = 0; i < samples.length; i++) {
+        $('#mqc_col_filters').append('<li style="color:'+colors[samples[i]]+';" id="'+samples[i]+'"><span class="hc_handle"><span></span><span></span></span><input class="f_text" value="'+samples[i]+'" /><button type="button" class="close" aria-label="Close"><span aria-hidden="true">&times;</span></button></li>');  
+      }
+    
+      $("#mqc_cols_apply").click();
+    }
+  }   
 });
 

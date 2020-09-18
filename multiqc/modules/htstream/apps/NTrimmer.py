@@ -12,21 +12,26 @@ from multiqc.plots import table, bargraph
 
 class NTrimmer():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Trims reads to the longest subsequence that contains no N's."
 		self.type = "bp_reducer"
 
 
+	########################
+	# Table Function
 	def table(self, json, overall_pe, overall_se, zeroes, index):
 
 		# Table construction. Taken from MultiQC docs.
 
+		# If no PE and SE removed, return nothin
 		if (overall_pe + overall_se) == 0:
 			return ""
 
 		headers = OrderedDict()
 
+		# IF values sufficiently small, use raw values
 		if zeroes == False:
 			headers["Nt_%_BP_Lost" + index] = {'title': "% Bp Lost", 'namespace': "% Bp Lost", 'description': 'Percentage of Input bps (SE and PE) trimmed.',
 									   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
@@ -34,17 +39,19 @@ class NTrimmer():
 			headers["Nt_BP_Lost" + index] = {'title': "Total Bp Lost", 'namespace': "Total Bp Lost", 'description': 'Total input bps (SE and PE) trimmed.',
 									 'format': '{:,.0f}', 'scale': 'Greens'}
 
-
+		# IF PE data, add columns
 		if overall_pe != 0:
 			headers["Nt_%_R1_BP_Lost" + index] = {'title': "% R1 of Bp Lost", 'namespace': "% Bp Lost from R1", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 			headers["Nt_%_R2_BP_Lost" + index] = {'title': "% R2 of Bp Lost", 'namespace': "% Bp Lost from R2", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'Greens'}
 
+		# If SE data, add columns
 		if overall_se != 0:
 			headers["Nt_%_SE_BP_Lost" + index] = {'title': "% SE of Bp Lost", 'namespace': "% Bp Lost from SE", 'description': 'Percentage of total trimmed bps.',
 										   'suffix': '%', 'format': '{:,.2f}', 'scale': 'RdPu'}
 
+		# IF data is large enough, include avg.
 		if zeroes == False:
 			headers["Nt_Avg_BP_Trimmed" + index] = {'title': "Avg. Bps Trimmed", 'namespace': "Avg. Bps Trimmed", 'description': 'Average Number of Basepairs Trimmed per Read', 'format': '{:,.2f}', 'scale': 'Blues'}
 			
@@ -63,6 +70,8 @@ class NTrimmer():
 		return table.plot(json, headers)
 
 
+	########################
+	# Table Function
 	def bargraph(self, json, bps):
 
 		# config dict for bar graph
@@ -76,6 +85,7 @@ class NTrimmer():
        							 {'name': "Single End"}]
 				  }
 
+		# Header
 		html = "<h4> NTrimmer: Trimmed Basepairs Composition </h4>\n"
 
 		# returns nothing if no reads were trimmed.
@@ -83,15 +93,16 @@ class NTrimmer():
 			html = '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'	
 			return html
 
+		# If too many samples, get outta here
 		if len(json.keys()) > 150:
 			html = '<div class="alert alert-warning"> <strong>Notice:</strong> Too many samples for bargraph. </div>'	
 			return html
-
 
 		r1_data = {}
 		r2_data = {}
 		se_data = {}
 
+		# Create dictionaries for multidataset bargraphs
 		for key in json:
 
 			r1_data[key] = {"LT_R1": json[key]["Nt_Left_Trimmed_R1"],
@@ -103,8 +114,7 @@ class NTrimmer():
 			se_data[key] = {"LT_SE": json[key]["Nt_Left_Trimmed_SE"],
 						    "RT_SE": json[key]["Nt_Right_Trimmed_SE"]}
 
-
-
+		# Create categores for multidatatset bragraphs
 		cats = [OrderedDict(), OrderedDict(), OrderedDict()]
 		cats[0]["LT_R1"] =   {'name': 'Left Trimmmed'}
 		cats[0]["RT_R1"] =  {'name': 'Right Trimmmed'}
@@ -113,11 +123,14 @@ class NTrimmer():
 		cats[2]["LT_SE"] =   {'name': 'Left Trimmmed'}
 		cats[2]["RT_SE"] =  {'name': 'Right Trimmmed'}
 
+		# create bargraphs
 		html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
 		return html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -132,6 +145,7 @@ class NTrimmer():
 
 			total_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) 
 
+			# IF total lost is zero, avoid division by zero
 			if total_bp_lost == 0:
 				perc_bp_lost = 0
 				total_r1 = 0 
@@ -149,10 +163,11 @@ class NTrimmer():
 			# number ofreads discarded
 			discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"] 
 
-
+			# are values very small?
 			if perc_bp_lost < 0.01 and zeroes == False:
 				zeroes = True
 
+			# overview stats
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
 								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
@@ -177,6 +192,7 @@ class NTrimmer():
 							   "Nt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"]
 							  }
 
+			# accumulatr totals
 			overall_pe += total_r1 + total_r2
 			overall_se += total_se 
 

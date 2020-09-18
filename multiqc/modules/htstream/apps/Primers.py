@@ -12,15 +12,17 @@ from multiqc.plots import table, heatmap
 
 #################################################
 
-
 class Primers():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."
 		self.type = "bp_reducer"		
 
 
+	########################
+	# Table Function
 	def table(self, json, index, total_flipped):
 
 		# standard table constructor. See MultiQC docs.
@@ -33,6 +35,7 @@ class Primers():
 										   'format': '{:,.4f}',
 										   'scale': 'Greens'}
 
+		# IF reads flipped, add col
 		if total_flipped != 0:
 			headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
 		
@@ -41,6 +44,8 @@ class Primers():
 		return table.plot(json, headers)
 
 
+	########################
+	# Heatmap Function
 	def heatmap(self, json, index):
 
 		# config dictionary for heatmaps
@@ -54,31 +59,34 @@ class Primers():
 						        [0, '#FFFFFF'],
 						        [1, '#1DC802']
 						           ]
-    			  }
+    				  }
 
-
-		btn_id = "primers_" + index 
-		unique_id = str(random() % 1000)[2:]
+		# Button and unique ids
+		unique_id = str(random() % 1000)[5:]
 		first = True
 		button_list = []
 	
 		for key in json.keys():
 
 			# creates unique heatmap id that can be queired later by js.
-			heat_pconfig["id"] = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_heatmap_" + index
+			heat_pconfig["id"] = "htstream_primers_" + key + "_" + unique_id + "_heatmap"
 
 			data = []
 			labs = []
 			counts_list = json[key]["Pr_Primer_Counts" + index]
 
+			# get counts and labels
 			for x in range(len(counts_list)):
 				temp = counts_list[x]
 				labs += temp[:-1]
 
+			# remove label dups
 			labs = list(set(labs))
 
+			# Create multidimensional list
 			data = [ [0] * len(labs) for i in range(len(labs)) ] 
 
+			# Appropriately fill list for primer combos
 			for x in range(len(counts_list)):
 				x_pos = labs.index(counts_list[x][0])
 				y_pos = labs.index(counts_list[x][1])
@@ -102,13 +110,12 @@ class Primers():
 
 			# html div attributes and text
 			name = key
-			pid = "htstream_" + btn_id + "_" + key + "_" + unique_id + "_btn"
+			pid = heat_pconfig["id"] + "_btn"
 
-			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this, {i})" id="{pid}">{n}</button>\n'.format(a=active, i=index, pid=pid, n=name))
+			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
 
-
+		# Create html for multiple heatmaps
 		heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
-
 
 		wrapper_html = '<h4> Primers: Primer Counts </h4>'
 		wrapper_html += '''<p>Heatmap indicating abundance of primer combinations.</p>'''
@@ -123,6 +130,8 @@ class Primers():
 		return wrapper_html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -138,6 +147,7 @@ class Primers():
 
 			total_flipped += json[key]["Fragment"]["flipped"]
 
+			# Overview stats
 			overview_dict[key] = {
 								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
 								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],

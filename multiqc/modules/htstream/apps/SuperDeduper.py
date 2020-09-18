@@ -12,17 +12,21 @@ from multiqc.plots import table, linegraph
 
 class SuperDeduper():
 
-
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "A reference free duplicate read removal tool."
 		self.type = "read_reducer"
 
 
+	########################
+	# Table Function
 	def table(self, json, pe_total, se_total, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
 
+		# If no read removed, don't add table
 		if (pe_total + se_total) == 0:
 			html = '<div class="alert alert-info"> <strong>Notice:</strong> No Duplicates in any sample. </div>'	
 			return html
@@ -45,10 +49,11 @@ class SuperDeduper():
 
 		headers["Sd_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
-
 		return table.plot(json, headers)
 
 
+	########################
+	# Linegraph Function
 	def linegraph(self, json, index):
 
 		# plot configurations, list of options in MultiQC docs
@@ -101,6 +106,8 @@ class SuperDeduper():
 		return html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -115,21 +122,25 @@ class SuperDeduper():
 			perc_duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
 			perc_ignored = (json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]) * 100
 			
+			# Will fail if no PE data
 			try:
 				perc_pe_loss = ((json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"])  * 100
 
 			except:
 				perc_pe_loss = 0
 
+			# Will fail if no SE data
 			try:
 				perc_se_loss = ((json[key]["Single_end"]["in"] - json[key]["Single_end"]["out"]) / json[key]["Single_end"]["in"])  * 100
 
 			except:
 				perc_se_loss = 0
 
+			# Accumulate totals
 			pe_total_loss += perc_pe_loss
 			se_total_loss += perc_se_loss 
 
+			# Overview stats
 			overview_dict[key] = {
 								  "PE_Output_Reads": json[key]["Paired_end"]["out"],
 								  "SE_Output_Reads": json[key]["Single_end"]["out"],

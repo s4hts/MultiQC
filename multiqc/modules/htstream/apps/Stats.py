@@ -14,14 +14,28 @@ from multiqc.plots import table, linegraph, heatmap
 
 class Stats():
 
+	########################
+	# Info about App
 	def __init__(self):
 		self.info = "Generates a JSON formatted file containing a set of statistical measures about the input read data."
 		self.type = "both"
+		self.read_keys = {"St_PE_Base_by_Cycle": "PE",
+						  "St_SE_Base_by_Cycle": "SE",
+						  "St_PE_Quality_by_Cycle": "PE",
+						  "St_SE_Quality_by_Cycle": "SE",
+						  "St_PE_Read_Lengths": "PE",
+						  "St_SE_Read_Lengths": "SE",
+						  "PE": "Paired End",
+						  "SE": "Single End"}
 
+
+	########################
+	# Table Function
 	def table(self, json, index):
 
 		# striaght forward table function, right from MultiQC documentation
 		headers = OrderedDict()
+
 		# "St_PE_Fraction" + index
 		headers["St_PE_Fraction" + index] = {'title': "% PE", 'namespace': "% PE", 'description': 'percentage of paried end reads', 'format': '{:,.0f}', 
 											 'format': '{:,.2f}', 'suffix': '%', 'scale': "Greens"}
@@ -39,23 +53,18 @@ class Stats():
 								   'format': '{:,.4f}', 'suffix': '%','scale': 'Green'}
 		headers["St_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
 
-
 		return table.plot(json, headers)
 
 
-
+	########################
+	# Base By cycle sections Functions
 	def base_by_cycle(self, json, read):
 
-		read_keys = {"St_PE_Base_by_Cycle": "PE",
-					 "St_SE_Base_by_Cycle": "SE",
-					 "PE": "Paired End",
-				     "SE": "Single End"}
-
-
-		read_code = read_keys[read]
+		# Read Code and Unique ID
+		read_code = self.read_keys[read]
 		unique_id = str(random() % 1000)[5:]
 
-
+		# Multi Sample Line Config, it's called entropy (even though its not)
 		config = {'id': "htstream_stats_entropy_" + read + "_" + unique_id,
 				  'title': "HTStream: Base by Cycle (" + read_code + ")",
 				  'smooth_points_sumcounts': False,
@@ -68,9 +77,9 @@ class Stats():
 								{'from': 8, 'to': 35, 'color': '#e6dcc3'},
 								{'from': 35, 'to': 100, 'color': '#e6c3c3'},
 								]
-
 				  }
 
+		# Single Sample Base by Cycle Config
 		samp_config = {'id': "htstream_stats_base_line_" + read + "_" + unique_id,
 					  'title': "HTStream: Base by Cycle (" + read_code + ")",
 					  'data_labels': [],
@@ -95,37 +104,24 @@ class Stats():
 									]
 						}
 
-
+		# If paired end, we need to add midpoint line 
 		if read_code == "PE":
 
-			midpoint = 0
-			uniform_pe = True
+			midpoint = htstream_utils.uniform(json, read)
 
-			for key in json.keys():
-
-				temp = (json[key][read][0]["shape"][-1] * 2) 
-
-				if midpoint == 0:
-					midpoint = temp
-
-				elif midpoint == temp:
-					midpoint = midpoint
-
-				else:
-					uniform_pe = False
-					break
-
-			if uniform_pe == True:
+			# If uniform, add line
+			if midpoint != -1:
 				config['xPlotLines'] = [{'color': '#5D4B87', 
 										 "width": 1.5, 
 										 "value": (midpoint - 1) / 2, 
 										 "dashStyle": 'shortdash',
 										 "zIndex": 4}]
 
-
+		# Data list and dictionaries for line graphs
 		line_data = {}
 		data_list = []
 
+		# For each sample, add their line to multi-sample graph and construct their own line graph
 		for samp in json.keys():
 
 			line_data[samp] = {}
@@ -135,27 +131,29 @@ class Stats():
 						 "Base: T": {},
 						 "Base: N": {}}
 
-
+			# If PE< we need to concat base by cycle lists
 			if read_code == "PE":
 				data = [ json[samp][read][0]["data"][x] + json[samp][read][1]["data"][x] for x in range(5) ]
-
-
 			else:
 				data = json[samp][read]["data"]
 
-
+			# Len of reads
 			bases = len(data[0])
 
+			# Iterates through positions
 			for i in range(bases):
 
+				# Total count at position
 				total = sum([base[i] for base in data])
 
+				# Base by Cycle fraction
 				samp_data["Base: A"][i + 1] = (data[0][i] / total) * 100
 				samp_data["Base: C"][i + 1] = (data[1][i] / total) * 100
 				samp_data["Base: G"][i + 1] = (data[2][i] / total) * 100
 				samp_data["Base: T"][i + 1] = (data[3][i] / total) * 100
 				samp_data["Base: N"][i + 1] = (data[4][i] / total) * 100
-								
+				
+				# Avg difference from 25%, N not included
 				avg = sum([ abs(((data[x][i] / total) * 100) - 25) for x in range(4) ]) / 4
 
 				line_data[samp][i + 1] = avg
@@ -170,23 +168,24 @@ class Stats():
 			# append base by cycle to data for this to data list
 			data_list.append(samp_data)
 
-
-		header_html = '<h4> Base by Cycle: ' + read_keys[read_code] + '</h4>'
+		# HTML for plots
+		header_html = '<h4> Base by Cycle: ' + self.read_keys[read_code] + '</h4>'
 		header_html += '''<p> Provides a measure of the uniformity of a distribution. The higher the average is at a certain position,
 							the more unequal the base pair composition. N's are excluded from this calculation. </p>'''
 
+		# Button labels
 		btn_label_1 = "Avg. Diff. from  25%"
 		btn_label_2 = "Base by Cycle"
 
-
+		# Line IDs
 		line_1_id = "htstream_stats_entropy_{r}_{b}".format(r=read_code, b=unique_id)
 		line_2_id = "htstream_stats_base_line_{r}_{b}".format(r=read_code, b=unique_id)
 
-
+		# Actual graphs
 		line_1 = linegraph.plot(line_data, config)
 		line_2 = linegraph.plot(data_list, samp_config)
 
-
+		# Construct multiplot div
 		html = htstream_utils.multi_plot_html(header_html,
 											  btn_label_1, btn_label_2,
 											  line_1_id, line_2_id,
@@ -196,17 +195,12 @@ class Stats():
 		return html
 
 
-
+	########################
+	# Quality By cycle sections Functions
 	def quality_by_cycle(self, json, read):
 
-	
-		read_keys = {"St_PE_Quality_by_Cycle": "PE",
-					 "St_SE_Quality_by_Cycle": "SE",
-					 "PE": "Paired End",
-				     "SE": "Single End"}
-
-
-		read_code = read_keys[read]
+		# Read Code and Unique ID
+		read_code = self.read_keys[read]
 		unique_id = str(random() % 1000)[5:]
 
 		# config dictionary for mean Q score line graph
@@ -221,7 +215,6 @@ class Stats():
 				  'colors': {}
 				  }
 
-
 		# config dictionary for heatmaps
 		heat_pconfig = {
 				   'title': "HTStream: Quality by Cycle (" + read_code + ")",
@@ -230,6 +223,7 @@ class Stats():
 				   'square' : False,
 				   'datalabels': False,
 				   'xcats_samples': False, 
+				   'ycats_samples': False, 
 				   'max': 1.0, 
 				   'colstops': [
 					        [0, '#FFFFFF'],
@@ -239,40 +233,24 @@ class Stats():
 					           ],
     			  }
 
-
-		# check for uniform pe length, if so, add midpoint line to denote paired end reads.
+		# If paired end, we need to add midpoint line 
 		if read_code == "PE":
 
-			midpoint = 0
-			uniform_pe = True
+			midpoint = htstream_utils.uniform(json, read)
 
-			for key in json.keys():
-
-				temp = (json[key][read][0]["shape"][-1] * 2) 
-
-				if midpoint == 0:
-					midpoint = temp
-
-				elif midpoint == temp:
-					midpoint = midpoint
-
-				else:
-					uniform_pe = False
-					break
-
-			if uniform_pe == True:
+			# If uniform, add line
+			if midpoint != -1:
 				line_config['xPlotLines'] = [{'color': '#5D4B87', 
-											 "width": 1.5, 
-											 "value": (midpoint - 1) / 2, 
-											 "dashStyle": 'shortdash',
-											 "zIndex": 4}]	
+											  "width": 1.5, 
+											  "value": (midpoint - 1) / 2, 
+											  "dashStyle": 'shortdash',
+											  "zIndex": 4}]
 		
 
-
+		# Line Data, Button List, and Boolean
 		line_data = {}
 		first = True
 		button_list = []
-
 
 		for key in json.keys():
 
@@ -282,12 +260,15 @@ class Stats():
 			# creates unique heatmap id that can be queired later by js.
 			heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key + "_" + unique_id
 
+			# If PE, we wanna concat quality by cycle data
 			if read_code == "PE":
-
+				
+				# Length of R1, Create concat list, Get Column Names
 				length = len(json[key][read][0]["data"])
 				temp_data = [ json[key][read][0]["data"][x] + json[key][read][1]["data"][x] for x in range(length) ]
 				temp_col_name = [ str(int(x) + int(json[key][read][0]["col_names"][-1]) ) for x in json[key][read][1]["col_names"]]
 
+				# Rewrite JSON for this sample
 				json[key][read] = {
 					 			   "data": temp_data,
 					 			   "col_names": json[key][read][0]["col_names"] + temp_col_name,
@@ -295,13 +276,11 @@ class Stats():
 					 			   "shape": [json[key][read][0]["shape"][0], json[key][read][0]["shape"][-1] + json[key][read][1]["shape"][-1]]
 							 	  }
 
-				del temp_data
-				del temp_col_name
-
 			# creates x and y axis labels for heatmap (categorical)
 			x_lab = [ str(int(x)) for x in json[key][read]["col_names"]]
 			y_lab = json[key][read]["row_names"][::-1] # reverse orientation makes it easier to cycle through
 
+			# Data list
 			data = []
 
 			# create variables for range functions in loops. Represents shape of data
@@ -332,7 +311,8 @@ class Stats():
 					num_above_q30 += 1
 
 
-			# check to see what percent of bases have a mean Q score of at least 30
+			# check to see what percent of bases have a mean Q score of at least 30,
+			#   color samples accordingly.
 			q30_gate = (num_above_q30 / cycles) 
 
 			if q30_gate < 0.6:
@@ -378,23 +358,25 @@ class Stats():
 			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
 
 
-		# section heade
-		header_html = '<h4> Quality by Cycle: ' + read_keys[read_code] + '</h4>'
+		# section head
+		header_html = '<h4> Quality by Cycle: ' + self.read_keys[read_code] + '</h4>'
 		header_html += '''<p> Mean quality score for each position along the read. 
 							  Sample is colored red if less than 60% of bps have mean score of at least Q30, 
 							  orange if between 60% and 80%, and green otherwise.</p>'''
 
+		# Button ID
 		btn_label_1 = "Mean Quality"
 		btn_label_2 = "Quality by Cycle"
 
-
+		# Plot IDs
 		line_1_id = "htstream_qbc_line_{r}_{u}".format(r=read_code, u=unique_id)
 		line_2_id = "htstream_qbc_heat_{r}_{u}".format(r= read_code, u=unique_id)
 
-
+		# HTML of plots
 		line_plot = linegraph.plot(line_data, line_config)
 		heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
 
+		# Construct multiplot div
 		html = htstream_utils.multi_plot_html(header_html,
 											  btn_label_1, btn_label_2,
 											  line_1_id, line_2_id,
@@ -404,16 +386,13 @@ class Stats():
 		return html
 
 
-
-
+	########################
+	# Read Length Heatmaps
 	def read_length(self, json, read):
 
-		read_keys = {"St_PE_Read_Lengths": "PE",
-					 "St_SE_Read_Lengths": "SE"}
-
-		read_code = read_keys[read]
+		# Read cor and unique IDs
+		read_code = self.read_keys[read]
 		unique_id = str(random() % 1000)[5:]
-
 
 		# config dictionary for heatmaps
 		heat_pconfig = {'id' : "htstream_stats_read_lengths_" + read_code + "_" + unique_id,
@@ -432,12 +411,13 @@ class Stats():
 					           ],
     			  }
 
-
+		# Initialize useful lists
 		readlength_data = []
 		lengths = []
 		samples = []
 		max_length = 0 
 
+		# Are all reads from all samples uniform? Let's find out.
 		uniform = True
 
 		for samp in json.keys():
@@ -445,21 +425,26 @@ class Stats():
 			# paired end reads require the histograms be concatenated
 			if read_code == "SE":
 
+				# uniform reads
 				if len(json[samp][read][0]) == 1:
 					uniform = True
 				else:
 					uniform = False
 
+				# Get Read length data
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_SE_in"]
 				
 			else:
 
+				# uniform read lengths
 				if len(json[samp][read][0]) + len(json[samp][read][1]) == 2:
 					uniform = True
+					uni_length = json[samp][read][0][0][0]
 				else:
 					uniform = False
 
+				# Get Read length data for R1 and R2
 				read_lengths = json[samp][read][0]
 				total = json[samp]["St_PE_in"]
 				r2 = [[read_lengths[-1][0] + x[0], x[1]] for x in json[samp][read][1]] 
@@ -468,19 +453,19 @@ class Stats():
 				read_lengths += r2 
 	
 
-
 			# check if max read length is longest, if not update length of lists 
 			if max_length < read_lengths[-1][0]:
-
+				
+				# update max
 				max_length = read_lengths[-1][0]
 				data = [0 for i in range(0, max_length)]
 
+				# update previously processed data lists
 				for i in range(len(readlength_data)):
 
 					temp = readlength_data[i]
 
 					if len(temp) < len(data): 
-
 						readlength_data[i] = temp + [0] * (len(temp) - len(data))  
 
 
@@ -489,7 +474,7 @@ class Stats():
 
 				data[lst[0] - 1] = lst[1] / total
 
-			
+			# add data to lits
 			readlength_data.append(data)
 			samples.append(samp)
 
@@ -497,28 +482,24 @@ class Stats():
 		lengths = [i for i in range(1, max_length + 1)]
 
 		# Title
-		html = '<h4> Read Lengths: ' + read + ' </h4>'
+		html = '<h4> Read Lengths: ' + self.read_keys[read_code] + ' </h4>'
 
 		# If uniform read distributions
 		if uniform == True:
-			html += '\n<div class="alert alert-info"> <strong>Notice:</strong> Read lengths were uniform across samples. </div>'	
+			html += '\n<div class="alert alert-info"> <strong>Notice:</strong> All samples had uniform read lengths. </div>'	
 			return html
 
-		# read type
-		if read_code == "PE":
-			read = "Paired End"
-
-		else:
-			read = "Single End"
-
-
+		# Descriptions
 		html += '''<p> Distribution of read lengths for each sample. </p>'''
 
+		# Construct heatmap
 		html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
 
 		return html
 
 
+	########################
+	# Main Function
 	def execute(self, json, index):
 
 		stats_json = OrderedDict()
@@ -542,7 +523,7 @@ class Stats():
 						       "St_N_Content" + index: n_content * 100 ,
 						       "St_Notes" + index: json[key]["Program_details"]["options"]["notes"]}
 
-
+			# Overview stats
 			overview_stats[key] = {
 								   "GC_Content": gc_content,
 								   "N_Content": n_content,

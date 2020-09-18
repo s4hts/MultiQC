@@ -21,7 +21,6 @@ log = logging.getLogger(__name__)
 # Config Initialization
 hconfig = {}
 
-
 class MultiqcModule(BaseMultiqcModule):
 
 	def __init__(self):
@@ -35,6 +34,9 @@ class MultiqcModule(BaseMultiqcModule):
 
 		# Initialize ordered dictionary (key: samples, values: their respective json files)
 		self.data = OrderedDict()
+		self.overview_stats = {}
+		self.report_sections = {}
+		self.app_order = []
 
 		# Import js and css functions.
 		self.js = { 'assets/js/htstream.js' : os.path.join(os.path.dirname(__file__), 'assets', 'js', 'htstream.js') }
@@ -57,14 +59,14 @@ class MultiqcModule(BaseMultiqcModule):
 			# parse json file
 			file_data = htstream_utils.parse_json(file['s_name'], file['f']) # parse stats file. Should return json directory of apps and their stats 
 
-			self.add_data_source(file) # write file to MultiQC source file 
-			self.data[s_name] = file_data # add sample and stats to OrderedDict
+			# Add data to MultiQC and data structures 
+			self.add_data_source(file) 
+			self.data[s_name] = file_data
 
 
 		# make sure samples are being processed 
 		if len(self.data) == 0:
 			raise UserWarning
-		
 
 		# parse config file
 		hconfig = getattr(config, "htstream_config", {})
@@ -73,10 +75,10 @@ class MultiqcModule(BaseMultiqcModule):
 		if "sample_colors" in hconfig.keys():
 
 			try:
-
 				color_file = hconfig["sample_colors"]
 				hconfig["sample_colors"] = {}
 
+				# Read in specified sample colors
 				with open(color_file, "r") as f:
 					lines = f.readlines()
 
@@ -95,68 +97,56 @@ class MultiqcModule(BaseMultiqcModule):
 		# intro json holding HTStream specific parameters, FASTQC does similar things but with actual data
 		self.intro += '<div id="htstream_config" style="display: none;">{}</div>'.format(json.dumps(hconfig))
 
-		# parse json containing stats on each sample
-		self.generate_reports(self.data) 
+		# parse json containing stats on each sample and generate reports
+		self.process_data(self.data)
+		self.generate_reports() 
 
 
 	#########################
-
 	# Iterate through files and generate report 
-
-	def generate_reports(self, json):
+	def process_data(self, json):
 
 		# import global list of supported apps
 		supported_apps = globals()["supported_apps"]
-
-		# initialize useful variables
-		report_sections = {}
-		app_order = []
-		stats_section = ""
 
 		# checks that order is consistent within stats files 
 		for key in json.keys():
 
 			temp = list(json[key].keys())
 			
-			if app_order == []:
-				app_order = temp
+			if self.app_order == []:
+				self.app_order = temp
 
-			elif app_order == temp:
+			elif self.app_order == temp:
 				continue
 
 			else:
 				log.error("Inconsistent order of HTStream applications.")
 
-
 		# scold people that don't read the documentation
-		if "hts_Stats_1" not in app_order:
+		if "hts_Stats_1" not in self.app_order:
 			log.warning("hts_Stats not found. It is recommended you run this app before and after pipeline.")
-		
 
 		# sort list of samples
 		sample_keys = list(sorted(json.keys()))
 
 		# initialize some more useful variables
-		overview_stats = {
-						  "Pipeline Input": {},
-						  "details": {
-						  			 "read_reducer": [],
-						  			 "bp_reducer": []
-						  			 }
-						 }
+		self.overview_stats = {
+							   "Pipeline Input": {},
+							   "details": {
+						  				   "read_reducer": [],
+						  				   "bp_reducer": []
+						  				  }
+							  }
 		excludes = []
 		stats_wrapper = False
 		pipeline_input = True
 
-
-		############################
-		# process data and generate report sections 
-
 		# process data
-		for i in range(len(app_order)):
+		for i in range(len(self.app_order)):
 
 			# clean up app name
-			app = app_order[i]
+			app = self.app_order[i]
 			program = app.split("hts_")[-1].split("_")[0]
 
 			# Check if app is supported
@@ -174,7 +164,7 @@ class MultiqcModule(BaseMultiqcModule):
 				stats_dict[key] = json[key][app]
 
 				# populate info for first app in pipeline
-				if pipeline_input == True and len(app_order) > 1:
+				if pipeline_input == True and len(self.app_order) > 1:
 					
 					# paired end reads? 
 					try:
@@ -195,12 +185,12 @@ class MultiqcModule(BaseMultiqcModule):
 						se_in_bps = 0 
 
 					# add info
-					overview_stats["Pipeline Input"][key] = {
-															 "PE_Input_Reads": pe_in_reads,
-															 "PE_Input_Bps": pe_in_bps,
-															 "SE_Input_Reads": se_in_reads,
-															 "SE_Input_Bps": se_in_bps
-															}
+					self.overview_stats["Pipeline Input"][key] = {
+																  "PE_Input_Reads": pe_in_reads,
+																  "PE_Input_Bps": pe_in_bps,
+																  "SE_Input_Reads": se_in_reads,
+																  "SE_Input_Bps": se_in_bps
+																 }
 					
 			pipeline_input = False					
 
@@ -214,11 +204,11 @@ class MultiqcModule(BaseMultiqcModule):
 
 				# add app to list of read or bp reducers
 				if app.type == "both":
-					overview_stats["details"]["read_reducer"].append(program)
-					overview_stats["details"]["bp_reducer"].append(program)
+					self.overview_stats["details"]["read_reducer"].append(program)
+					self.overview_stats["details"]["bp_reducer"].append(program)
 
 				else:
-					overview_stats["details"][app.type].append(program)
+					self.overview_stats["details"][app.type].append(program)
 
 
 				# dictionary of subsections
@@ -228,7 +218,7 @@ class MultiqcModule(BaseMultiqcModule):
 				if len(section_dict.keys()) != 0:
 
 					# get overview sectino data
-					overview_stats[app_name] = section_dict["Overview"] 
+					self.overview_stats[app_name] = section_dict["Overview"] 
 
 					# construct html for section
 					html = ""
@@ -244,28 +234,22 @@ class MultiqcModule(BaseMultiqcModule):
 					description = app.info
 
 					# add report section to dictionary, to be added later
-					report_sections[app_name] = {'description': description,
-												 'html': html}
-	
-
-		# get rid of data that is no longer needed, usually this isn't an issue,
-		#     but for some reason, tons of memeory is used during compression.
-		#     Better just clean it up.
-		stats_dict.clear()
-		del stats_dict
+					self.report_sections[app_name] = {'description': description,
+													  'html': html}
 
 
-		############################
-		# add sections
+	############################
+	# add sections
+	def generate_reports(self):
 
 		# add pipeline overview section if appropriate
-		if overview_stats != {} and len(app_order) > 1:
+		if self.overview_stats != {} and len(self.app_order) > 1:
 
 			try:
 				app = globals()["OverviewStats"]()
 
 				description = "General statistics from the HTStream pipeline."
-				html, stats_data = app.execute(overview_stats, app_order)
+				html, stats_data = app.execute(self.overview_stats, self.app_order)
 
 				self.write_data_file(stats_data, 'htstream_raw_overview_data')
 				
@@ -276,13 +260,9 @@ class MultiqcModule(BaseMultiqcModule):
 			except:
 			  	log.warning("Report Section for Processing Overview Failed.")
 
-
-		# good bye overview data
-		overview_stats.clear()
-		del overview_stats
 		
 		# add app sections
-		for section, content in report_sections.items():
+		for section, content in self.report_sections.items():
 
 				temp_list = section.split("_")
 
