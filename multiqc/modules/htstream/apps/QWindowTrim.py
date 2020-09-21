@@ -69,7 +69,7 @@ class QWindowTrim():
 		config = {
 				  "title": "HTStream: QWindowTrim Trimmed Basepairs Bargraph",
 				  'id': "htstream_qwindowtrimmer_bargraph_" + index,
-				  'ylab' : "Samples",
+				  'ylab' : "Basepairs",
 				  'cpswitch_c_active': False,
 				  'data_labels': [{'name': "Read 1"},
        							 {'name': "Read 2"},
@@ -78,6 +78,8 @@ class QWindowTrim():
 
 		# Header 
 		html = "<h4> QWindowTrim: Trimmed Basepairs Composition </h4>\n" 
+		html += "<p>Plots the number of low quality basepairs trimmed from ends of paired end and single end reads.</p>"
+
 
 		# If too many samples, don't add bargraph
 		if len(json.keys()) > 150:

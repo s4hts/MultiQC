@@ -66,11 +66,13 @@ class AdapterTrimmer():
 		# configuration dictionary for bar graph
 		config = {'title': "HTStream: Trimmed Bp Composition Bargraph",
 				  'id': "htstream_adaptertrimmer_bargraph",
-				  'ylab' : "Samples",
+				  'ylab' : "Basepairs",
 				  'cpswitch_c_active': True}
 
 		# Title
 		html = "<h4> AdapterTrimmer: Trimmed Basepairs Composition </h4>\n" 
+		html += "<p>Composition of basepairs trimmed from the ends of paired end and single end reads.</p>"
+
 
 		# if no overlaps at all are present, return nothing
 		if avg_bp_trimmed == 0:

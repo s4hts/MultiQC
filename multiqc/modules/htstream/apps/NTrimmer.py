@@ -78,7 +78,7 @@ class NTrimmer():
 		config = {
 				  "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
 				  'id': "htstream_ntrimmer_bargraph",
-				  'ylab' : "Samples",
+				  'ylab' : "Basepairs",
 				  'cpswitch_c_active': False,
 				  'data_labels': [{'name': "Read 1"},
        							 {'name': "Read 2"},
@@ -87,6 +87,8 @@ class NTrimmer():
 
 		# Header
 		html = "<h4> NTrimmer: Trimmed Basepairs Composition </h4>\n"
+		html += "<p>Plots the number of N bases trimmed from ends of paired end and single end reads.</p>"
+
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:

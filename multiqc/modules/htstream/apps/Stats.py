@@ -479,6 +479,9 @@ class Stats():
 
 		# Title
 		html = '<h4> Read Lengths: ' + self.read_keys[read_code] + ' </h4>'
+		# Descriptions
+		html += '''<p> Distribution of read lengths for each sample. </p>'''
+
 
 		if len(uniform_dict.keys()) == len(json.keys()):
 
@@ -500,9 +503,6 @@ class Stats():
 
 			# X Labels
 			lengths = [i for i in range(1, max_length + 1)]
-
-			# Descriptions
-			html += '''<p> Distribution of read lengths for each sample. </p>'''
 
 			# Construct heatmap
 			html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)

@@ -66,6 +66,7 @@ class SuperDeduper():
 		data = {}
 		invariant_saturation_dict = {}
 		html = "<h4> SuperDeduper: Duplicate Saturation </h4>\n"
+		html += "<p>Plots the number of duplicates against the number of unique reads per sample.</p>"
 
 		for key in json.keys():
 

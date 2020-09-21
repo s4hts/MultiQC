@@ -59,7 +59,7 @@ class CutTrim():
 		config = {
 				  "title": "HTStream: CutTrim Trimmed Basepairs Bargraph",
 				  'id': "htstream_qwindowtrimmer_bargraph",
-				  'ylab' : "Samples",
+				  'ylab' : "Basepairs",
 				  'cpswitch_c_active': False,
 				  'data_labels': [{'name': "Read 1"},
        							 {'name': "Read 2"},
@@ -68,6 +68,8 @@ class CutTrim():
 		
 		# Header
 		html = "<h4> CutTrim: Trimmed Basepairs Composition </h4>\n"
+		html += "<p>Plots the number of basepairs cut from paired end and single end reads</p>"
+
 
 		# returns nothing if no reads were trimmed.
 		if bps == 0:

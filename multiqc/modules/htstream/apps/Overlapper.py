@@ -56,6 +56,8 @@ class Overlapper():
 
 		# Header 
 		html = "<h4> Overlapper: Overlap Composition </h4>\n"
+		html += "<p>Plots the quantities of insert types for each sample.</p>"
+
 
 		# if no overlaps at all are present, return nothing
 		if inserts == 0:
@@ -103,7 +105,9 @@ class Overlapper():
 
 				multi_line[key][item[0]] = item[1]
 
-		html = "<h4> Overlapper: Overlapped Lengths </h4>\n" +linegraph.plot(multi_line, config)
+		html = "<h4> Overlapper: Overlapped Lengths </h4>\n"
+		html += "<p>Plots the lengths of paired end read overlaps.</p>"
+		html += linegraph.plot(multi_line, config)
 
 		return html
 
