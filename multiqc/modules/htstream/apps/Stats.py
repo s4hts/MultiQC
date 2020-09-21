@@ -457,25 +457,20 @@ class Stats():
 				
 				# update max
 				max_length = read_lengths[-1][0]
-				data = [0 for i in range(0, max_length)]
+				
 
-				# update previously processed data lists
-				for i in range(len(readlength_data)):
-
-					temp = readlength_data[i]
-
-					if len(temp) < len(data): 
-						readlength_data[i] = temp + [0] * (len(temp) - len(data))  
-
+			data = [0 for i in range(0, read_lengths[-1][0])]
 
 			# populate data 
 			for lst in read_lengths:
 
 				data[lst[0] - 1] = lst[1] / total
 
+
 			# add data to lits
 			readlength_data.append(data)
 			samples.append(samp)
+
 
 		# Title
 		html = '<h4> Read Lengths: ' + self.read_keys[read_code] + ' </h4>'
