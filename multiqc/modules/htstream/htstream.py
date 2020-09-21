@@ -138,8 +138,7 @@ class MultiqcModule(BaseMultiqcModule):
 						  				   "bp_reducer": []
 						  				  }
 							  }
-		excludes = []
-		stats_wrapper = False
+
 		pipeline_input = True
 
 		# process data

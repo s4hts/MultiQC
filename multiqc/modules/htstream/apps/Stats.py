@@ -37,9 +37,9 @@ class Stats():
 		headers = OrderedDict()
 
 		# "St_PE_Fraction" + index
-		headers["St_PE_Fraction" + index] = {'title': "% PE", 'namespace': "% PE", 'description': 'percentage of paried end reads', 'format': '{:,.0f}', 
+		headers["St_PE_Fraction" + index] = {'title': "% PE", 'namespace': "% PE", 'description': 'percentage of paried end reads', 
 											 'format': '{:,.2f}', 'suffix': '%', 'scale': "Greens"}
-		headers["St_SE_Fraction" + index] = {'title': "% SE", 'namespace': "% SE", 'description': 'percentage of paried end reads', 'format': '{:,.0f}', 
+		headers["St_SE_Fraction" + index] = {'title': "% SE", 'namespace': "% SE", 'description': 'percentage of paried end reads',
 											 'format': '{:,.2f}', 'suffix': '%', 'scale': "RdPu"}
 		headers["St_R1_Q30" + index] = {'title': "% R1 Q30", 'namespace': "% R1 Q30", 'description': 'percentage of read 1 bps Q30 or greater', 
 										'format': '{:,.2f}', 'suffix': '%', 'scale': 'Blues'}
@@ -111,11 +111,14 @@ class Stats():
 
 			# If uniform, add line
 			if midpoint != -1:
-				config['xPlotLines'] = [{'color': '#5D4B87', 
+				line_list = [{'color': '#5D4B87', 
 										 "width": 1.5, 
 										 "value": (midpoint - 1) / 2, 
 										 "dashStyle": 'shortdash',
 										 "zIndex": 4}]
+
+				config['xPlotLines'] = line_list
+				samp_config['xPlotLines'] = line_list
 
 		# Data list and dictionaries for line graphs
 		line_data = {}
@@ -418,7 +421,7 @@ class Stats():
 		max_length = 0 
 
 		# Are all reads from all samples uniform? Let's find out.
-		uniform = True
+		uniform_dict = {}
 
 		for samp in json.keys():
 
@@ -427,9 +430,7 @@ class Stats():
 
 				# uniform reads
 				if len(json[samp][read][0]) == 1:
-					uniform = True
-				else:
-					uniform = False
+					uniform_dict[samp] = {"St_Read_Lengths_SE_" + unique_id: json[samp][read][0][0][0]}
 
 				# Get Read length data
 				read_lengths = json[samp][read][0]
@@ -439,10 +440,8 @@ class Stats():
 
 				# uniform read lengths
 				if len(json[samp][read][0]) + len(json[samp][read][1]) == 2:
-					uniform = True
-					uni_length = json[samp][read][0][0][0]
-				else:
-					uniform = False
+					uniform_dict[samp] = {"St_Read_Lengths_R1_" + unique_id: json[samp][read][0][0][0],
+										  "St_Read_Lengths_R2_" + unique_id: json[samp][read][1][0][0]}
 
 				# Get Read length data for R1 and R2
 				read_lengths = json[samp][read][0]
@@ -478,24 +477,37 @@ class Stats():
 			readlength_data.append(data)
 			samples.append(samp)
 
-		# X Labels
-		lengths = [i for i in range(1, max_length + 1)]
-
 		# Title
 		html = '<h4> Read Lengths: ' + self.read_keys[read_code] + ' </h4>'
 
-		# If uniform read distributions
-		if uniform == True:
-			html += '\n<div class="alert alert-info"> <strong>Notice:</strong> All samples had uniform read lengths. </div>'	
+		if len(uniform_dict.keys()) == len(json.keys()):
+
+			headers = OrderedDict()
+
+			headers["St_Read_Lengths_SE_" + unique_id] = {'title': "SE Read Lengths", 'namespace': "SE Read Lengths", 'description': 'Length of SE reads (uniform for each sample).',
+														  'format': '{:,.0f}', 'scale': 'Blues'}
+			headers["St_Read_Lengths_R1_" + unique_id] = {'title': "R1 Read Lengths", 'namespace': "R1 Read Lengths", 'description': 'Length of R1 reads (uniform for each sample).',
+														  'format': '{:,.0f}', 'scale': 'Blues'}
+			headers["St_Read_Lengths_R2_" + unique_id] = {'title': "R2 Read Lengths", 'namespace': "R2 Read Lengths", 'description': 'Length of R2 reads (uniform for each sample).',
+														  'format': '{:,.0f}', 'scale': 'Greens'}
+
+			html += '\n<div class="alert alert-info"> <strong>Notice:</strong> Each sample has a uniform read length distribution. </div>'	
+			html += table.plot(uniform_dict, headers)
+
 			return html
 
-		# Descriptions
-		html += '''<p> Distribution of read lengths for each sample. </p>'''
+		else:
 
-		# Construct heatmap
-		html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
+			# X Labels
+			lengths = [i for i in range(1, max_length + 1)]
 
-		return html
+			# Descriptions
+			html += '''<p> Distribution of read lengths for each sample. </p>'''
+
+			# Construct heatmap
+			html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
+
+			return html
 
 
 	########################
