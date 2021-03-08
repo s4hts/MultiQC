@@ -12,161 +12,167 @@ from multiqc.plots import table, heatmap
 
 #################################################
 
-class Primers():
 
-	########################
-	# Info about App
-	def __init__(self):
-		self.info = "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."
-		self.type = "bp_reducer"		
+class Primers:
 
+    ########################
+    # Info about App
+    def __init__(self):
+        self.info = "Identifies primer sequences located on the 5' ends of R1 and R2, or 5' and 3' end of SE reads."
+        self.type = "bp_reducer"
 
-	########################
-	# Table Function
-	def table(self, json, index, total_flipped):
+    ########################
+    # Table Function
+    def table(self, json, index, total_flipped):
 
-		# standard table constructor. See MultiQC docs.
-		headers = OrderedDict()
+        # standard table constructor. See MultiQC docs.
+        headers = OrderedDict()
 
-		headers["Pr_%_BP_Lost" + index] = {'title': "% Bp Lost",
-										   'namespace': "% Bp Lost",
-										   'description': 'Percentage of bps lost.',
-										   'suffix': '%',
-										   'format': '{:,.4f}',
-										   'scale': 'Greens'}
+        headers["Pr_%_BP_Lost" + index] = {
+            "title": "% Bp Lost",
+            "namespace": "% Bp Lost",
+            "description": "Percentage of bps lost.",
+            "suffix": "%",
+            "format": "{:,.4f}",
+            "scale": "Greens",
+        }
 
-		# IF reads flipped, add col
-		if total_flipped != 0:
-			headers["Pr_Reads_Flipped" + index] = {'title': "Reads Flipped", 'namespace': "Reads Flipped", 'description': 'Number of Flipped Reads', 'format': '{:,.0f}', 'scale': 'Blues'}
-		
-		headers["Pr_Notes" + index] = {'title': "Notes", 'namespace': "Notes", 'description': 'Notes'}
+        # IF reads flipped, add col
+        if total_flipped != 0:
+            headers["Pr_Reads_Flipped" + index] = {
+                "title": "Reads Flipped",
+                "namespace": "Reads Flipped",
+                "description": "Number of Flipped Reads",
+                "format": "{:,.0f}",
+                "scale": "Blues",
+            }
 
-		return table.plot(json, headers)
+        headers["Pr_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
 
+        return table.plot(json, headers)
 
-	########################
-	# Heatmap Function
-	def heatmap(self, json, index):
+    ########################
+    # Heatmap Function
+    def heatmap(self, json, index):
 
-		# config dictionary for heatmaps
-		heat_pconfig = {'id' : "htstream_primers_bargraph_" + index,
-					   'title': "HTStream: Primers Heatmap",
-					   'square' : False,
-					   'datalabels': False,
-					   'xcats_samples': False, 
-					   'ycats_samples': False, 
-					   'colstops': [
-						        [0, '#FFFFFF'],
-						        [1, '#1DC802']
-						           ]
-    				  }
+        # config dictionary for heatmaps
+        heat_pconfig = {
+            "id": "htstream_primers_bargraph_" + index,
+            "title": "HTStream: Primers Heatmap",
+            "square": False,
+            "datalabels": False,
+            "xcats_samples": False,
+            "ycats_samples": False,
+            "colstops": [[0, "#FFFFFF"], [1, "#1DC802"]],
+        }
 
-		# Button and unique ids
-		unique_id = str(random() % 1000)[5:]
-		first = True
-		button_list = []
-	
-		for key in json.keys():
+        # Button and unique ids
+        unique_id = str(random() % 1000)[5:]
+        first = True
+        button_list = []
 
-			# creates unique heatmap id that can be queired later by js.
-			heat_pconfig["id"] = "htstream_primers_" + key + "_" + unique_id + "_heatmap"
+        for key in json.keys():
 
-			data = []
-			labs = []
-			counts_list = json[key]["Pr_Primer_Counts" + index]
+            # creates unique heatmap id that can be queired later by js.
+            heat_pconfig["id"] = "htstream_primers_" + key + "_" + unique_id + "_heatmap"
 
-			# get counts and labels
-			for x in range(len(counts_list)):
-				temp = counts_list[x]
-				labs += temp[:-1]
+            data = []
+            labs = []
+            counts_list = json[key]["Pr_Primer_Counts" + index]
 
-			# remove label dups
-			labs = list(set(labs))
+            # get counts and labels
+            for x in range(len(counts_list)):
+                temp = counts_list[x]
+                labs += temp[:-1]
 
-			# Create multidimensional list
-			data = [ [0] * len(labs) for i in range(len(labs)) ] 
+            # remove label dups
+            labs = list(set(labs))
 
-			# Appropriately fill list for primer combos
-			for x in range(len(counts_list)):
-				x_pos = labs.index(counts_list[x][0])
-				y_pos = labs.index(counts_list[x][1])
-				data[x_pos][y_pos] = counts_list[x][-1]
-				data[y_pos][x_pos] = counts_list[x][-1]
-			
+            # Create multidimensional list
+            data = [[0] * len(labs) for i in range(len(labs))]
 
-			# if this is the first sample process, lucky them, they get to be shown first and marked as active.
-			#	This step is necessary otherwise, the plot div is not initialized. The additional calls to the 
-			#	heatmap function are simply to add the data to the internal jsons used by MultiQC
-			if first == True:
-				active = "active" # button is default active
-				first = False # shuts off first gate
+            # Appropriately fill list for primer combos
+            for x in range(len(counts_list)):
+                x_pos = labs.index(counts_list[x][0])
+                y_pos = labs.index(counts_list[x][1])
+                data[x_pos][y_pos] = counts_list[x][-1]
+                data[y_pos][x_pos] = counts_list[x][-1]
 
-				heatmap_html = heatmap.plot(data, labs, labs, heat_pconfig)
+            # if this is the first sample process, lucky them, they get to be shown first and marked as active.
+            # 	This step is necessary otherwise, the plot div is not initialized. The additional calls to the
+            # 	heatmap function are simply to add the data to the internal jsons used by MultiQC
+            if first == True:
+                active = "active"  # button is default active
+                first = False  # shuts off first gate
 
-			else:
-				active = "" # button is default off 
-				heatmap.plot(data, labs, labs, heat_pconfig)
+                heatmap_html = heatmap.plot(data, labs, labs, heat_pconfig)
 
+            else:
+                active = ""  # button is default off
+                heatmap.plot(data, labs, labs, heat_pconfig)
 
-			# html div attributes and text
-			name = key
-			pid = heat_pconfig["id"] + "_btn"
+            # html div attributes and text
+            name = key
+            pid = heat_pconfig["id"] + "_btn"
 
-			button_list.append('<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(a=active, pid=pid, n=name))
+            button_list.append(
+                '<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(
+                    a=active, pid=pid, n=name
+                )
+            )
 
-		# Create html for multiple heatmaps
-		heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
+        # Create html for multiple heatmaps
+        heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
 
-		wrapper_html = '<h4> Primers: Primer Counts </h4>'
-		wrapper_html += '''<p>Heatmap indicating abundance of primer combinations.</p>'''
+        wrapper_html = "<h4> Primers: Primer Counts </h4>"
+        wrapper_html += """<p>Heatmap indicating abundance of primer combinations.</p>"""
 
-		# Heatmaps
-		wrapper_html  += '''<div class="mqc_hcplot_plotgroup">'''
-		wrapper_html += '<div id="htstream_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
-		wrapper_html += heatmap_plot + "</div></div>"
+        # Heatmaps
+        wrapper_html += """<div class="mqc_hcplot_plotgroup">"""
+        wrapper_html += '<div id="htstream_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
+        wrapper_html += heatmap_plot + "</div></div>"
 
-		final_html = wrapper_html 
+        final_html = wrapper_html
 
-		return wrapper_html
+        return wrapper_html
 
+    ########################
+    # Main Function
+    def execute(self, json, index):
 
-	########################
-	# Main Function
-	def execute(self, json, index):
+        stats_json = OrderedDict()
+        overview_dict = {}
 
-		stats_json = OrderedDict()
-		overview_dict = {}
+        total_flipped = 0
 
-		total_flipped = 0
+        for key in json.keys():
 
-		for key in json.keys():
+            reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
+            bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
+            perc_bp_lost = bp_lost / json[key]["Fragment"]["basepairs_in"]
 
-			reads_lost = ( json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"] ) / json[key]["Fragment"]["in"]
-			bp_lost = ( json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"] )
-			perc_bp_lost = bp_lost / json[key]["Fragment"]["basepairs_in"]
+            total_flipped += json[key]["Fragment"]["flipped"]
 
-			total_flipped += json[key]["Fragment"]["flipped"]
+            # Overview stats
+            overview_dict[key] = {
+                "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"]
+                + json[key]["Paired_end"]["Read2"]["basepairs_out"],
+                "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
+                "Fraction_Bp_Lost": bp_lost / json[key]["Fragment"]["basepairs_in"],
+            }
 
-			# Overview stats
-			overview_dict[key] = {
-								  "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"] + json[key]["Paired_end"]["Read2"]["basepairs_out"],
-								  "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
-								  "Fraction_Bp_Lost": bp_lost / json[key]["Fragment"]["basepairs_in"]
-								  }
+            stats_json[key] = {
+                "Pr_%_BP_Lost" + index: perc_bp_lost * 100,
+                "Pr_Primer_Counts" + index: json[key]["Fragment"]["primers_counts"],
+                "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
+                "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
+            }
 
-			stats_json[key] = {
-							   "Pr_%_BP_Lost" + index: perc_bp_lost * 100,
-							   "Pr_Primer_Counts" + index: json[key]["Fragment"]['primers_counts'],
-							   "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
-							   "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
-							  }
+        # dictionary for sections and figure function calls
+        section = {
+            "Table": self.table(stats_json, index, total_flipped),
+            "Primer Counts": self.heatmap(stats_json, index),
+            "Overview": overview_dict,
+        }
 
-
-		# dictionary for sections and figure function calls
-		section = {
-				   "Table": self.table(stats_json, index, total_flipped),
-				   "Primer Counts": self.heatmap(stats_json, index),
-				   "Overview": overview_dict
-				   }
-
-		return section
+        return section
