@@ -30,7 +30,4 @@ ehthumbs.db
 Thumbs.db
 
 .idea/
-<<<<<<< HEAD
-=======
 runTest.sh
->>>>>>> upstream/master
