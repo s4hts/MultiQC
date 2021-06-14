@@ -6,6 +6,7 @@ Helper functions to manipulate colours and colour scales
 from __future__ import print_function
 import spectra
 import numpy as np
+import os
 import re
 
 # Default logger will be replaced by caller
@@ -15,17 +16,17 @@ logger = logging.getLogger(__name__)
 
 
 class mqc_colour_scale(object):
-    """ Class to hold a colour scheme. """
+    """Class to hold a colour scheme."""
 
     def __init__(self, name="GnBu", minval=0, maxval=100):
-        """ Initialise class with a colour scale """
+        """Initialise class with a colour scale"""
 
         self.colours = self.get_colours(name)
         self.name = name
 
         # Sanity checks
-        minval = re.sub("[^0-9\.-]", "", str(minval))
-        maxval = re.sub("[^0-9\.-]", "", str(maxval))
+        minval = re.sub("[^0-9\.-e]", "", str(minval))
+        maxval = re.sub("[^0-9\.-e]", "", str(maxval))
         if minval == "":
             minval = 0
         if maxval == "":
@@ -40,8 +41,8 @@ class mqc_colour_scale(object):
             self.minval = float(minval)
             self.maxval = float(maxval)
 
-    def get_colour(self, val, colformat="hex"):
-        """ Given a value, return a colour within the colour scale """
+    def get_colour(self, val, colformat="hex", lighten=0.3):
+        """Given a value, return a colour within the colour scale"""
         try:
             # When we have non-numeric values (e.g. Male/Female, Yes/No, chromosome names, etc), and a qualitive
             # scale (Set1, Set3, etc), we don't want to attempt to parse numbers, otherwise we will end up with all
@@ -56,7 +57,7 @@ class mqc_colour_scale(object):
 
             else:
                 # Sanity checks
-                val = re.sub("[^0-9\.-]", "", str(val))
+                val = re.sub("[^0-9\.-e]", "", str(val))
                 if val == "":
                     val = self.minval
                 val = float(val)
@@ -68,7 +69,7 @@ class mqc_colour_scale(object):
 
                 # Weird, I know. I ported this from the original JavaScript for continuity
                 # Seems to work better than adjusting brightness / saturation / luminosity
-                rgb_converter = lambda x: max(0, min(1, 1 + ((x - 1) * 0.3)))
+                rgb_converter = lambda x: max(0, min(1, 1 + ((x - 1) * lighten)))
                 thecolour = spectra.rgb(*[rgb_converter(v) for v in my_scale(val).rgb])
 
                 return thecolour.hexcode
