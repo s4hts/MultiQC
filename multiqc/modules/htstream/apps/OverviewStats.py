@@ -29,12 +29,7 @@ class OverviewStats:
             "xlab": "Tool",
             "ylab": "Counts",
             "tt_decimals": "{point.y:.0f}'",
-            "colors": {
-                "SE Reads": "#1EC2D0",
-                "PE Reads": "#E8961B",
-                "SE Bps": "#1EC2D0",
-                "PE Bps": "#E8961B",
-            },
+            "colors": {"SE Reads": "#1EC2D0", "PE Reads": "#E8961B", "SE Bps": "#1EC2D0", "PE Bps": "#E8961B"},
             "data_labels": [],
         }
 

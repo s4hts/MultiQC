@@ -139,7 +139,6 @@ class SuperDeduper:
             perc_duplicates = (json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]) * 100
             perc_ignored = (json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]) * 100
 
-
             # Will fail if no PE data
             try:
                 perc_pe_loss = (
@@ -178,7 +177,6 @@ class SuperDeduper:
                 "Sd_Duplicates": json[key]["Fragment"]["duplicate"],
                 "Sd_Saturation": json[key]["Fragment"]["duplicate_saturation"],
             }
-
 
         # output dictionary, keys are section, value is function called for figure generation
         section = {
