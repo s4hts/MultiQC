@@ -171,6 +171,8 @@ busco:
   fn: "short_summary*"
   contents: "BUSCO version is:"
   num_lines: 1
+bustools:
+  fn: "*inspect.json"
 custom_content:
   fn_re: '.+_mqc\.(yaml|yml|json|txt|csv|tsv|log|out|png|jpg|jpeg|html)'
 clipandmerge:
@@ -698,5 +700,14 @@ vcftools/tstv_by_qual:
   fn: "*.TsTv.qual"
 vcftools/tstv_summary:
   fn: "*.TsTv.summary"
+vep/vep_html:
+  fn: "*.html"
+  contents: "VEP summary"
+  num_lines: 10
+  max_filesize: 1000000
+vep/vep_txt:
+  contents: "[VEP run statistics]"
+  num_lines: 1
+  max_filesize: 100000
 verifybamid/selfsm:
   fn: "*.selfSM"
