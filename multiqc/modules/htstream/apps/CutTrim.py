@@ -81,7 +81,7 @@ class CutTrim:
         # config dict for bar graph
         config = {
             "title": "HTStream: CutTrim Trimmed Basepairs Bargraph",
-            "id": "htstream_qwindowtrimmer_bargraph",
+            "id": "htstream_cuttrim_bargraph",
             "ylab": "Basepairs",
             "cpswitch_c_active": False,
             "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],

@@ -1,15 +1,20 @@
 from inspect import isclass
-from pkgutil import iter_modules
+#from pkgutil import iter_modules
 from pathlib import Path
 from importlib import import_module
+
+from os.path import dirname, basename, isfile, join
+import glob
 
 # global list of support
 globals()["supported_apps"] = []
 
-# iterate through the modules in the current package
-package_dir = Path(__file__).resolve().parent
+modules = glob.glob(join(dirname(__file__), "*.py"))
+__all__ = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
 
-for (_, module_name, _) in iter_modules([package_dir]):
+
+#for (_, module_name, _) in iter_modules([package_dir]):
+for module_name in __all__:
 
     # import the module and assign it to a global variable
     module = import_module(f"{__name__}.{module_name}")
@@ -30,3 +35,4 @@ for (_, module_name, _) in iter_modules([package_dir]):
 
     else:
         globals()[module_name] = module
+

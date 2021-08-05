@@ -50,36 +50,6 @@ class NTrimmer:
                 "scale": "Greens",
             }
 
-        # IF PE data, add columns
-        if overall_pe != 0:
-            headers["Nt_%_R1_BP_Lost" + index] = {
-                "title": "% R1 of Bp Lost",
-                "namespace": "% Bp Lost from R1",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "RdPu",
-            }
-            headers["Nt_%_R2_BP_Lost" + index] = {
-                "title": "% R2 of Bp Lost",
-                "namespace": "% Bp Lost from R2",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "Greens",
-            }
-
-        # If SE data, add columns
-        if overall_se != 0:
-            headers["Nt_%_SE_BP_Lost" + index] = {
-                "title": "% SE of Bp Lost",
-                "namespace": "% Bp Lost from SE",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "RdPu",
-            }
-
         # IF data is large enough, include avg.
         if zeroes == False:
             headers["Nt_Avg_BP_Trimmed" + index] = {
@@ -146,12 +116,12 @@ class NTrimmer:
 
         # Create categores for multidatatset bragraphs
         cats = [OrderedDict(), OrderedDict(), OrderedDict()]
-        cats[0]["LT_R1"] = {"name": "Left Trimmmed"}
-        cats[0]["RT_R1"] = {"name": "Right Trimmmed"}
-        cats[1]["LT_R2"] = {"name": "Left Trimmmed"}
-        cats[1]["RT_R2"] = {"name": "Right Trimmmed"}
-        cats[2]["LT_SE"] = {"name": "Left Trimmmed"}
-        cats[2]["RT_SE"] = {"name": "Right Trimmmed"}
+        cats[0]["LT_R1"] = {"name": "R1 Left Trimmmed"}
+        cats[0]["RT_R1"] = {"name": "R1 Right Trimmmed"}
+        cats[1]["LT_R2"] = {"name": "R2 Left Trimmmed"}
+        cats[1]["RT_R2"] = {"name": "R2 Right Trimmmed"}
+        cats[2]["LT_SE"] = {"name": "SE Left Trimmmed"}
+        cats[2]["RT_SE"] = {"name": "SE Right Trimmmed"}
 
         # create bargraphs
         html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
