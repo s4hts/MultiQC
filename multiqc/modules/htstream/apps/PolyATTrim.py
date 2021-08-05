@@ -21,12 +21,12 @@ class PolyATTrim:
 
     ########################
     # Table Function
-    def table(self, json, overall_pe, overall_se, zeroes, index):
+    def table(self, json, overall, zeroes, index):
 
         # Table construction. Taken from MultiQC docs.
 
         # If no polyAT trimmerd, no need for table
-        if (overall_pe + overall_se) == 0:
+        if (overall) == 0:
             return ""
 
         headers = OrderedDict()
@@ -122,8 +122,7 @@ class PolyATTrim:
         overview_dict = {}
 
         # accumulator variable. Used to prevent empty bargraphs
-        overall_pe = 0
-        overall_se = 0
+        overall = 0
         zeroes = False
 
         for key in json.keys():
@@ -168,7 +167,7 @@ class PolyATTrim:
             overall += total_bp_lost
 
         # section and figure function calls
-        section = {"Table": self.table(stats_json, overall_pe, overall_se, zeroes, index), 
+        section = {"Table": self.table(stats_json, overall, zeroes, index), 
                    "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, overall),
                    "Overview": overview_dict}
 
