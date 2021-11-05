@@ -36,23 +36,41 @@ class AdapterTrimmer:
         # Some columns have SUPER small values, add raw counts instead of percentages
         if zeroes == False:
             decimals = "{:,.2f}"
+
+            headers["At_%_BP_Lost" + index] = {
+                "title": "% Bp Lost",
+                "namespace": "Bp Lost",
+                "description": "Percentage of Input bps (SE and PE) trimmed.",
+                "scale": "RdPu",
+                "suffix": "%",
+                "format": decimals,
+            }
+            headers["At_%_Adapters" + index] = {
+                "title": "% Adapters",
+                "namespace": "Adapters",
+                "description": "Percentage of Reads (SE and PE) with an Adapter",
+                "scale": "Blues",
+                "suffix": "%",
+                "format": decimals,
+            }
+
         else:
             decimals = "{:,.0f}"
 
-        headers["At_BP_Lost" + index] = {
-            "title": "Bp Lost",
-            "namespace": "Bp Lost",
-            "description": "Input bps (SE and PE) trimmed.",
-            "scale": "RdPu",
-            "format": decimals,
-        }
-        headers["At_Adapters" + index] = {
-            "title": "Adapters",
-            "namespace": "Adapters",
-            "description": "Reads (SE and PE) with an Adapter",
-            "scale": "Blues",
-            "format": decimals,
-        }
+            headers["At_BP_Lost" + index] = {
+                "title": "Bp Lost",
+                "namespace": "Bp Lost",
+                "description": "Input bps (SE and PE) trimmed.",
+                "scale": "RdPu",
+                "format": decimals,
+            }
+            headers["At_Adapters" + index] = {
+                "title": "Adapters",
+                "namespace": "Adapters",
+                "description": "Reads (SE and PE) with an Adapter",
+                "scale": "Blues",
+                "format": decimals,
+            }
 
         # More columns
         headers["At_Avg_BP_Trimmed" + index] = {

@@ -34,16 +34,26 @@ class PolyATTrim:
         # If values are small, use raw counts
         if zeroes == False:
             decimals = "{:,.2f}"
+
+            headers["Pt_%_BP_Lost" + index] = {
+                "title": "% Total Bp Lost",
+                "namespace": "Total Bp Lost",
+                "description": "Percentage of Total input bps (SE and PE) trimmed.",
+                "format": decimals,
+                "suffix": "%",
+                "scale": "Greens",
+            }
+
         else:
             decimals = "{:,.0f}"
 
-        headers["Pt_BP_Lost" + index] = {
-            "title": "Total Bp Lost",
-            "namespace": "Total Bp Lost",
-            "description": "Total input bps (SE and PE) trimmed.",
-            "format": decimals,
-            "scale": "Greens",
-        }
+            headers["Pt_BP_Lost" + index] = {
+                "title": "Total Bp Lost",
+                "namespace": "Total Bp Lost",
+                "description": "Total input bps (SE and PE) trimmed.",
+                "format": decimals,
+                "scale": "Greens",
+            }
 
         # If values are small, use raw counts
         if zeroes == False:

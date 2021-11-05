@@ -34,17 +34,27 @@ class NTrimmer:
         # IF values sufficiently small, use raw values
         if zeroes == False:
             decimals = "{:,.0f}"
+
+            headers["Nt_%_BP_Lost" + index] = {
+                "title": "% Bp Lost",
+                "namespace": "% Bp Lost",
+                "description": "Percentage of Input bps (SE and PE) trimmed.",
+                "suffix": "%",
+                "format": decimals,
+                "scale": "Greens",
+            }
+
         else:
             decimals = "{:,.2f}"
 
-        headers["Nt_%_BP_Lost" + index] = {
-            "title": "% Bp Lost",
-            "namespace": "% Bp Lost",
-            "description": "Percentage of Input bps (SE and PE) trimmed.",
-            "suffix": "%",
-            "format": decimals,
-            "scale": "Greens",
-        }
+            headers["Nt_BP_Lost" + index] = {
+                "title": "Bp Lost",
+                "namespace": "Bp Lost",
+                "description": "Percentage of Input bps (SE and PE) trimmed.",
+                "suffix": "%",
+                "format": decimals,
+                "scale": "Greens",
+            }
 
         # IF data is large enough, include avg.
         if zeroes == False:
