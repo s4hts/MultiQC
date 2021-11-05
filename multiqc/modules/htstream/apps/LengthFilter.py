@@ -65,6 +65,39 @@ class LengthFilter:
         return table.plot(json, headers)
 
     ########################
+    # Bargraphs Function
+    def bargraph(self, json, reads_trimmed, index):
+
+        # configuration dictionary for bar graph
+        config = {
+            "title": "HTStream: Composition of Reads Lost Bargraph",
+            "id": "htstream_lengthfilter_bargraph_" + index,
+            "ylab": "Reads",
+        }
+
+        # Title
+        html = "<h4> LengthFilter: Composition of Reads Lost </h4>\n"
+        html += "<p>Composition of reads removed.</p>"
+
+        # if no overlaps at all are present, return nothing
+        if reads_trimmed == 0:
+            html += '<div class="alert alert-info"> <strong>Notice:</strong> No reads were removed from samples. </div>'
+            return html
+
+        # bargraph dictionary. Exact use of example in MultiQC docs.
+        categories = OrderedDict()
+
+        # Colors for sections
+        categories["Lf_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+        categories["Lf_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+        categories["Lf_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+
+        # Create bargrpah
+        html += bargraph.plot(json, categories, config)
+
+        return html
+
+    ########################
     # Main Function
     def execute(self, json, index):
 
@@ -122,12 +155,16 @@ class LengthFilter:
                 "Lf_PE_loss" + index: pe_perc_loss,
                 "Lf_PE_Orphaned" + index: pe_orphaned,
                 "Lf_SE_loss" + index: se_perc_loss,
+                "Lf_R1_lost": json[key]["Paired_end"]["Read1"]["discarded"],
+                "Lf_R2_lost": json[key]["Paired_end"]["Read2"]["discarded"],
+                "Lf_SE_lost": json[key]["Single_end"]["discarded"],
                 "Lf_Notes" + index: json[key]["Program_details"]["options"]["notes"],
             }
 
         # sections and figure function calls
         section = {
             "Table": self.table(stats_json, pe_total_loss, se_total_loss, pe_orphaned_total, index),
+            "Read Composition Bargraph": self.bargraph(stats_json, (pe_total_loss + se_total_loss), index),
             "Overview": overview_dict,
         }
 

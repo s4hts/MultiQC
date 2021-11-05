@@ -21,34 +21,30 @@ class NTrimmer:
 
     ########################
     # Table Function
-    def table(self, json, overall_pe, overall_se, zeroes, index):
+    def table(self, json, total, zeroes, index):
 
         # Table construction. Taken from MultiQC docs.
 
         # If no PE and SE removed, return nothin
-        if (overall_pe + overall_se) == 0:
+        if (total) == 0:
             return ""
 
         headers = OrderedDict()
 
         # IF values sufficiently small, use raw values
         if zeroes == False:
-            headers["Nt_%_BP_Lost" + index] = {
-                "title": "% Bp Lost",
-                "namespace": "% Bp Lost",
-                "description": "Percentage of Input bps (SE and PE) trimmed.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "Greens",
-            }
+            decimals = "{:,.0f}"
         else:
-            headers["Nt_BP_Lost" + index] = {
-                "title": "Total Bp Lost",
-                "namespace": "Total Bp Lost",
-                "description": "Total input bps (SE and PE) trimmed.",
-                "format": "{:,.0f}",
-                "scale": "Greens",
-            }
+            decimals = "{:,.2f}"
+
+        headers["Nt_%_BP_Lost" + index] = {
+            "title": "% Bp Lost",
+            "namespace": "% Bp Lost",
+            "description": "Percentage of Input bps (SE and PE) trimmed.",
+            "suffix": "%",
+            "format": decimals,
+            "scale": "Greens",
+        }
 
         # IF data is large enough, include avg.
         if zeroes == False:
@@ -66,7 +62,7 @@ class NTrimmer:
             "description": "Percentage of Reads (SE and PE) Discarded",
             "suffix": "%",
             "max": 100,
-            "format": "{:,.2f}",
+            "format": decimals,
             "scale": "Oranges",
         }
 
@@ -75,13 +71,49 @@ class NTrimmer:
         return table.plot(json, headers)
 
     ########################
+    # Bargraphs Function
+    def bargraph_1(self, json, bps_trimmed, index):
+
+        # configuration dictionary for bar graph
+        config = {
+            "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
+            "id": "htstream_ntrimmer_bargraph_1_" + index,
+            "ylab": "Reads",
+            "cpswitch_c_active": False,
+        }
+
+        # Title
+        html = "<h4> NTrimmer: Read Composition of Bps Trimmed </h4>\n"
+        html += "<p>Read Composition of basepairs trimmed.</p>"
+
+        # if no overlaps at all are present, return nothing
+        if bps_trimmed == 0:
+            html += (
+                '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
+            )
+            return html
+
+        # bargraph dictionary. Exact use of example in MultiQC docs.
+        categories = OrderedDict()
+
+        # Colors for sections
+        categories["Nt_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+        categories["Nt_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+        categories["Nt_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+
+        # Create bargrpah
+        html += bargraph.plot(json, categories, config)
+
+        return html
+
+    ########################
     # Table Function
-    def bargraph(self, json, bps):
+    def bargraph_2(self, json, bps, index):
 
         # config dict for bar graph
         config = {
             "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
-            "id": "htstream_ntrimmer_bargraph",
+            "id": "htstream_ntrimmer_bargraph_2_" + index,
             "ylab": "Basepairs",
             "cpswitch_c_active": False,
             "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],
@@ -94,11 +126,6 @@ class NTrimmer:
         # returns nothing if no reads were trimmed.
         if bps == 0:
             html = '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'
-            return html
-
-        # If too many samples, get outta here
-        if len(json.keys()) > 150:
-            html = '<div class="alert alert-warning"> <strong>Notice:</strong> Too many samples for bargraph. </div>'
             return html
 
         r1_data = {}
@@ -144,33 +171,16 @@ class NTrimmer:
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
 
-            # IF total lost is zero, avoid division by zero
-            if total_bp_lost == 0:
-                perc_bp_lost = 0
-                total_r1 = 0
-                total_r2 = 0
-                total_se = 0
+            perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
 
-            else:
-                perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+            total_r1 = (
+                json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
+            )
 
-                total_r1 = (
-                    (
-                        json[key]["Paired_end"]["Read1"]["basepairs_in"]
-                        - json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                    )
-                    / total_bp_lost
-                ) * 100
-                total_r2 = (
-                    (
-                        json[key]["Paired_end"]["Read2"]["basepairs_in"]
-                        - json[key]["Paired_end"]["Read2"]["basepairs_out"]
-                    )
-                    / total_bp_lost
-                ) * 100
-                total_se = (
-                    (json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]) / total_bp_lost
-                ) * 100
+            total_r2 = (
+                json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
+            )
+            total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
             # number ofreads discarded
             discarded_reads = json[key]["Single_end"]["discarded"] + json[key]["Paired_end"]["discarded"]
@@ -191,12 +201,12 @@ class NTrimmer:
             stats_json[key] = {
                 "Nt_%_BP_Lost" + index: perc_bp_lost,
                 "Nt_BP_Lost" + index: total_bp_lost,
-                "Nt_%_R1_BP_Lost" + index: total_r1,
-                "Nt_%_R2_BP_Lost" + index: total_r2,
-                "Nt_%_SE_BP_Lost" + index: total_se,
                 "Nt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
                 "Nt_%_Discarded" + index: (discarded_reads / json[key]["Fragment"]["in"]) * 100,
                 "Nt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
+                "Nt_R1_lost": total_r1,
+                "Nt_R2_lost": total_r2,
+                "Nt_SE_lost": total_se,
                 "Nt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
                 "Nt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
                 "Nt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
@@ -211,8 +221,9 @@ class NTrimmer:
 
         # section and figure function calls
         section = {
-            "Table": self.table(stats_json, overall_pe, overall_se, zeroes, index),
-            "Trimmed Reads": self.bargraph(stats_json, (overall_pe + overall_se)),
+            "Table": self.table(stats_json, (overall_pe + overall_se), zeroes, index),
+            "Composition Trimmed": self.bargraph_1(stats_json, (overall_pe + overall_se), index),
+            "Trimmed Bps": self.bargraph_2(stats_json, (overall_pe + overall_se), index),
             "Overview": overview_dict,
         }
 

@@ -35,38 +35,24 @@ class AdapterTrimmer:
 
         # Some columns have SUPER small values, add raw counts instead of percentages
         if zeroes == False:
-            headers["At_%_BP_Lost" + index] = {
-                "title": "% Bp Lost",
-                "namespace": "% Bp Lost",
-                "description": "Percentage of Input bps (SE and PE) trimmed.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "RdPu",
-            }
-            headers["At_%_Adapters" + index] = {
-                "title": "% Adapters",
-                "namespace": "% Adapters",
-                "description": "Percentage of Reads (SE and PE) with an Adapter",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "Blues",
-            }
-
+            decimals = "{:,.2f}"
         else:
-            headers["At_BP_Lost" + index] = {
-                "title": "Bp Lost",
-                "namespace": "Bp Lost",
-                "description": "Input bps (SE and PE) trimmed.",
-                "scale": "RdPu",
-                "format": "{:,.0f}",
-            }
-            headers["At_Adapters" + index] = {
-                "title": "Adapters",
-                "namespace": "Adapters",
-                "description": "Reads (SE and PE) with an Adapter",
-                "scale": "Blues",
-                "format": "{:,.0f}",
-            }
+            decimals = "{:,.0f}"
+
+        headers["At_BP_Lost" + index] = {
+            "title": "Bp Lost",
+            "namespace": "Bp Lost",
+            "description": "Input bps (SE and PE) trimmed.",
+            "scale": "RdPu",
+            "format": decimals,
+        }
+        headers["At_Adapters" + index] = {
+            "title": "Adapters",
+            "namespace": "Adapters",
+            "description": "Reads (SE and PE) with an Adapter",
+            "scale": "Blues",
+            "format": decimals,
+        }
 
         # More columns
         headers["At_Avg_BP_Trimmed" + index] = {
@@ -82,12 +68,12 @@ class AdapterTrimmer:
 
     ########################
     # Bargraphs Function
-    def bargraph(self, json, avg_bp_trimmed):
+    def bargraph(self, json, avg_bp_trimmed, index):
 
         # configuration dictionary for bar graph
         config = {
             "title": "HTStream: Trimmed Bp Composition Bargraph",
-            "id": "htstream_adaptertrimmer_bargraph",
+            "id": "htstream_adaptertrimmer_bargraph_" + index,
             "ylab": "Basepairs",
             "cpswitch_c_active": True,
         }
@@ -101,11 +87,6 @@ class AdapterTrimmer:
             html += (
                 '<div class="alert alert-info"> <strong>Notice:</strong> No adapters were trimmed from samples. </div>'
             )
-            return html
-
-        # If too many samples, forget about it.
-        if len(json.keys()) > 150:
-            html += '<div class="alert alert-warning"> <strong>Notice:</strong> Too many samples for bargraph. </div>'
             return html
 
         # bargraph dictionary. Exact use of example in MultiQC docs.
@@ -202,7 +183,7 @@ class AdapterTrimmer:
         # sections and figure function calls
         section = {
             "Table": self.table(stats_json, total, zeroes, index),
-            "Bp Composition Bargraph": self.bargraph(stats_json, total),
+            "Bp Composition Bargraph": self.bargraph(stats_json, total, index),
             "Overview": overview_dict,
         }
 

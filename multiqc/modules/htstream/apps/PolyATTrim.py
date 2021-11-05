@@ -21,34 +21,29 @@ class PolyATTrim:
 
     ########################
     # Table Function
-    def table(self, json, overall, zeroes, index):
+    def table(self, json, total, zeroes, index):
 
         # Table construction. Taken from MultiQC docs.
 
         # If no polyAT trimmerd, no need for table
-        if (overall) == 0:
+        if (total) == 0:
             return ""
 
         headers = OrderedDict()
 
         # If values are small, use raw counts
         if zeroes == False:
-            headers["Pt_%_BP_Lost" + index] = {
-                "title": "% Bp Lost",
-                "namespace": "% Bp Lost",
-                "description": "Percentage of Input bps (SE and PE) trimmed.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "Greens",
-            }
+            decimals = "{:,.2f}"
         else:
-            headers["Pt_BP_Lost" + index] = {
-                "title": "Total Bp Lost",
-                "namespace": "Total Bp Lost",
-                "description": "Total input bps (SE and PE) trimmed.",
-                "format": "{:,.0f}",
-                "scale": "Greens",
-            }
+            decimals = "{:,.0f}"
+
+        headers["Pt_BP_Lost" + index] = {
+            "title": "Total Bp Lost",
+            "namespace": "Total Bp Lost",
+            "description": "Total input bps (SE and PE) trimmed.",
+            "format": decimals,
+            "scale": "Greens",
+        }
 
         # If values are small, use raw counts
         if zeroes == False:
@@ -64,15 +59,14 @@ class PolyATTrim:
 
         return table.plot(json, headers)
 
-
     ########################
     # Bargraph Function
-    def bargraph(self, json, bps):
+    def bargraph(self, json, bps, index):
 
-         # config dict for bar graph
+        # config dict for bar graph
         config = {
             "title": "HTStream: PolyATTrim Trimmed Basepairs Bargraph",
-            "id": "htstream_polyattrim_bargraph",
+            "id": "htstream_polyattrim_bargraph_" + index,
             "ylab": "Basepairs",
             "cpswitch_c_active": False,
             "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],
@@ -135,7 +129,6 @@ class PolyATTrim:
 
             else:
                 perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
-                
 
             # If values are small, use raw counts
             if perc_bp_lost < 0.01 and zeroes == False:
@@ -167,8 +160,10 @@ class PolyATTrim:
             overall += total_bp_lost
 
         # section and figure function calls
-        section = {"Table": self.table(stats_json, overall, zeroes, index), 
-                   "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, overall),
-                   "Overview": overview_dict}
+        section = {
+            "Table": self.table(stats_json, overall, zeroes, index),
+            "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, overall, index),
+            "Overview": overview_dict,
+        }
 
         return section

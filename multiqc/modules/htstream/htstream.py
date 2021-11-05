@@ -24,7 +24,8 @@ log = logging.getLogger(__name__)
 hconfig = {}
 
 modules = glob.glob(join(dirname(__file__), "apps/*.py"))
-globals()["supported_apps"] = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith('__init__.py')]
+globals()["supported_apps"] = [basename(f)[:-3] for f in modules if isfile(f) and not f.endswith("__init__.py")]
+
 
 class MultiqcModule(BaseMultiqcModule):
     def __init__(self):

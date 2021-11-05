@@ -21,12 +21,12 @@ class QWindowTrim:
 
     ########################
     # Table Function
-    def table(self, json, pe_bps, se_bps, index):
+    def table(self, json, total, index):
 
         # Table construction. Taken from MultiQC docs.
 
         # If no SE and BP lost, dont add table
-        if (pe_bps + se_bps) == 0:
+        if (total) == 0:
             return ""
 
         headers = OrderedDict()
@@ -39,36 +39,6 @@ class QWindowTrim:
             "format": "{:,.2f}",
             "scale": "Greens",
         }
-
-        # If PE data, add cols
-        if pe_bps != 0:
-            headers["Qt_%_R1_BP_Lost" + index] = {
-                "title": "% R1 of Bp Lost",
-                "namespace": "% Bp Lost from R1",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "RdPu",
-            }
-            headers["Qt_%_R2_BP_Lost" + index] = {
-                "title": "% R2 of Bp Lost",
-                "namespace": "% Bp Lost from R2",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "Greens",
-            }
-
-        # If SE data, add cols
-        if se_bps != 0:
-            headers["Qt_%_SE_BP_Lost" + index] = {
-                "title": "% SE of Bp Lost",
-                "namespace": "% Bp Lost from SE",
-                "description": "Percentage of total trimmed bps.",
-                "suffix": "%",
-                "format": "{:,.2f}",
-                "scale": "RdPu",
-            }
 
         headers["Qt_Avg_BP_Trimmed" + index] = {
             "title": "Avg. Bps Trimmed",
@@ -91,13 +61,49 @@ class QWindowTrim:
         return table.plot(json, headers)
 
     ########################
+    # Bargraphs Function
+    def bargraph_1(self, json, reads_trimmed, index):
+
+        # configuration dictionary for bar graph
+        config = {
+            "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
+            "id": "htstream_qwindowtrimmer_bargraph_1" + index,
+            "ylab": "Reads",
+            "cpswitch_c_active": False,
+        }
+
+        # Title
+        html = "<h4> QWindowTrim: Read Composition of Bps Trimmed </h4>\n"
+        html += "<p>Read Composition of basepairs trimmed.</p>"
+
+        # if no overlaps at all are present, return nothing
+        if reads_trimmed == 0:
+            html += (
+                '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
+            )
+            return html
+
+        # bargraph dictionary. Exact use of example in MultiQC docs.
+        categories = OrderedDict()
+
+        # Colors for sections
+        categories["Qt_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+        categories["Qt_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+        categories["Qt_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+
+        # Create bargrpah
+        html += bargraph.plot(json, categories, config)
+
+        return html
+
+    ########################
     # Bargraph Function
-    def bargraph(self, json, bps, index):
+    def bargraph_2(self, json, bps, index):
 
         # config dict for bar graph
         config = {
-            "title": "HTStream: QWindowTrim Trimmed Basepairs Bargraph",
-            "id": "htstream_qwindowtrimmer_bargraph_" + index,
+            "title": "HTStream: Trimmed Basepairs Bargraph",
+            "id": "htstream_qwindowtrimmer_bargraph_2_" + index,
             "ylab": "Basepairs",
             "cpswitch_c_active": False,
             "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],
@@ -170,46 +176,24 @@ class QWindowTrim:
             else:
                 perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
 
-                # Will fail if no PE data
-                try:
-                    total_r1 = (
-                        (
-                            json[key]["Paired_end"]["Read1"]["basepairs_in"]
-                            - json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                        )
-                        / total_bp_lost
-                    ) * 100
-                    total_r2 = (
-                        (
-                            json[key]["Paired_end"]["Read2"]["basepairs_in"]
-                            - json[key]["Paired_end"]["Read2"]["basepairs_out"]
-                        )
-                        / total_bp_lost
-                    ) * 100
-                    left_pe_trimmed = (
-                        json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"]
-                    )
-                    right_pe_trimmed = (
-                        json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"]
-                    )
-                    total_pe = left_pe_trimmed + right_pe_trimmed
+                total_r1 = (
+                    json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
+                )
+                total_r2 = (
+                    json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
+                )
 
-                except:
-                    total_r1 = 0
-                    total_r2 = 0
-                    total_pe = 0
+                left_pe_trimmed = (
+                    json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"]
+                )
+                right_pe_trimmed = (
+                    json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"]
+                )
+                total_pe = left_pe_trimmed + right_pe_trimmed
 
-                # Will fail if no SE data
-                try:
-                    total_se = (
-                        (json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"])
-                        / total_bp_lost
-                    ) * 100
-                    left_se_trimmed = json[key]["Single_end"]["leftTrim"]
-                    right_se_trimmed = json[key]["Single_end"]["rightTrim"]
-
-                except:
-                    total_se = 0
+                total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
+                left_se_trimmed = json[key]["Single_end"]["leftTrim"]
+                right_se_trimmed = json[key]["Single_end"]["rightTrim"]
 
             bp_in = json[key]["Fragment"]["basepairs_in"]
 
@@ -229,11 +213,11 @@ class QWindowTrim:
             # sample dictionary entry
             stats_json[key] = {
                 "Qt_%_BP_Lost" + index: perc_bp_lost,
-                "Qt_%_R1_BP_Lost" + index: total_r1,
-                "Qt_%_R2_BP_Lost" + index: total_r2,
-                "Qt_%_SE_BP_Lost" + index: total_se,
                 "Qt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
                 "Qt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
+                "Qt_R1_lost": total_r1,
+                "Qt_R2_lost": total_r2,
+                "Qt_SE_lost": total_se,
                 "Qt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
                 "Qt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
                 "Qt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
@@ -248,8 +232,9 @@ class QWindowTrim:
 
         # sections and figure function calls
         section = {
-            "Table": self.table(stats_json, overall_pe, overall_se, index),
-            "Trimmed Basepairs": self.bargraph(stats_json, (overall_pe + overall_se), index),
+            "Table": self.table(stats_json, (overall_pe + overall_se), index),
+            "Trimmed Composition": self.bargraph_1(stats_json, (overall_pe + overall_se), index),
+            "Trimmed Basepairs": self.bargraph_2(stats_json, (overall_pe + overall_se), index),
             "Overview": overview_dict,
         }
 
