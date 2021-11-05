@@ -307,8 +307,9 @@ class Stats:
             # create dictionary for line graph. Again, format is {x: y}
             line_data[key] = {}
 
+            key_id = str(random() % 1000)[2:8]
             # creates unique heatmap id that can be queired later by js.
-            heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key + "_" + unique_id
+            heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key_id + "_" + unique_id
 
             # If PE, we wanna concat quality by cycle data
             if read_code == "PE":
