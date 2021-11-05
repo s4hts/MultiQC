@@ -307,7 +307,7 @@ class Stats:
             # create dictionary for line graph. Again, format is {x: y}
             line_data[key] = {}
 
-            key_id = str(random() % 1000)[2:8]
+            key_id = str(random() % 1000)[5:10]
             # creates unique heatmap id that can be queired later by js.
             heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key_id + "_" + unique_id
 
