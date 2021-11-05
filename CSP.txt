@@ -35,5 +35,15 @@ script-src 'self'
     'sha256-8kPZc83fQr/qzo5ISaYAcLl4M5meLuuTzHFVRGb4GhU=' # multiqc_mpl.js
     'sha256-1pWjCVoi5AoQvT52zb72qGCpIpfJzlc9trKcbcarXUY=' # multiqc_toolbox.js
     'sha256-gB0osLOAZOyj1tcLhUs/xzf98qK3dfViuIJdX0lI8xA=' # multiqc_fastqc.js
+    
+    'sha256-TUYHIjQsABv4n1G4GdIAz0ZljvuXPEvQ9T20Sok7TvE=' # ////////////////////////////////////////////////// Base JS for MultiQC Reports//
+    'sha256-teMLGfDW72TRam2f0Fnj53uchjf3tQR9N0xo+hR2PXU=' # ////////////////////////////////////////////////// MultiQC Table code///////////
+    'sha256-AEcY37NW7iIjmlzDOPZvuAorKHxXZxsECPnuSP52fB8=' # ////////////////////////////////////////////////// HighCharts Plotting Code/////
+    'sha256-iPIReyQyAoheerXqjtulr8WN7lPMWacMVU4awy5CTJg=' # ////////////////////////////////////////////////// Static MatPlotLib Plots Javas
+    'sha256-KGgqQTL/PWbF29mNXwFnepbDYBEnTKdMtejlNhEiXfs=' # ////////////////////////////////////////////////// MultiQC Report Toolbox Code//
+    'sha256-RO0nmf6TEJtrp+R4JF8N4UrF+A2Hfkb8BKxyS7nM5go=' # // Return JS code required for plotting a single sample// RSeQC plot. Attempt to
+    'sha256-kH3IklvmfvBiZprdCgEZqGuZjhiGEF5V3tHncoRciQI=' # // Javascript for the FastQC MultiQC Mod///////////////// Per Base Sequence Cont
+    'sha256-NXm6btt3SaSrMpn3ubq276L3yuxUtGJ8i6ds0Wa8GTA=' # // Functions//////////////////////////////////////////////////// Button Status S
+
     'unsafe-eval'
 ;
