@@ -32,8 +32,21 @@ class NTrimmer:
         headers = OrderedDict()
 
         # IF values sufficiently small, use raw values
-        if zeroes == False:
+        if zeroes == True:
+
             decimals = "{:,.0f}"
+
+            headers["Nt_BP_Lost" + index] = {
+                "title": "Bp Lost",
+                "namespace": "Bp Lost",
+                "description": "Input bps (SE and PE) trimmed.",
+                "format": decimals,
+                "scale": "Greens",
+            }
+
+        else:
+
+            decimals = "{:,.2f}"
 
             headers["Nt_%_BP_Lost" + index] = {
                 "title": "% Bp Lost",
@@ -44,27 +57,13 @@ class NTrimmer:
                 "scale": "Greens",
             }
 
-        else:
-            decimals = "{:,.2f}"
-
-            headers["Nt_BP_Lost" + index] = {
-                "title": "Bp Lost",
-                "namespace": "Bp Lost",
-                "description": "Percentage of Input bps (SE and PE) trimmed.",
-                "suffix": "%",
-                "format": decimals,
-                "scale": "Greens",
-            }
-
-        # IF data is large enough, include avg.
-        if zeroes == False:
-            headers["Nt_Avg_BP_Trimmed" + index] = {
-                "title": "Avg. Bps Trimmed",
-                "namespace": "Avg. Bps Trimmed",
-                "description": "Average Number of Basepairs Trimmed per Read",
-                "format": "{:,.2f}",
-                "scale": "Blues",
-            }
+        headers["Nt_Avg_BP_Trimmed" + index] = {
+            "title": "Avg. Bps Trimmed",
+            "namespace": "Avg. Bps Trimmed",
+            "description": "Average Number of Basepairs Trimmed per Read",
+            "format": "{:,.2f}",
+            "scale": "Blues",
+        }
 
         headers["Nt_%_Discarded" + index] = {
             "title": "% Discarded",
