@@ -38,6 +38,7 @@ class MultiqcModule(BaseMultiqcModule):
             anchor="htstream",
             href="https://s4hts.github.io/HTStream/",
             info=" quality control and processing pipeline for High Throughput Sequencing data.",
+            doi="",
         )
 
         # Initialize ordered dictionary (key: samples, values: their respective json files)
