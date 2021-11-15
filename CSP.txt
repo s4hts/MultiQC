@@ -46,6 +46,8 @@ script-src 'self'
     'sha256-8kPZc83fQr/qzo5ISaYAcLl4M5meLuuTzHFVRGb4GhU=' # multiqc_mpl.js
     'sha256-1pWjCVoi5AoQvT52zb72qGCpIpfJzlc9trKcbcarXUY=' # multiqc_toolbox.js
     'sha256-gB0osLOAZOyj1tcLhUs/xzf98qK3dfViuIJdX0lI8xA=' # multiqc_fastqc.js
+
+    'sha256-NXm6btt3SaSrMpn3ubq276L3yuxUtGJ8i6ds0Wa8GTA=' # htstream.js
     
     'unsafe-eval'
 ;
