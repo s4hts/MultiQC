@@ -26,7 +26,7 @@ class NTrimmer:
         # Table construction. Taken from MultiQC docs.
 
         # If no PE and SE removed, return nothin
-        if (total) == 0:
+        if total == 0:
             return ""
 
         headers = OrderedDict()

@@ -113,11 +113,6 @@ class QWindowTrim:
         html = "<h4> QWindowTrim: Trimmed Basepairs Composition </h4>\n"
         html += "<p>Plots the number of low quality basepairs trimmed from ends of paired end and single end reads.</p>"
 
-        # If too many samples, don't add bargraph
-        if len(json.keys()) > 150:
-            html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'
-            return html
-
         r1_data = {}
         r2_data = {}
         se_data = {}

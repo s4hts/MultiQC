@@ -72,11 +72,6 @@ class Overlapper:
             html += '<div class="alert alert-info"> <strong>Notice:</strong> No overlaps present in samples. </div>'
             return html
 
-        # If too many samples, dont plot
-        if len(json.keys()) > 150:
-            html += '<div class="alert alert-warning"> <strong>Warning:</strong> Too many samples for bargraph. </div>'
-            return html
-
         # bargraph dictionary. Exact use of example in MultiQC docs.
         categories = OrderedDict()
 
