@@ -177,8 +177,8 @@ class Overlapper:
 
             # Overview stats
             overview_dict[key] = {
-                "PE_Output_Reads": json[key]["Paired_end"]["out"],
-                "SE_Output_Reads": json[key]["Single_end"]["out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Overlap_Length_Max": parsed_hist_stats["Max"],
                 "Overlap_Length_Med": parsed_hist_stats["Median"],
                 "Sin": sins / json[key]["Fragment"]["in"],

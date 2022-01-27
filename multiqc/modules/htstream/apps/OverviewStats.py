@@ -9,122 +9,62 @@ from multiqc.plots import table, linegraph, scatter
 
 
 class OverviewStats:
-    def composition_and_reduction(self, json, app_list, data_type):
+    def read_and_basepair_reduction(self, json, app_list):
 
-        line_config_1 = {
-            "id": "htstream_overview_" + data_type + "_reduction",
+        line_config = {
+            "id": "htstream_overview_reduction",
             "smooth_points_sumcounts": False,
-            "logswitch": False,
             "categories": True,
-            "xlab": "Tool",
-            "ylab": "Counts",
             "tt_decimals": "{point.y:.0f}'",
+            "data_labels": [
+                {"name": "Reads", "ylab": "Counts", "xlab": "Tool"},
+                {"name": "Basepairs", "ylab": "Counts", "xlab": "Tool"},
+            ],
         }
 
-        line_config_2 = {
-            "id": "htstream_overview_" + data_type + "composition",
-            "smooth_points_sumcounts": False,
-            "logswitch": True,
-            "categories": True,
-            "xlab": "Tool",
-            "ylab": "Counts",
-            "tt_decimals": "{point.y:.0f}'",
-            "colors": {"SE Reads": "#1EC2D0", "PE Reads": "#E8961B", "SE Bps": "#1EC2D0", "PE Bps": "#E8961B"},
-            "data_labels": [],
-        }
-
-        # Define variables so code is less messy later
-        if data_type == "read":
-            html_title = "Fragment Reduction"
-            line_config_1["title"] = "HTStream: " + html_title
-            line_config_2["title"] = "HTStream: Fragment Composition"
-            reducers = json["details"]["read_reducer"]
-            index = "Reads"
-            notice = "No Read Reducing Apps were found."
-
-        else:
-            html_title = "Basepair Reduction"
-            line_config_1["title"] = "HTStream: " + html_title
-            line_config_2["title"] = "HTStream: Basepair Composition"
-            reducers = json["details"]["bp_reducer"]
-            index = "Bps"
-            notice = "No Read Reducing Apps were found."
-
-        # Containers for line graph data
-        reducing_line = {}
-        composition_data_list = []
+        data = [{}, {}]
 
         # Initialize lists for sample and app order
         samples = list(json["Pipeline Input"].keys())
         app_list = ["Pipeline Input"] + app_list  # preserves order of elements
-        app_subset = ["Pipeline Input"]
+        read_reducers = json["details"]["read_reducer"]
+        bp_reducers = json["details"]["bp_reducer"]
 
         for samp in samples:
 
-            # dictionaries for line graphs
-            reducing_line[samp] = {}
-            composition_line = {"SE " + index: {}, "PE " + index: {}}
+            # initilize read and bp line dicts
+            data[0][samp] = {}
+            data[1][samp] = {}
 
             # Iterate through app list, if desired app is found,
-            #   grab total read counts and se/pe compisiton
+            #   grab total read counts and bp counts
             #   and add them to line graphs.
 
             for app in app_list:
 
-                include = False
+                if app == "Pipeline Input":
+                    io = "Input"
 
-                if app[4:-2] in reducers:
-                    total = json[app][samp]["PE_Output_" + index] + json[app][samp]["SE_Output_" + index]
-                    app_subset.append(app)
-                    prefix = "Output_"
-                    include = True
+                else:
+                    io = "Output"
 
-                elif app == "Pipeline Input":
-                    total = json[app][samp]["PE_Input_" + index] + json[app][samp]["SE_Input_" + index]
-                    prefix = "Input_"
-                    include = True
+                total_reads = json[app][samp][io + "_Reads"]
+                data[0][samp][app] = total_reads
 
-                if include == True:
-
-                    reducing_line[samp][app] = total
-
-                    try:
-                        composition_line["SE " + index][app] = json[app][samp]["SE_" + prefix + index]
-                    except:
-                        composition_line["SE " + index][app] = 0
-
-                    try:
-                        composition_line["PE " + index][app] = json[app][samp]["PE_" + prefix + index]
-                    except:
-                        composition_line["PE " + index][app] = 0
-
-            composition_data_list.append(composition_line)
-            line_config_2["data_labels"].append({"name": samp, "ylab": "Counts", "xlab": "Tool"})
+                total_bps = json[app][samp][io + "_Bps"]
+                data[1][samp][app] = total_bps
 
         # Construct html sections
-        header = "<h4> {t} </h4>".format(t=html_title)
-        header += """<p> Provides scaled statistics collected throughout the preprocessing pipeline, highlighting variable statistics across experiment. </p>"""
-
-        btn_label_1 = "Reduction"
-        btn_label_2 = "Composition"
-
-        line_1_id = "htstream_comp_table_{b}".format(b=data_type)
-        line_2_id = "htstream_comp_line_{b}".format(b=data_type)
+        header = "<h4> {t} </h4>".format(t="Fragment and Basepair Reduction")
+        header += """<p> Plots reduction of reads and basepairs across the preprocessing pipeline </p>"""
 
         # if no apps found in section, create alert div, otherwise, create plots
-        if len(app_subset) < 2:
+        if len(app_list) < 2:
             html = title + "\n<br>"
             html = '<div class="alert alert-info">{n}</div>'.format(n=notice)
             return html
 
-        else:
-            line_1_html = linegraph.plot(reducing_line, line_config_1)
-            line_2_html = linegraph.plot(composition_data_list, line_config_2)
-
-        # add html
-        html = htstream_utils.multi_plot_html(
-            header, btn_label_1, btn_label_2, line_1_id, line_2_id, line_1_html, line_2_html
-        )
+        html = header + linegraph.plot(data, line_config)
 
         return html
 
@@ -196,17 +136,20 @@ class OverviewStats:
             line_config["data_labels"].append({"name": samp, "ylab": "Value", "xlab": "Tool"})
 
         # add html
-        html = "<hr><h4> Preprocessing Statistics </h4>\n"
+        html = "<hr><h4> rovides scaled statistics collected throughout the preprocessing pipeline, highlighting variable statistics across experiment. </h4>\n"
         html += linegraph.plot(data_dict, line_config) + "\n<br>"
 
         return html, raw_data
 
     def execute(self, json, app_list):
 
-        read_html = self.composition_and_reduction(json, app_list, "read") + "\n<br>"
-        bps_html = self.composition_and_reduction(json, app_list, "bp")
+        # read_html = self.composition_and_reduction(json, app_list, "read") + "\n<br>"
+        # bps_html = self.composition_and_reduction(json, app_list, "bp")
+        reduction_html = self.read_and_basepair_reduction(json, app_list)
         line_html, line_data = self.hts_line(json)
 
-        html = line_html + read_html + bps_html
+        # html = line_html + read_html + bps_html
+
+        html = line_html + reduction_html
 
         return html, line_data

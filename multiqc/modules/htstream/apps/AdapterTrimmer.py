@@ -138,7 +138,6 @@ class AdapterTrimmer:
             adapter_reads = (
                 json[key]["Single_end"]["adapterTrim"]
                 + json[key]["Paired_end"]["Read1"]["adapterTrim"]
-                + json[key]["Paired_end"]["Read2"]["adapterTrim"]
             )  # total reads trimmed
             bp_trimmed = (
                 json[key]["Single_end"]["adapterBpTrim"]
@@ -168,9 +167,8 @@ class AdapterTrimmer:
 
             # Overview stats
             overview_dict[key] = {
-                "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                + json[key]["Paired_end"]["Read2"]["basepairs_out"],
-                "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Fraction_Bp_Lost": (bp_in - json[key]["Fragment"]["basepairs_out"]) / bp_in,
                 "Fraction_PE_Bp_Trimmed": (
                     json[key]["Paired_end"]["Read1"]["adapterBpTrim"]

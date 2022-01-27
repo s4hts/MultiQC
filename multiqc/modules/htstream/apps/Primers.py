@@ -155,9 +155,8 @@ class Primers:
 
             # Overview stats
             overview_dict[key] = {
-                "PE_Output_Bps": json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                + json[key]["Paired_end"]["Read2"]["basepairs_out"],
-                "SE_Output_Bps": json[key]["Single_end"]["basepairs_out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Fraction_Bp_Lost": bp_lost / json[key]["Fragment"]["basepairs_in"],
             }
 

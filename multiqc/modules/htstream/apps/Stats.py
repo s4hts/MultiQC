@@ -588,7 +588,13 @@ class Stats:
             }
 
             # Overview stats
-            overview_stats[key] = {"GC_Content": gc_content, "N_Content": n_content, "Q30_Fraction": 0}
+            overview_stats[key] = {
+                "GC_Content": gc_content,
+                "N_Content": n_content,
+                "Q30_Fraction": 0,
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
+            }
             #
             # SINGLE END STATS
             #
@@ -608,14 +614,10 @@ class Stats:
 
                 overview_stats[key]["Q30_Fraction"] += json[key]["Single_end"]["total_Q30_basepairs"] / total_bps
                 overview_stats[key]["SE_Fraction"] = json[key]["Single_end"]["out"] / total_frags
-                overview_stats[key]["SE_Output_Reads"] = json[key]["Single_end"]["out"]
-                overview_stats[key]["SE_Output_Bps"] = json[key]["Single_end"]["basepairs_out"]
 
             except:
                 overview_stats[key]["Q30_Fraction"] += 0
                 overview_stats[key]["SE_Fraction"] = 0
-                overview_stats[key]["SE_Output_Reads"] = 0
-                overview_stats[key]["SE_Output_Bps"] = 0
 
                 del SE_json[key]
 
@@ -654,17 +656,10 @@ class Stats:
                     + json[key]["Paired_end"]["Read2"]["total_Q30_basepairs"]
                 ) / total_bps
                 overview_stats[key]["PE_Fraction"] = json[key]["Paired_end"]["out"] / total_frags
-                overview_stats[key]["PE_Output_Reads"] = json[key]["Paired_end"]["out"]
-                overview_stats[key]["PE_Output_Bps"] = (
-                    json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                    + json[key]["Paired_end"]["Read2"]["basepairs_out"]
-                )
 
             except:
                 overview_stats[key]["Q30_Fraction"] += 0
                 overview_stats[key]["PE_Fraction"] = 0
-                overview_stats[key]["PE_Output_Reads"] = 0
-                overview_stats[key]["PE_Output_Bps"] = 0
 
                 del PE_json[key]
 

@@ -107,8 +107,8 @@ class SeqScreener:
 
             # Overview stats
             overview_dict[key] = {
-                "PE_Output_Reads": json[key]["Paired_end"]["out"],
-                "SE_Output_Reads": json[key]["Single_end"]["out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Fraction_Reads_Lost": (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"])
                 / json[key]["Fragment"]["in"],
                 "Percent_Hits": (pe_hits + se_hits) / json[key]["Fragment"]["in"],

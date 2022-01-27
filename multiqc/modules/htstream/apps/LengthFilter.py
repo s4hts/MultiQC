@@ -145,8 +145,8 @@ class LengthFilter:
             pe_orphaned_total += pe_orphaned
 
             overview_dict[key] = {
-                "PE_Output_Reads": json[key]["Paired_end"]["out"],
-                "SE_Output_Reads": json[key]["Single_end"]["out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Fraction_Reads_Lost": reads_lost,
             }
 

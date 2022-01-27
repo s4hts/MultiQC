@@ -163,8 +163,8 @@ class SuperDeduper:
 
             # Overview stats
             overview_dict[key] = {
-                "PE_Output_Reads": json[key]["Paired_end"]["out"],
-                "SE_Output_Reads": json[key]["Single_end"]["out"],
+                "Output_Reads": json[key]["Fragment"]["out"],
+                "Output_Bps": json[key]["Fragment"]["basepairs_out"],
                 "Percent_Duplicates": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
                 "Percent_Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"],
             }

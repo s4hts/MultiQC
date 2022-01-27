@@ -174,33 +174,10 @@ class MultiqcModule(BaseMultiqcModule):
                 # populate info for first app in pipeline
                 if pipeline_input == True and len(self.app_order) > 1:
 
-                    # paired end reads?
-                    try:
-                        pe_in_reads = json[key][app]["Paired_end"]["in"]
-                        pe_in_bps = (
-                            json[key][app]["Paired_end"]["Read1"]["basepairs_in"]
-                            + json[key][app]["Paired_end"]["Read2"]["basepairs_in"]
-                        )
-
-                    except:
-                        pe_in_reads = 0
-                        pe_in_bps = 0
-
-                    # single end reads?
-                    try:
-                        se_in_reads = json[key][app]["Single_end"]["in"]
-                        se_in_bps = json[key][app]["Single_end"]["basepairs_in"]
-
-                    except:
-                        se_in_reads = 0
-                        se_in_bps = 0
-
                     # add info
                     self.overview_stats["Pipeline Input"][key] = {
-                        "PE_Input_Reads": pe_in_reads,
-                        "PE_Input_Bps": pe_in_bps,
-                        "SE_Input_Reads": se_in_reads,
-                        "SE_Input_Bps": se_in_bps,
+                        "Input_Reads": stats_dict[key]["Fragment"]["in"],
+                        "Input_Bps": stats_dict[key]["Fragment"]["basepairs_in"],
                     }
 
             pipeline_input = False
