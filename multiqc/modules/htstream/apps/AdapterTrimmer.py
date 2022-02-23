@@ -153,9 +153,6 @@ class AdapterTrimmer:
                 "At_BP_Lost" + index: bp_trimmed,
                 "At_Adapters" + index: adapter_reads,
                 "At_Avg_BP_Trimmed" + index: avg_bp_trimmed,
-                "At_R1": json[key]["Paired_end"]["Read1"]["adapterBpTrim"],
-                "At_R2": json[key]["Paired_end"]["Read2"]["adapterBpTrim"],
-                "At_SE": json[key]["Single_end"]["adapterBpTrim"],
             }
 
         # sections and figure function calls

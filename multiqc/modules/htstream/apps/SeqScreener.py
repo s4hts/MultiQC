@@ -20,7 +20,7 @@ class SeqScreener:
         self.type = "read_reducer"
 
    
-   # Bargraph Function
+    # Bargraph Function
     def bargraph(self, json, reads_screened, index):
 
         # config dict for bar graph
@@ -28,7 +28,7 @@ class SeqScreener:
             "title": "HTStream: Identified Reads Bargraph",
             "id": "htstream_seqscreener_bargraph_" + index,
             "cpswitch": False,
-            "ylab": "ercentage of Total Reads",
+            "ylab": "Percentage of Total Reads",
             "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Reads"}, 
                             {"name": "Raw Counts", "ylab": "Reads"}],
         }
