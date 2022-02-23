@@ -45,10 +45,10 @@ class CutTrim:
 
         # Create categories for multidataset bargraph
         cats = [OrderedDict(), OrderedDict()]
-        cats[0]["Perc_Left_Trim"] = {"name": "Left"}
-        cats[0]["Perc_Right_Trim"] = {"name": "Right"}
-        cats[1]["Left_Trim"] = {"name": "Left"}
-        cats[1]["Right_Trim"] = {"name": "Right"}
+        cats[0]["Perc_Left_Trim"] = {"name": "Left Trimmed"}
+        cats[0]["Perc_Right_Trim"] = {"name": "Right Trimmed"}
+        cats[1]["Left_Trim"] = {"name": "Left Trimmed"}
+        cats[1]["Right_Trim"] = {"name": "Right Trimmed"}
 
         # Create bargraph
         html += bargraph.plot([perc_data, read_data], cats, config)
