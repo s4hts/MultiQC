@@ -28,7 +28,7 @@ class SeqScreener:
             "title": "HTStream: Identified Reads Bargraph",
             "id": "htstream_seqscreener_bargraph_" + index,
             "cpswitch": False,
-            "ylab": "ercentage of Total Reads"
+            "ylab": "ercentage of Total Reads",
             "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Reads"}, 
                             {"name": "Raw Counts", "ylab": "Reads"}],
         }
