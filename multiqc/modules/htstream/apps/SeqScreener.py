@@ -19,36 +19,48 @@ class SeqScreener:
         self.info = "A simple sequence screening tool which uses a kmer lookup approach to identify reads from an unwanted source."
         self.type = "read_reducer"
 
-
-    ########################
-    # Bargraph Function
+   
+   # Bargraph Function
     def bargraph(self, json, reads_screened, index):
 
-        # configuration dictionary for bar graph
+        # config dict for bar graph
         config = {
-            "title": "HTStream: Sequences Identified",
+            "title": "HTStream: Identified Reads Bargraph",
             "id": "htstream_seqscreener_bargraph_" + index,
-            "ylab": "Reads",
+            "cpswitch": False,
+            "ylab": "ercentage of Total Reads"
+            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Reads"}, 
+                            {"name": "Raw Counts", "ylab": "Reads"}],
         }
-
+       
         html = ""
 
-        # if no overlaps at all are present, return nothing
+        # returns nothing if no reads were trimmed.
         if reads_screened == 0:
-            html += '<div class="alert alert-info"> <strong>Notice:</strong> No reads were identified from samples. </div>'
+            html += '<div class="alert alert-info"> <strong>Notice:</strong> No sequences were identified in any sample. </div>'
             return html
 
-        # bargraph dictionary. Exact use of example in MultiQC docs.
-        categories = OrderedDict()
+        perc_data = {}
+        read_data = {}
 
-        # Colors for sections
-        categories["Ss_PE_hits" + index] = {"name": "Paired End", "color": "#779BCC"}
-        categories["Ss_SE_hits" + index] = {"name": "Single End", "color": "#D1ADC3"}
+        # Construct data for multidataset bargraph
+        for key in json:
 
-        # create bargrpah
-        html += bargraph.plot(json, categories, config)
+            perc_data[key] = {"Perc_PE": json[key]["Ss_PE_%_hits"], "Perc_SE": json[key]["Ss_SE_%_hits"]}
+            read_data[key] = {"Reads_PE": json[key]["Ss_PE_hits"], "Reads_SE": json[key]["Ss_SE_hits"]}
+
+        # Create categories for multidataset bargraph
+        cats = [OrderedDict(), OrderedDict()]
+        cats[0]["Perc_PE"] = {"name": "Paired End"}
+        cats[0]["Perc_SE"] = {"name": "Single End"}
+        cats[1]["Reads_PE"] = {"name": "Paired End"}
+        cats[1]["Reads_SE"] = {"name": "Single End"}
+
+        # Create bargraph
+        html += bargraph.plot([perc_data, read_data], cats, config)
 
         return html
+
 
     ########################
     # Main Function
@@ -56,12 +68,28 @@ class SeqScreener:
 
         stats_json = OrderedDict()
         overview_dict = {}
-        reads_screened = 0 
+
+        reads_screened = 0
 
         for key in json.keys():
 
-            pe_hits = json[key]["Paired_end"]["hits"]    
-            se_hits = json[key]["Single_end"]["hits"]
+            # Will fail if no PE data
+            try:
+                pe_hits = json[key]["Paired_end"]["hits"]
+                perc_pe_hits = (pe_hits / json[key]["Paired_end"]["in"]) * 100
+
+            except:
+                pe_hits = 0
+                perc_pe_hits = 0
+
+            # Will fail if no SE data
+            try:
+                se_hits = json[key]["Single_end"]["hits"]
+                perc_se_hits = (se_hits / json[key]["Single_end"]["in"]) * 100
+
+            except:
+                se_hits = 0
+                perc_se_hits = 0
 
             reads_screened += pe_hits + se_hits
 
@@ -76,8 +104,10 @@ class SeqScreener:
 
             # sample entry for stats dictionary
             stats_json[key] = {
-                "Ss_PE_hits" + index: pe_hits,
-                "Ss_SE_hits" + index: se_hits,
+                "Ss_PE_%_hits": perc_pe_hits,
+                "Ss_PE_hits": pe_hits,
+                "Ss_SE_%_hits": perc_se_hits,
+                "Ss_SE_hits": se_hits,
             }
 
         # sections and figure function calls

@@ -19,23 +19,41 @@ class CutTrim:
         self.info = "Trims a fixed number of bases from the 5' and/or 3' end of each read."
         self.type = "bp_reducer"
 
-    ########################
-    # Table Function
-    def table(self, json, index):
+    # Bargraph Function
+    def bargraph(self, json, index):
 
-        # Table constructor. Just like the MultiQC docs.
-        headers = OrderedDict()
-
-        headers["Ct_%_BP_Lost" + index] = {
-            "title": "% Bp Lost",
-            "namespace": "% Bp Lost",
-            "description": "Percentage of Input bps (SE and PE) trimmed.",
-            "suffix": "%",
-            "format": "{:,.2f}",
-            "scale": "RdPu",
+        # config dict for bar graph
+        config = {
+            "title": "HTStream: Trimmed Basepairs Bargraph",
+            "id": "htstream_cuttrim_bargraph_" + index,
+            "ylab": "Percentage of Total Basepairs",
+            "cpswitch": False,
+            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"}, 
+                            {"name": "Raw Counts", "ylab": "Basepairs"}],
         }
+       
+        html = ""
 
-        return table.plot(json, headers)
+        perc_data = {}
+        read_data = {}
+
+        # Construct data for multidataset bargraph
+        for key in json:
+
+            perc_data[key] = {"Perc_Left_Trim": json[key]["Ct_%_Left_Trimmed"], "Perc_Left_Trimm": json[key]["Ct_%_Right_Trimmed"]}
+            read_data[key] = {"Left_Trim": json[key]["Ct_Left_Trimmed"], "Right_Trim": json[key]["Ct_Right_Trimmed"]}
+
+        # Create categories for multidataset bargraph
+        cats = [OrderedDict(), OrderedDict()]
+        cats[0]["Perc_Left_Trim"] = {"name": "Left"}
+        cats[0]["Perc_Right_Trim"] = {"name": "Right"}
+        cats[1]["Left_Trim"] = {"name": "Left"}
+        cats[1]["Right_Trim"] = {"name": "Right"}
+
+        # Create bargraph
+        html += bargraph.plot([perc_data, read_data], cats, config)
+
+        return html
 
     ########################
     # MainFunction
@@ -49,15 +67,11 @@ class CutTrim:
         for key in json.keys():
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
-
-            perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
-            total_r1 = (
-                json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
-            )
-            total_r2 = (
-                json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
-            )
-            total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
+            left_bp_lost = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
+            right_bp_lost = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
+            
+            perc_left_bp_lost = (left_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+            perc_right_bp_lost = (right_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
 
             # Overview stats
             overview_dict[key] = {
@@ -68,19 +82,16 @@ class CutTrim:
 
             # sample dictionary entry
             stats_json[key] = {
-                "Ct_%_BP_Lost" + index: perc_bp_lost,
-                "Ct_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
-                "Ct_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
-                "Ct_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
-                "Ct_Right_Trimmed_R2": json[key]["Paired_end"]["Read2"]["rightTrim"],
-                "Ct_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
-                "Ct_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"],
+                "Ct_%_Left_Trimmed": perc_left_bp_lost,
+                "Ct_%_Right_Trimmed": perc_right_bp_lost,
+                "Ct_Left_Trimmed": left_bp_lost,
+                "Ct_Right_Trimmed": right_bp_lost
             }
 
         # sections and figure function calls
         section = {
-            "Table": self.table(stats_json, index),
-            "Overview": overview_dict,
+            "Bargraph": self.bargraph(stats_json, index),
+            "Overview": overview_dict
         }
 
         return section
