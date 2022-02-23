@@ -47,8 +47,6 @@ class Overlapper:
                 "scale": "Blues",
             }
 
-        headers["Ov_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
-
         return table.plot(json, headers)
 
     ########################
@@ -190,7 +188,6 @@ class Overlapper:
             stats_json[key] = {
                 "Ov_SE_gain" + index: perc_se_gain,
                 "Ov_%_Overlapped" + index: perc_overlapped,
-                "Ov_Notes" + index: json[key]["Program_details"]["options"]["notes"],
                 "Ov_Sins": sins,
                 "Ov_Mins": mins,
                 "Ov_Lins": lins,

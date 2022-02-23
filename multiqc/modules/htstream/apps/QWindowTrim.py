@@ -56,8 +56,6 @@ class QWindowTrim:
             "scale": "Oranges",
         }
 
-        headers["Qt_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
-
         return table.plot(json, headers)
 
     ########################
@@ -208,7 +206,6 @@ class QWindowTrim:
             stats_json[key] = {
                 "Qt_%_BP_Lost" + index: perc_bp_lost,
                 "Qt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
-                "Qt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
                 "Qt_R1_lost": total_r1,
                 "Qt_R2_lost": total_r2,
                 "Qt_SE_lost": total_se,

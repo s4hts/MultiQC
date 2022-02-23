@@ -206,12 +206,24 @@ class MultiqcModule(BaseMultiqcModule):
                     # get overview sectino data
                     self.overview_stats[app_name] = section_dict["Overview"]
 
+                    try:
+                        notes = stats_dict[list(stats_dict.keys())[1]]["Program_details"]["options"]["notes"]
+                    except:
+                        notes = ""
+
                     # construct html for section
                     html = ""
+
+                    if notes != "":
+                        html += '\n<div class="alert alert-info"> <strong>Notes: </strong>' + notes + '</div>'
+
+
                     for title, section in section_dict.items():
 
                         if section != "" and title != "Overview":
                             html += section + "<br>\n"
+
+
 
                     # remove trailing space
                     html = html[:-5]
@@ -246,12 +258,8 @@ class MultiqcModule(BaseMultiqcModule):
         for section, content in self.report_sections.items():
 
             temp_list = section.split("_")
-
-            if temp_list[-1] == "1":
-                name = temp_list[0] + "_" + temp_list[1]
-            else:
-                name = temp_list[0] + "_" + temp_list[1] + " " + temp_list[-1]
-
+            name = (temp_list[1]) if temp_list[-1] == "1" else (temp_list[1] + " " + temp_list[-1])
+           
             try:
                 self.add_section(name=name, description=content["description"], content=content["html"])
 

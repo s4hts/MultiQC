@@ -47,8 +47,6 @@ class Primers:
                 "scale": "Blues",
             }
 
-        headers["Pr_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
-
         return table.plot(json, headers)
 
     ########################
@@ -164,7 +162,6 @@ class Primers:
                 "Pr_%_BP_Lost" + index: perc_bp_lost * 100,
                 "Pr_Primer_Counts" + index: json[key]["Fragment"]["primers_counts"],
                 "Pr_Reads_Flipped" + index: json[key]["Fragment"]["flipped"],
-                "Pr_Notes" + index: json[key]["Program_details"]["options"]["notes"],
             }
 
         # dictionary for sections and figure function calls

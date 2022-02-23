@@ -49,8 +49,6 @@ class SuperDeduper:
             "scale": "Blues",
         }
 
-        headers["Sd_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
-
         return table.plot(json, headers)
 
     ########################
@@ -173,7 +171,6 @@ class SuperDeduper:
             stats_json[key] = {
                 "Sd_%_Duplicates" + index: "{:.2f}".format(perc_duplicates),
                 "Sd_%_Ignored" + index: "{:.2f}".format(perc_ignored),
-                "Sd_Notes" + index: json[key]["Program_details"]["options"]["notes"],
                 "Sd_Duplicates": json[key]["Fragment"]["duplicate"],
                 "Sd_Saturation": json[key]["Fragment"]["duplicate_saturation"],
             }

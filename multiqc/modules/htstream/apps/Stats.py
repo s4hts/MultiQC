@@ -97,7 +97,6 @@ class Stats:
             "suffix": "%",
             "scale": "Green",
         }
-        headers["St_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
 
         return table.plot(json, headers)
 
@@ -584,7 +583,6 @@ class Stats:
                 "St_Fragments_in" + index: total_frags,
                 "St_GC_Content" + index: gc_content * 100,
                 "St_N_Content" + index: n_content * 100,
-                "St_Notes" + index: json[key]["Program_details"]["options"]["notes"],
             }
 
             # Overview stats

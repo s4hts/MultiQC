@@ -80,45 +80,8 @@ class AdapterTrimmer:
             "format": "{:,.2f}",
             "scale": "Oranges",
         }
-        headers["At_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
 
         return table.plot(json, headers)
-
-    ########################
-    # Bargraphs Function
-    def bargraph(self, json, avg_bp_trimmed, index):
-
-        # configuration dictionary for bar graph
-        config = {
-            "title": "HTStream: Trimmed Bp Composition Bargraph",
-            "id": "htstream_adaptertrimmer_bargraph_" + index,
-            "ylab": "Basepairs",
-            "cpswitch_c_active": True,
-        }
-
-        # Title
-        html = "<h4> AdapterTrimmer: Trimmed Basepairs Composition </h4>\n"
-        html += "<p>Composition of basepairs trimmed from the ends of paired end and single end reads.</p>"
-
-        # if no overlaps at all are present, return nothing
-        if avg_bp_trimmed == 0:
-            html += (
-                '<div class="alert alert-info"> <strong>Notice:</strong> No adapters were trimmed from samples. </div>'
-            )
-            return html
-
-        # bargraph dictionary. Exact use of example in MultiQC docs.
-        categories = OrderedDict()
-
-        # Colors for sections
-        categories["At_R1"] = {"name": "Read 1", "color": "#779BCC"}
-        categories["At_R2"] = {"name": "Read 2", "color": "#C3C3C3"}
-        categories["At_SE"] = {"name": "Single End", "color": "#D1ADC3"}
-
-        # Create bargrpah
-        html += bargraph.plot(json, categories, config)
-
-        return html
 
     ########################
     # Main Function
@@ -190,7 +153,6 @@ class AdapterTrimmer:
                 "At_BP_Lost" + index: bp_trimmed,
                 "At_Adapters" + index: adapter_reads,
                 "At_Avg_BP_Trimmed" + index: avg_bp_trimmed,
-                "At_Notes" + index: json[key]["Program_details"]["options"]["notes"],
                 "At_R1": json[key]["Paired_end"]["Read1"]["adapterBpTrim"],
                 "At_R2": json[key]["Paired_end"]["Read2"]["adapterBpTrim"],
                 "At_SE": json[key]["Single_end"]["adapterBpTrim"],
@@ -199,7 +161,6 @@ class AdapterTrimmer:
         # sections and figure function calls
         section = {
             "Table": self.table(stats_json, total, zeroes, index),
-            "Bp Composition Bargraph": self.bargraph(stats_json, total, index),
             "Overview": overview_dict,
         }
 

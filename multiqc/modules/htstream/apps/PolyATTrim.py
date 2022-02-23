@@ -55,17 +55,13 @@ class PolyATTrim:
                 "scale": "Greens",
             }
 
-        # If values are small, use raw counts
-        if zeroes == False:
-            headers["Pt_Avg_BP_Trimmed" + index] = {
-                "title": "Avg. Bps Trimmed",
-                "namespace": "Avg. Bps Trimmed",
-                "description": "Average Number of Basepairs Trimmed per Read",
-                "format": "{:,.2f}",
-                "scale": "Blues",
-            }
-
-        headers["Pt_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
+        headers["Pt_Avg_BP_Trimmed" + index] = {
+            "title": "Avg. Bps Trimmed",
+            "namespace": "Avg. Bps Trimmed",
+            "description": "Average Number of Basepairs Trimmed per Read",
+            "format": "{:,.2f}",
+            "scale": "Blues",
+        }
 
         return table.plot(json, headers)
 
@@ -162,7 +158,6 @@ class PolyATTrim:
                 "Pt_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
                 "Pt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"],
                 "Pt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
-                "Pt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
             }
 
             # Accumulate totals

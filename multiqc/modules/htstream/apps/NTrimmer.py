@@ -57,6 +57,7 @@ class NTrimmer:
                 "scale": "Greens",
             }
 
+
         headers["Nt_Avg_BP_Trimmed" + index] = {
             "title": "Avg. Bps Trimmed",
             "namespace": "Avg. Bps Trimmed",
@@ -71,58 +72,20 @@ class NTrimmer:
             "description": "Percentage of Reads (SE and PE) Discarded",
             "suffix": "%",
             "max": 100,
-            "format": decimals,
+            "format": "{:,.2f}",
             "scale": "Oranges",
         }
-
-        headers["Nt_Notes" + index] = {"title": "Notes", "namespace": "Notes", "description": "Notes"}
 
         return table.plot(json, headers)
 
     ########################
-    # Bargraphs Function
-    def bargraph_1(self, json, bps_trimmed, index):
-
-        # configuration dictionary for bar graph
-        config = {
-            "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
-            "id": "htstream_ntrimmer_bargraph_1_" + index,
-            "ylab": "Reads",
-            "cpswitch_c_active": False,
-        }
-
-        # Title
-        html = "<h4> NTrimmer: Read Composition of Bps Trimmed </h4>\n"
-        html += "<p>Read Composition of basepairs trimmed.</p>"
-
-        # if no overlaps at all are present, return nothing
-        if bps_trimmed == 0:
-            html += (
-                '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
-            )
-            return html
-
-        # bargraph dictionary. Exact use of example in MultiQC docs.
-        categories = OrderedDict()
-
-        # Colors for sections
-        categories["Nt_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
-        categories["Nt_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
-        categories["Nt_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
-
-        # Create bargrpah
-        html += bargraph.plot(json, categories, config)
-
-        return html
-
-    ########################
     # Table Function
-    def bargraph_2(self, json, bps, index):
+    def bargraph(self, json, bps, index):
 
         # config dict for bar graph
         config = {
             "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
-            "id": "htstream_ntrimmer_bargraph_2_" + index,
+            "id": "htstream_ntrimmer_bargraph_" + index,
             "ylab": "Basepairs",
             "cpswitch_c_active": False,
             "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],
@@ -211,7 +174,6 @@ class NTrimmer:
                 "Nt_BP_Lost" + index: total_bp_lost,
                 "Nt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
                 "Nt_%_Discarded" + index: (discarded_reads / json[key]["Fragment"]["in"]) * 100,
-                "Nt_Notes" + index: json[key]["Program_details"]["options"]["notes"],
                 "Nt_R1_lost": total_r1,
                 "Nt_R2_lost": total_r2,
                 "Nt_SE_lost": total_se,
@@ -230,8 +192,7 @@ class NTrimmer:
         # section and figure function calls
         section = {
             "Table": self.table(stats_json, (overall_pe + overall_se), zeroes, index),
-            "Composition Trimmed": self.bargraph_1(stats_json, (overall_pe + overall_se), index),
-            "Trimmed Bps": self.bargraph_2(stats_json, (overall_pe + overall_se), index),
+            "Trimmed Bps": self.bargraph(stats_json, (overall_pe + overall_se), index),
             "Overview": overview_dict,
         }
 
