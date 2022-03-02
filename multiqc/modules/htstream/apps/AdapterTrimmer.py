@@ -101,6 +101,7 @@ class AdapterTrimmer:
             adapter_reads = (
                 json[key]["Single_end"]["adapterTrim"]
                 + json[key]["Paired_end"]["Read1"]["adapterTrim"]
+                + json[key]["Paired_end"]["Read2"]["adapterTrim"]
             )  # total reads trimmed
             bp_trimmed = (
                 json[key]["Single_end"]["adapterBpTrim"]

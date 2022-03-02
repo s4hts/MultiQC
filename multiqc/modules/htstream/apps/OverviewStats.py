@@ -16,6 +16,8 @@ class OverviewStats:
             "smooth_points_sumcounts": False,
             "categories": True,
             "tt_decimals": "{point.y:.0f}'",
+            "title": "HTStream: Read and Basepair Reduction",
+            "ylab": "Counts",
             "data_labels": [
                 {"name": "Reads", "ylab": "Counts", "xlab": "Tool"},
                 {"name": "Basepairs", "ylab": "Counts", "xlab": "Tool"},
@@ -136,7 +138,7 @@ class OverviewStats:
             line_config["data_labels"].append({"name": samp, "ylab": "Value", "xlab": "Tool"})
 
         # add html
-        html = "<hr><h4> rovides scaled statistics collected throughout the preprocessing pipeline, highlighting variable statistics across experiment. </h4>\n"
+        html = "<hr><h4> Provides scaled statistics collected throughout the preprocessing pipeline, highlighting variable statistics across experiment. </h4>\n"
         html += linegraph.plot(data_dict, line_config) + "\n<br>"
 
         return html, raw_data

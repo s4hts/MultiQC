@@ -20,99 +20,60 @@ class PolyATTrim:
         self.type = "bp_reducer"
 
     ########################
-    # Table Function
-    def table(self, json, total, zeroes, index):
-
-        # Table construction. Taken from MultiQC docs.
-
-        # If no polyAT trimmerd, no need for table
-        if (total) == 0:
-            return ""
-
-        headers = OrderedDict()
-
-        # If values are small, use raw counts
-        if zeroes == False:
-            decimals = "{:,.2f}"
-
-            headers["Pt_%_BP_Lost" + index] = {
-                "title": "% Total Bp Lost",
-                "namespace": "Total Bp Lost",
-                "description": "Percentage of Total input bps (SE and PE) trimmed.",
-                "format": decimals,
-                "suffix": "%",
-                "scale": "Greens",
-            }
-
-        else:
-            decimals = "{:,.0f}"
-
-            headers["Pt_BP_Lost" + index] = {
-                "title": "Total Bp Lost",
-                "namespace": "Total Bp Lost",
-                "description": "Total input bps (SE and PE) trimmed.",
-                "format": decimals,
-                "scale": "Greens",
-            }
-
-        headers["Pt_Avg_BP_Trimmed" + index] = {
-            "title": "Avg. Bps Trimmed",
-            "namespace": "Avg. Bps Trimmed",
-            "description": "Average Number of Basepairs Trimmed per Read",
-            "format": "{:,.2f}",
-            "scale": "Blues",
-        }
-
-        return table.plot(json, headers)
-
-    ########################
     # Bargraph Function
-    def bargraph(self, json, bps, index):
+    def bargraph(self, json, bps_trimmed, index):
 
-        # config dict for bar graph
+        # configuration dictionary for bar graph
         config = {
             "title": "HTStream: PolyATTrim Trimmed Basepairs Bargraph",
             "id": "htstream_polyattrim_bargraph_" + index,
-            "ylab": "Basepairs",
-            "cpswitch_c_active": False,
-            "data_labels": [{"name": "Read 1"}, {"name": "Read 2"}, {"name": "Single End"}],
+            "ylab": "Percentage of Total Basepairs",
+            "cpswitch": False,
+            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"}, 
+                            {"name": "Raw Counts", "ylab": "Basepairs"}],
         }
 
-        # Header
-        html = "<h4> PolyATTrim: Trimmed Basepairs Composition </h4>\n"
-        html += "<p>Plots the number of N bases trimmed from ends of paired end and single end reads.</p>"
+        # Title
+        html = ""
 
-        # returns nothing if no reads were trimmed.
-        if bps == 0:
-            html = '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'
+        # if no overlaps at all are present, return nothing
+        if bps_trimmed == 0:
+            html += (
+                '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
+            )
             return html
 
-        r1_data = {}
-        r2_data = {}
-        se_data = {}
 
-        # Create dictionaries for multidataset bargraphs
+        perc_data = {}
+        read_data = {}
+
+        # Construct data for multidataset bargraph
         for key in json:
 
-            r1_data[key] = {"LT_R1": json[key]["Pt_Left_Trimmed_R1"], "RT_R1": json[key]["Pt_Right_Trimmed_R1"]}
+            perc_data[key] = {"Perc_R1_lost": json[key]["Pt_Perc_R1_lost"], 
+                              "Perc_R2_lost": json[key]["Pt_Perc_R2_lost"], 
+                              "Perc_SE_lost": json[key]["Pt_Perc_SE_lost"]}
+            read_data[key] = {"R1_lost": json[key]["Pt_R1_lost"],
+                              "R2_lost": json[key]["Pt_R2_lost"], 
+                              "SE_lost": json[key]["Pt_SE_lost"]}
 
-            r2_data[key] = {"LT_R2": json[key]["Pt_Left_Trimmed_R2"], "RT_R2": json[key]["Pt_Right_Trimmed_R2"]}
 
-            se_data[key] = {"LT_SE": json[key]["Pt_Left_Trimmed_SE"], "RT_SE": json[key]["Pt_Right_Trimmed_SE"]}
+        # bargraph dictionary. Exact use of example in MultiQC docs.
+        categories = [OrderedDict(), OrderedDict()]
 
-        # Create categores for multidatatset bragraphs
-        cats = [OrderedDict(), OrderedDict(), OrderedDict()]
-        cats[0]["LT_R1"] = {"name": "R1 Left Trimmmed"}
-        cats[0]["RT_R1"] = {"name": "R1 Right Trimmmed"}
-        cats[1]["LT_R2"] = {"name": "R2 Left Trimmmed"}
-        cats[1]["RT_R2"] = {"name": "R2 Right Trimmmed"}
-        cats[2]["LT_SE"] = {"name": "SE Left Trimmmed"}
-        cats[2]["RT_SE"] = {"name": "SE Right Trimmmed"}
+        # Colors for sections
+        categories[0]["Perc_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+        categories[0]["Perc_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+        categories[0]["Perc_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+        categories[1]["R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+        categories[1]["R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+        categories[1]["SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
 
-        # create bargraphs
-        html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
+        # Create bargrpah
+        html += bargraph.plot([perc_data, read_data], categories, config)
 
         return html
+
 
     ########################
     # Main Function
@@ -123,22 +84,17 @@ class PolyATTrim:
 
         # accumulator variable. Used to prevent empty bargraphs
         overall = 0
-        zeroes = False
 
         for key in json.keys():
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
+            perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
 
-            # If no bps lost, prevent zero division
-            if total_bp_lost == 0:
-                perc_bp_lost = 0
 
-            else:
-                perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+            r1_lost = json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
+            r2_lost = json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
+            se_lost = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
-            # If values are small, use raw counts
-            if perc_bp_lost < 0.01 and zeroes == False:
-                zeroes = True
 
             # Overview stats
             overview_dict[key] = {
@@ -149,15 +105,12 @@ class PolyATTrim:
 
             # sample entry in stats dictionary
             stats_json[key] = {
-                "Pt_%_BP_Lost" + index: perc_bp_lost,
-                "Pt_BP_Lost" + index: total_bp_lost,
-                "Pt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
-                "Pt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
-                "Pt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
-                "Pt_Right_Trimmed_R2": json[key]["Paired_end"]["Read2"]["rightTrim"],
-                "Pt_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
-                "Pt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"],
-                "Pt_Avg_BP_Trimmed" + index: total_bp_lost / json[key]["Fragment"]["in"],
+                "Pt_Perc_R1_lost": (r1_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
+                "Pt_Perc_R2_lost": (r2_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
+                "Pt_Perc_SE_lost": (se_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
+                "Pt_R1_lost": r1_lost,
+                "Pt_R2_lost": r2_lost,
+                "Pt_SE_lost": se_lost,
             }
 
             # Accumulate totals
@@ -165,7 +118,6 @@ class PolyATTrim:
 
         # section and figure function calls
         section = {
-            "Table": self.table(stats_json, overall, zeroes, index),
             "Trimmed Bp Composition Bargraph": self.bargraph(stats_json, overall, index),
             "Overview": overview_dict,
         }

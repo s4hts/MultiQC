@@ -20,34 +20,34 @@ class Overlapper:
         self.info = "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."
         self.type = "read_reducer"
 
-    ########################
-    # Table Function
-    def table(self, json, se_total_gain, index):
+    # ########################
+    # # Table Function
+    # def table(self, json, se_total_gain, index):
 
-        # straight forward table construction.
-        headers = OrderedDict()
+    #     # straight forward table construction.
+    #     headers = OrderedDict()
 
-        headers["Ov_%_Overlapped" + index] = {
-            "title": "% Overlapped",
-            "namespace": "% Overlapped",
-            "description": "Percentage of Reads with Overlap.",
-            "suffix": "%",
-            "format": "{:,.2f}",
-            "scale": "Greens",
-        }
+    #     headers["Ov_%_Overlapped" + index] = {
+    #         "title": "% Overlapped",
+    #         "namespace": "% Overlapped",
+    #         "description": "Percentage of Reads with Overlap.",
+    #         "suffix": "%",
+    #         "format": "{:,.2f}",
+    #         "scale": "Greens",
+    #     }
 
-        # If SE were gained, add col
-        if se_total_gain != 0:
-            headers["Ov_SE_gain" + index] = {
-                "title": "% SE Gained",
-                "namespace": "% SE Gained",
-                "description": "Percentage Increase of Single End Reads",
-                "format": "{:,.2f}",
-                "suffix": "%",
-                "scale": "Blues",
-            }
+    #     # If SE were gained, add col
+    #     if se_total_gain != 0:
+    #         headers["Ov_SE_gain" + index] = {
+    #             "title": "% SE Gained",
+    #             "namespace": "% SE Gained",
+    #             "description": "Percentage Increase of Single End Reads",
+    #             "format": "{:,.2f}",
+    #             "suffix": "%",
+    #             "scale": "Blues",
+    #         }
 
-        return table.plot(json, headers)
+    #     return table.plot(json, headers)
 
     ########################
     # Bargraph Function
@@ -62,8 +62,7 @@ class Overlapper:
         }
 
         # Header
-        html = "<h4> Overlapper: Overlap Composition </h4>\n"
-        html += "<p>Plots the quantities of insert types for each sample.</p>"
+        html = ""
 
         # if no overlaps at all are present, return nothing
         if inserts == 0:
@@ -83,36 +82,36 @@ class Overlapper:
 
         return html
 
-    ########################
-    # Linegraph Function
-    def linegraph(self, json, index):
+    # ########################
+    # # Linegraph Function
+    # def linegraph(self, json, index):
 
-        # config dictionary for "density" plots. Its a work in progress.
-        config = {
-            "id": "htstream_overlapper_linegraph_" + index,
-            "title": "HTStream: Overlapped Lengths",
-            "ylab": "Counts",
-            "xlab": "Overlap Lengths",
-        }
+    #     # config dictionary for "density" plots. Its a work in progress.
+    #     config = {
+    #         "id": "htstream_overlapper_linegraph_" + index,
+    #         "title": "HTStream: Overlapped Lengths",
+    #         "ylab": "Counts",
+    #         "xlab": "Overlap Lengths",
+    #     }
 
-        # initialize data structures
-        multi_line = {}
+    #     # initialize data structures
+    #     multi_line = {}
 
-        for key in json.keys():
+    #     for key in json.keys():
 
-            # creates empty dictionary to hold data for line graph.
-            multi_line[key] = {}
+    #         # creates empty dictionary to hold data for line graph.
+    #         multi_line[key] = {}
 
-            # iterates over ever value in histogram and adds it to line graph
-            for item in json[key]["Ov_Histogram"]:
+    #         # iterates over ever value in histogram and adds it to line graph
+    #         for item in json[key]["Ov_Histogram"]:
 
-                multi_line[key][item[0]] = item[1]
+    #             multi_line[key][item[0]] = item[1]
 
-        html = "<h4> Overlapper: Overlapped Lengths </h4>\n"
-        html += "<p>Plots the lengths of paired end read overlaps.</p>"
-        html += linegraph.plot(multi_line, config)
+    #     html = "<h4> Overlapper: Overlapped Lengths </h4>\n"
+    #     html += "<p>Plots the lengths of paired end read overlaps.</p>"
+    #     html += linegraph.plot(multi_line, config)
 
-        return html
+    #     return html
 
     ########################
     # Function for parsing histogram in files
@@ -142,7 +141,7 @@ class Overlapper:
 
         # accumulator for inserts, used to prevent empty bar graph
         inserts = 0
-        se_total_gain = 0
+        # se_total_gain = 0
 
         for key in json.keys():
 
@@ -154,22 +153,22 @@ class Overlapper:
             overlapped_sum = sins + mins + lins
 
             # the INFAMOUS percent overlapped
-            perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
-            perc_pe_loss = (
-                (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]
-            ) * 100
+            # perc_overlapped = ((sins + mins) / json[key]["Paired_end"]["in"]) * 100
+            # perc_pe_loss = (
+            #     (json[key]["Paired_end"]["in"] - json[key]["Paired_end"]["out"]) / json[key]["Paired_end"]["in"]
+            # ) * 100
 
-            # if no single end, prevent zero division
-            if json[key]["Single_end"]["in"] == 0:
-                perc_se_gain = 0
+            # # if no single end, prevent zero division
+            # if json[key]["Single_end"]["in"] == 0:
+            #     perc_se_gain = 0
 
-            else:
-                perc_se_gain = (
-                    (json[key]["Single_end"]["out"] - json[key]["Single_end"]["in"]) / json[key]["Single_end"]["in"]
-                ) * 100
+            # else:
+            #     perc_se_gain = (
+            #         (json[key]["Single_end"]["out"] - json[key]["Single_end"]["in"]) / json[key]["Single_end"]["in"]
+            #     ) * 100
 
             # total SE gain
-            se_total_gain += perc_se_gain
+            # se_total_gain += perc_se_gain
 
             parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
 
@@ -186,8 +185,8 @@ class Overlapper:
 
             # sample instance in dictionary
             stats_json[key] = {
-                "Ov_SE_gain" + index: perc_se_gain,
-                "Ov_%_Overlapped" + index: perc_overlapped,
+                # "Ov_SE_gain" + index: perc_se_gain,
+                # "Ov_%_Overlapped" + index: perc_overlapped,
                 "Ov_Sins": sins,
                 "Ov_Mins": mins,
                 "Ov_Lins": lins,
@@ -199,9 +198,9 @@ class Overlapper:
 
         # sections and function calls
         section = {
-            "Table": self.table(stats_json, se_total_gain, index),
+            # "Table": self.table(stats_json, se_total_gain, index),
             "Overlap Composition": self.bargraph(stats_json, inserts),
-            "Overlapped Lengths Density Plots": self.linegraph(stats_json, index),
+            # "Overlapped Lengths Density Plots": self.linegraph(stats_json, index),
             "Overview": overview_dict,
         }
 
