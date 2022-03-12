@@ -20,34 +20,6 @@ class Overlapper:
         self.info = "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."
         self.type = "read_reducer"
 
-    # ########################
-    # # Table Function
-    # def table(self, json, se_total_gain, index):
-
-    #     # straight forward table construction.
-    #     headers = OrderedDict()
-
-    #     headers["Ov_%_Overlapped" + index] = {
-    #         "title": "% Overlapped",
-    #         "namespace": "% Overlapped",
-    #         "description": "Percentage of Reads with Overlap.",
-    #         "suffix": "%",
-    #         "format": "{:,.2f}",
-    #         "scale": "Greens",
-    #     }
-
-    #     # If SE were gained, add col
-    #     if se_total_gain != 0:
-    #         headers["Ov_SE_gain" + index] = {
-    #             "title": "% SE Gained",
-    #             "namespace": "% SE Gained",
-    #             "description": "Percentage Increase of Single End Reads",
-    #             "format": "{:,.2f}",
-    #             "suffix": "%",
-    #             "scale": "Blues",
-    #         }
-
-    #     return table.plot(json, headers)
 
     ########################
     # Bargraph Function
@@ -169,28 +141,58 @@ class Overlapper:
 
             # total SE gain
             # se_total_gain += perc_se_gain
+            
+            # try to parse overlap hist
+            try:
+                parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
+                ov_hist = json[key]["Fragment"]["overlap_histogram"]
+            
+            except:
+                parsed_hist_stats = -1
+                ov_hist = -1
 
-            parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
+
+            # if no histogram, assign zeroes to median and max
+            if parsed_hist_stats == -1:
+                ov_max = 0
+                ov_med = 0
+            
+            else:
+                ov_max = parsed_hist_stats["Max"]
+                ov_med = parsed_hist_stats["Median"]
+
+            # try for perc of sins, mins, and lins,
+            try:
+                perc_sin = sins / json[key]["Fragment"]["in"]
+                perc_min = mins / json[key]["Fragment"]["in"]
+                perc_lin = lins / json[key]["Fragment"]["in"]
+
+            except:
+                perc_sin = 0
+                perc_min = 0
+                perc_lin = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
 
             # Overview stats
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Overlap_Length_Max": parsed_hist_stats["Max"],
-                "Overlap_Length_Med": parsed_hist_stats["Median"],
-                "Sin": sins / json[key]["Fragment"]["in"],
-                "Min": mins / json[key]["Fragment"]["in"],
-                "Lin": lins / json[key]["Fragment"]["in"],
+                "Overlap_Length_Max": ov_max,
+                "Overlap_Length_Med": ov_med,
+                "Sin": perc_sin,
+                "Min": perc_min,
+                "Lin": perc_lin,
             }
 
             # sample instance in dictionary
             stats_json[key] = {
-                # "Ov_SE_gain" + index: perc_se_gain,
-                # "Ov_%_Overlapped" + index: perc_overlapped,
                 "Ov_Sins": sins,
                 "Ov_Mins": mins,
                 "Ov_Lins": lins,
-                "Ov_Histogram": json[key]["Fragment"]["overlap_histogram"],
+                "Ov_Histogram": ov_hist,
             }
 
             # accumulator accumlating
@@ -198,7 +200,6 @@ class Overlapper:
 
         # sections and function calls
         section = {
-            # "Table": self.table(stats_json, se_total_gain, index),
             "Overlap Composition": self.bargraph(stats_json, inserts),
             # "Overlapped Lengths Density Plots": self.linegraph(stats_json, index),
             "Overview": overview_dict,

@@ -73,6 +73,19 @@ class SeqScreener:
 
         for key in json.keys():
 
+            try:
+                fract_reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
+                perc_hits = (pe_hits + se_hits) / json[key]["Fragment"]["in"]
+            
+            except:
+
+                fract_reads_lost = 0
+                perc_hits = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
             # Will fail if no PE data
             try:
                 pe_hits = json[key]["Paired_end"]["hits"]
@@ -97,9 +110,8 @@ class SeqScreener:
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_Reads_Lost": (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"])
-                / json[key]["Fragment"]["in"],
-                "Percent_Hits": (pe_hits + se_hits) / json[key]["Fragment"]["in"],
+                "Fraction_Reads_Lost": fract_reads_lost,
+                "Percent_Hits": perc_hits,
             }
 
             # sample entry for stats dictionary

@@ -70,14 +70,26 @@ class CutTrim:
             left_bp_lost = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
             right_bp_lost = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
             
-            perc_left_bp_lost = (left_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
-            perc_right_bp_lost = (right_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+
+            try:
+                perc_left_bp_lost = (left_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+                perc_right_bp_lost = (right_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+                fraction_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"])
+
+            except:
+                perc_left_bp_lost = 0
+                perc_right_bp_lost = 0
+                fraction_bp_lost = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
 
             # Overview stats
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_Bp_Lost": (total_bp_lost / json[key]["Fragment"]["basepairs_in"]),
+                "Fraction_Bp_Lost": fraction_bp_lost,
             }
 
             # sample dictionary entry

@@ -88,26 +88,46 @@ class PolyATTrim:
         for key in json.keys():
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
-            perc_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
-
 
             r1_lost = json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
             r2_lost = json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
             se_lost = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
 
+            # try block to avoid zero division
+            try:
+                fract_bp_lost = total_bp_lost / json[key]["Fragment"]["basepairs_in"]
+                perc_bp_lost = fract_bp_lost * 100
+
+                perc_r1_lost = (r1_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+                perc_r2_lost = (r2_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+                perc_se_lost = (se_lost / json[key]["Fragment"]["basepairs_in"]) * 100
+
+            except:
+                fract_bp_lost = 0
+                perc_bp_lost = 0
+
+                perc_r1_lost = 0
+                perc_r2_lost = 0
+                perc_se_lost = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
+
             # Overview stats
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"],
+                "Fraction_Bp_Lost": fract_bp_lost,
             }
 
             # sample entry in stats dictionary
             stats_json[key] = {
-                "Pt_Perc_R1_lost": (r1_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
-                "Pt_Perc_R2_lost": (r2_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
-                "Pt_Perc_SE_lost": (se_lost / json[key]["Fragment"]["basepairs_in"]) * 100,
+                "Pt_Perc_R1_lost": perc_r1_lost,
+                "Pt_Perc_R2_lost": perc_r2_lost,
+                "Pt_Perc_SE_lost": perc_se_lost,
                 "Pt_R1_lost": r1_lost,
                 "Pt_R2_lost": r2_lost,
                 "Pt_SE_lost": se_lost,

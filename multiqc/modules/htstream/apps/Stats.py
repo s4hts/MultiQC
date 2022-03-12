@@ -575,6 +575,14 @@ class Stats:
             #
             total_frags = json[key]["Fragment"]["out"]
             total_bps = json[key]["Fragment"]["basepairs_out"]
+
+            # exit if no reads, report that something is wrong
+            if total_frags == 0 or total_bps == 0:
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+                continue
+
             gc_count = json[key]["Fragment"]["base_composition"]["G"] + json[key]["Fragment"]["base_composition"]["C"]
             gc_content = gc_count / total_bps
             n_content = json[key]["Fragment"]["base_composition"]["N"] / total_bps

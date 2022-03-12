@@ -110,23 +110,52 @@ class QWindowTrim:
            
             bp_in = json[key]["Fragment"]["basepairs_in"]
 
+            if bp_in != 0:
+                fract_r1_bp_left = json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in
+                fract_r1_bp_right = json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in
+                fract_r2_bp_left =  json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in
+                fract_r2_bp_right = json[key]["Paired_end"]["Read2"]["rightTrim"] / bp_in
+                fract_se_bp_left = json[key]["Single_end"]["leftTrim"] / bp_in
+                fract_se_bp_right = json[key]["Single_end"]["rightTrim"] / bp_in
+
+                perc_r1_lost = (total_r1 / bp_in) * 100
+                perc_r2_lost = (total_r2 / bp_in) * 100
+                perc_se_lost = (total_se / bp_in) * 100
+            
+            else:
+                fract_r1_bp_left = 0
+                fract_r1_bp_right = 0
+                fract_r2_bp_left =  0
+                fract_r2_bp_right = 0
+                fract_se_bp_left = 0
+                fract_se_bp_right = 0
+
+                perc_r1_lost = 0
+                perc_r2_lost = 0
+                perc_se_lost = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
+
             # overview data
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_R1_Bp_Trimmed_Left": json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in,
-                "Fraction_R1_Bp_Trimmed_Right": json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in,
-                "Fraction_R2_Bp_Trimmed_Left": json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in,
-                "Fraction_R2_Bp_Trimmed_Right": json[key]["Paired_end"]["Read2"]["rightTrim"] / bp_in,
-                "Fraction_SE_Bp_Trimmed_Left": json[key]["Single_end"]["leftTrim"] / bp_in,
-                "Fraction_SE_Bp_Trimmed_Right": json[key]["Single_end"]["rightTrim"] / bp_in,
+                "Fraction_R1_Bp_Trimmed_Left":  fract_r1_bp_left,
+                "Fraction_R1_Bp_Trimmed_Right": fract_r1_bp_right,
+                "Fraction_R2_Bp_Trimmed_Left": fract_r2_bp_left,
+                "Fraction_R2_Bp_Trimmed_Right": fract_r2_bp_right,
+                "Fraction_SE_Bp_Trimmed_Left": fract_se_bp_left,
+                "Fraction_SE_Bp_Trimmed_Right": fract_se_bp_right,
             }
 
             # sample dictionary entry
             stats_json[key] = {
-                "Qt_Perc_R1_lost": (total_r1 / bp_in) * 100,
-                "Qt_Perc_R2_lost": (total_r2 / bp_in) * 100,
-                "Qt_Perc_SE_lost": (total_se / bp_in) * 100,
+                "Qt_Perc_R1_lost": perc_r1_lost,
+                "Qt_Perc_R2_lost": perc_r2_lost,
+                "Qt_Perc_SE_lost": perc_se_lost,
                 "Qt_R1_lost": total_r1,
                 "Qt_R2_lost": total_r2,
                 "Qt_SE_lost": total_se,

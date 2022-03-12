@@ -93,11 +93,22 @@ class NTrimmer:
             )
             total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
+
+            try:
+                fract_bp_lost = total_bp_lost / json[key]["Fragment"]["basepairs_in"]
+
+            except:
+                fract_bp_lost = 0
+                
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
             # overview stats
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_Bp_Lost": total_bp_lost / json[key]["Fragment"]["basepairs_in"],
+                "Fraction_Bp_Lost": fract_bp_lost,
             }
 
             # sample entry in stats dictionary

@@ -82,6 +82,12 @@ class LengthFilter:
 
         for key in json.keys():
 
+            if json[key]["Fragment"]["in"] == 0:
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
+
             reads_lost += json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]
 
             overview_dict[key] = {

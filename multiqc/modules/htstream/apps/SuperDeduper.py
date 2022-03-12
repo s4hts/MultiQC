@@ -37,6 +37,8 @@ class SuperDeduper:
                                 "ylab": "Unique Reads"}]
         }
 
+        html = ""
+
         # initialize data structures and variabe;s
         data = [{}, {}]
 
@@ -44,6 +46,10 @@ class SuperDeduper:
 
             data[0][key] = {}
             data[1][key] = {}
+
+            # exit to avoid division by zero
+            if json[key]["Sd_Total_Reads"] == 0:
+                return html
 
             for item in json[key]["Sd_Saturation"]:
 
@@ -64,12 +70,24 @@ class SuperDeduper:
 
         for key in json.keys():
 
+            try:
+                perc_dup = json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]
+                perc_ignored = json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
+            
+            except:
+                perc_dup = 0
+                perc_ignored = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
+
             # Overview stats
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Percent_Duplicates": json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"],
-                "Percent_Ignored": json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"],
+                "Percent_Duplicates": perc_dup,
+                "Percent_Ignored": perc_ignored,
             }
 
             # sample instance in ordered dict
