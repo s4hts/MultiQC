@@ -330,8 +330,10 @@ def make_table(dt):
         visible_rows = [x for x in row_visibilities if not x]
 
         # Visible rows
-        t_showing_rows_txt = 'Showing <sup id="{tid}_numrows" class="mqc_table_numrows">{nvisrows}</sup>/<sub>{nrows}</sub> rows'.format(
-            tid=table_id, nvisrows=len(visible_rows), nrows=len(t_rows)
+        t_showing_rows_txt = (
+            'Showing <sup id="{tid}_numrows" class="mqc_table_numrows">{nvisrows}</sup>/<sub>{nrows}</sub> rows'.format(
+                tid=table_id, nvisrows=len(visible_rows), nrows=len(t_rows)
+            )
         )
 
         # How many columns are visible?
