@@ -18,22 +18,8 @@ def plot_mhist(samples, file_type, **plot_args):
         all_x.add(item[0])
 
     columns_to_plot = {
-        "Read 1": {
-            0: "Match",
-            1: "Sub",
-            2: "Del",
-            3: "Ins",
-            4: "N1",
-            5: "Other1",
-        },
-        "Read 2": {
-            6: "Match",
-            7: "Sub",
-            8: "Del",
-            9: "Ins",
-            10: "N2",
-            11: "Other2",
-        },
+        "Read 1": {0: "Match", 1: "Sub", 2: "Del", 3: "Ins", 4: "N1", 5: "Other1"},
+        "Read 2": {6: "Match", 7: "Sub", 8: "Del", 9: "Ins", 10: "N2", 11: "Other2"},
     }
 
     plot_data = []
@@ -55,10 +41,7 @@ def plot_mhist(samples, file_type, **plot_args):
         "title": "BBTools: " + plot_args["plot_title"],
         "xlab": "Location in read",
         "ylab": "Proportion",
-        "data_labels": [
-            {"name": "Read 1", "ylab": "Proportion"},
-            {"name": "Read 2", "ylab": "Proportion"},
-        ],
+        "data_labels": [{"name": "Read 1", "ylab": "Proportion"}, {"name": "Read 2", "ylab": "Proportion"}],
     }
 
     plot_params.update(plot_args["plot_params"])

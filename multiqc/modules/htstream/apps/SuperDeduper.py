@@ -29,12 +29,10 @@ class SuperDeduper:
             "title": "HTStream: Duplicates",
             "xlab": "Percentage of Reads",
             "ylab": "Percent Duplicates",
-            "data_labels": [{"name": "Percent Duplicates", 
-                                "xlab": "Percentage of Reads",
-                                "ylab": "Percent Duplicates"},
-                            {"name": "Duplicate Saturation", 
-                                "xlab": "Total Reads",
-                                "ylab": "Unique Reads"}]
+            "data_labels": [
+                {"name": "Percent Duplicates", "xlab": "Percentage of Reads", "ylab": "Percent Duplicates"},
+                {"name": "Duplicate Saturation", "xlab": "Total Reads", "ylab": "Unique Reads"},
+            ],
         }
 
         html = ""
@@ -53,7 +51,7 @@ class SuperDeduper:
 
             for item in json[key]["Sd_Saturation"]:
 
-                perc = (item[0] / json[key]["Sd_Total_Reads"]) * 100 
+                perc = (item[0] / json[key]["Sd_Total_Reads"]) * 100
                 perc_dup = (item[1] / json[key]["Sd_Total_Reads"]) * 100
 
                 data[0][key][perc] = perc_dup
@@ -73,7 +71,7 @@ class SuperDeduper:
             try:
                 perc_dup = json[key]["Fragment"]["duplicate"] / json[key]["Fragment"]["in"]
                 perc_ignored = json[key]["Fragment"]["ignored"] / json[key]["Fragment"]["in"]
-            
+
             except:
                 perc_dup = 0
                 perc_ignored = 0
@@ -98,9 +96,6 @@ class SuperDeduper:
             }
 
         # output dictionary, keys are section, value is function called for figure generation
-        section = {
-            "Duplicate Saturation": self.linegraph(stats_json, index),
-            "Overview": overview_dict,
-        }
+        section = {"Duplicate Saturation": self.linegraph(stats_json, index), "Overview": overview_dict}
 
         return section

@@ -305,8 +305,7 @@ def highcharts_linegraph(plotdata, pconfig=None):
 
     # The plot div
     html += '<div class="hc-plot-wrapper"{height}><div id="{id}" class="hc-plot not_rendered hc-line-plot"><small>loading..</small></div></div></div> \n'.format(
-        id=pconfig["id"],
-        height=f' style="height:{pconfig["height"]}px"' if "height" in pconfig else "",
+        id=pconfig["id"], height=f' style="height:{pconfig["height"]}px"' if "height" in pconfig else ""
     )
 
     report.num_hc_plots += 1

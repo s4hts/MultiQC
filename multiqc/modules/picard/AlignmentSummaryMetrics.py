@@ -113,16 +113,8 @@ def parse_reports(self):
             "title": "Picard: Alignment Summary",
             "ylab": "# Reads",
             "data_labels": [
-                {
-                    "name": "Aligned Reads",
-                    "ylab": "# Reads",
-                    "cpswitch_counts_label": "Number of Reads",
-                },
-                {
-                    "name": "Aligned Bases",
-                    "ylab": "# Bases",
-                    "cpswitch_counts_label": "Number of Bases",
-                },
+                {"name": "Aligned Reads", "ylab": "# Reads", "cpswitch_counts_label": "Number of Reads"},
+                {"name": "Aligned Bases", "ylab": "# Bases", "cpswitch_counts_label": "Number of Bases"},
             ],
         }
 

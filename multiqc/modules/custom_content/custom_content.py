@@ -123,10 +123,8 @@ def custom_module_classes():
                 elif f_extension == ".png" or f_extension == ".jpeg" or f_extension == ".jpg":
                     image_string = base64.b64encode(f["f"].read()).decode("utf-8")
                     image_format = "png" if f_extension == ".png" else "jpg"
-                    img_html = (
-                        '<div class="mqc-custom-content-image"><img src="data:image/{};base64,{}" /></div>'.format(
-                            image_format, image_string
-                        )
+                    img_html = '<div class="mqc-custom-content-image"><img src="data:image/{};base64,{}" /></div>'.format(
+                        image_format, image_string
                     )
                     parsed_data = {
                         "id": f["s_name"],

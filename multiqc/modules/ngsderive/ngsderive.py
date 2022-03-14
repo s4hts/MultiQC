@@ -48,44 +48,19 @@ class MultiqcModule(BaseMultiqcModule):
         expected_header_count_junctions = 9
 
         for f in self.find_log_files("ngsderive/strandedness"):
-            self.parse(
-                self.strandedness,
-                f,
-                "strandedness",
-                expected_header_count_strandedness,
-            )
+            self.parse(self.strandedness, f, "strandedness", expected_header_count_strandedness)
 
         for f in self.find_log_files("ngsderive/instrument"):
-            self.parse(
-                self.instrument,
-                f,
-                "instrument",
-                expected_header_count_instrument,
-            )
+            self.parse(self.instrument, f, "instrument", expected_header_count_instrument)
 
         for f in self.find_log_files("ngsderive/readlen"):
-            self.parse(
-                self.readlen,
-                f,
-                "readlen",
-                expected_header_count_readlen,
-            )
+            self.parse(self.readlen, f, "readlen", expected_header_count_readlen)
 
         for f in self.find_log_files("ngsderive/encoding"):
-            self.parse(
-                self.encoding,
-                f,
-                "encoding",
-                expected_header_count_encoding,
-            )
+            self.parse(self.encoding, f, "encoding", expected_header_count_encoding)
 
         for f in self.find_log_files("ngsderive/junction_annotation"):
-            self.parse(
-                self.junctions,
-                f,
-                "junctions",
-                expected_header_count_junctions,
-            )
+            self.parse(self.junctions, f, "junctions", expected_header_count_junctions)
 
         self.strandedness = self.ignore_samples(self.strandedness)
         self.instrument = self.ignore_samples(self.instrument)
@@ -163,12 +138,7 @@ class MultiqcModule(BaseMultiqcModule):
         for (k, v) in sorted_data:
             bardata[k] = v
 
-        headers = {
-            "predicted": {
-                "title": "Strandedness",
-                "description": "Predicted strandedness from ngsderive",
-            }
-        }
+        headers = {"predicted": {"title": "Strandedness", "description": "Predicted strandedness from ngsderive"}}
         self.general_stats_addcols(data, headers)
 
         # Config for the plot
@@ -242,10 +212,7 @@ class MultiqcModule(BaseMultiqcModule):
                 "bgcols": bgcols,
                 "cond_formatting_rules": cond_formatting_rules,
             }
-        headers["basis"] = {
-            "title": "Instrument: Basis",
-            "description": "Basis upon which the prediction was made.",
-        }
+        headers["basis"] = {"title": "Instrument: Basis", "description": "Basis upon which the prediction was made."}
 
         table_data = {}
         for sample, instrument_data in self.instrument.items():
@@ -255,10 +222,7 @@ class MultiqcModule(BaseMultiqcModule):
             table_data[sample]["basis"] = instrument_data.get("Basis")
 
         # Config for the plot
-        config = {
-            "id": "ngsderive_instruments_plot",
-            "title": "ngsderive: Instruments",
-        }
+        config = {"id": "ngsderive_instruments_plot", "title": "ngsderive: Instruments"}
 
         self.add_section(
             name="Instrument",

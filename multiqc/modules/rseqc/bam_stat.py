@@ -91,12 +91,7 @@ def parse_reports(self):
         # Make dot plot of counts
         pconfig = {"id": "rseqc_bam_stat"}
         keys = OrderedDict()
-        defaults = {
-            "min": 0,
-            "shared_key": "read_count",
-            "decimalPlaces": 2,
-            "modify": lambda x: float(x) / 1000000.0,
-        }
+        defaults = {"min": 0, "shared_key": "read_count", "decimalPlaces": 2, "modify": lambda x: float(x) / 1000000.0}
         keys["total_records"] = dict(defaults, **{"title": "Total records"})
         keys["qc_failed"] = dict(defaults, **{"title": "QC failed"})
         keys["optical_pcr_duplicate"] = dict(

@@ -1027,12 +1027,7 @@ class MultiqcModule(BaseMultiqcModule):
             "min": 0,
             "max": 1,
             "square": False,
-            "colstops": [
-                [0, "#ffffff"],
-                [0.25, "#d9534f"],
-                [0.5, "#fee391"],
-                [1, "#5cb85c"],
-            ],
+            "colstops": [[0, "#ffffff"], [0.25, "#d9534f"], [0.5, "#fee391"], [1, "#5cb85c"]],
             "decimalPlaces": 1,
             "legend": False,
             "datalabels": False,

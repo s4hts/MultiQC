@@ -14,14 +14,7 @@ def plot_indelhist(samples, file_type, **plot_args):
     for item in sorted(chain(*[samples[sample]["data"].items() for sample in samples])):
         all_x.add(item[0])
 
-    columns_to_plot = {
-        "Deletions": {
-            0: "Count",
-        },
-        "Insertions": {
-            1: "Count",
-        },
-    }
+    columns_to_plot = {"Deletions": {0: "Count"}, "Insertions": {1: "Count"}}
 
     plot_data = []
     for column_type in columns_to_plot:

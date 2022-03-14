@@ -37,11 +37,7 @@ class TsTvSummaryMixin:
         keys = OrderedDict()
         keys = ["AC", "AG", "AT", "CG", "CT", "GT", "Ts", "Tv"]
 
-        pconfig = {
-            "id": "vcftools_tstv_summary",
-            "title": "VCFTools: TsTv Summary",
-            "ylab": "Counts",
-        }
+        pconfig = {"id": "vcftools_tstv_summary", "title": "VCFTools: TsTv Summary", "ylab": "Counts"}
 
         self.add_section(
             name="TsTv Summary",

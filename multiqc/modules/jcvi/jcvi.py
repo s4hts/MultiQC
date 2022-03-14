@@ -42,11 +42,7 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Add most important JCVI annotation stats to the general table
         headers = OrderedDict()
-        headers["genes"] = {
-            "title": "Number of genes",
-            "description": "Number of genes",
-            "format": "{:i}",
-        }
+        headers["genes"] = {"title": "Number of genes", "description": "Number of genes", "format": "{:i}"}
         headers["transcripts"] = {
             "title": "Number of transcripts",
             "description": "Number of transcripts",

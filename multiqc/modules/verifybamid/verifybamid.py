@@ -267,10 +267,7 @@ class MultiqcModule(BaseMultiqcModule):
             "hidden": all([s["RDPALT"] == "NA" for s in self.verifybamid_data.values()]),
         }
 
-        tconfig = {
-            "namespace": "VerifyBAMID",
-            "id": "verifybamid-results",
-        }
+        tconfig = {"namespace": "VerifyBAMID", "id": "verifybamid-results"}
 
         # send the plot to add section function with data dict and headers
         self.add_section(

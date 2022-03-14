@@ -33,13 +33,7 @@ class MultiqcModule(BaseMultiqcModule):
         "Median percent identity",
     ]
 
-    _KEYS_READ_Q = [
-        "&gt;Q5",
-        "&gt;Q7",
-        "&gt;Q10",
-        "&gt;Q12",
-        "&gt;Q15",
-    ]
+    _KEYS_READ_Q = ["&gt;Q5", "&gt;Q7", "&gt;Q10", "&gt;Q12", "&gt;Q15"]
     _stat_types = ("aligned", "seq summary", "fastq", "fasta", "unrecognized")
 
     def __init__(self):

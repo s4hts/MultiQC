@@ -20,7 +20,6 @@ class Overlapper:
         self.info = "Attempts to overlap paired end reads to produce the original fragment, trims adapters, and can correct sequencing errors."
         self.type = "read_reducer"
 
-
     ########################
     # Bargraph Function
     def bargraph(self, json, inserts):
@@ -141,22 +140,21 @@ class Overlapper:
 
             # total SE gain
             # se_total_gain += perc_se_gain
-            
+
             # try to parse overlap hist
             try:
                 parsed_hist_stats = self.parse_histogram_stats(json[key]["Fragment"]["overlap_histogram"])
                 ov_hist = json[key]["Fragment"]["overlap_histogram"]
-            
+
             except:
                 parsed_hist_stats = -1
                 ov_hist = -1
-
 
             # if no histogram, assign zeroes to median and max
             if parsed_hist_stats == -1:
                 ov_max = 0
                 ov_med = 0
-            
+
             else:
                 ov_max = parsed_hist_stats["Max"]
                 ov_med = parsed_hist_stats["Median"]
@@ -188,12 +186,7 @@ class Overlapper:
             }
 
             # sample instance in dictionary
-            stats_json[key] = {
-                "Ov_Sins": sins,
-                "Ov_Mins": mins,
-                "Ov_Lins": lins,
-                "Ov_Histogram": ov_hist,
-            }
+            stats_json[key] = {"Ov_Sins": sins, "Ov_Mins": mins, "Ov_Lins": lins, "Ov_Histogram": ov_hist}
 
             # accumulator accumlating
             inserts += overlapped_sum

@@ -67,39 +67,12 @@ class MultiqcModule(BaseMultiqcModule):
         # A1, A2, B1, B2, C1, C2, Reads, Objective
         headers = OrderedDict()
 
-        headers["A1"] = {
-            "title": "HLA-A1",
-            "description": "First HLA-A allele",
-            "scale": False,
-        }
-        headers["A2"] = {
-            "title": "HLA-A2",
-            "description": "Second HLA-A allele",
-            "scale": False,
-            "hidden": True,
-        }
-        headers["B1"] = {
-            "title": "HLA-B1",
-            "description": "First HLA-B allele",
-            "scale": False,
-        }
-        headers["B2"] = {
-            "title": "HLA-B2",
-            "description": "Second HLA-B allele",
-            "scale": False,
-            "hidden": True,
-        }
-        headers["C1"] = {
-            "title": "HLA-C1",
-            "description": "First HLA-C allele",
-            "scale": False,
-        }
-        headers["C2"] = {
-            "title": "HLA-C2",
-            "description": "Second HLA-C allele",
-            "scale": False,
-            "hidden": True,
-        }
+        headers["A1"] = {"title": "HLA-A1", "description": "First HLA-A allele", "scale": False}
+        headers["A2"] = {"title": "HLA-A2", "description": "Second HLA-A allele", "scale": False, "hidden": True}
+        headers["B1"] = {"title": "HLA-B1", "description": "First HLA-B allele", "scale": False}
+        headers["B2"] = {"title": "HLA-B2", "description": "Second HLA-B allele", "scale": False, "hidden": True}
+        headers["C1"] = {"title": "HLA-C1", "description": "First HLA-C allele", "scale": False}
+        headers["C2"] = {"title": "HLA-C2", "description": "Second HLA-C allele", "scale": False, "hidden": True}
         headers["Reads"] = {
             "title": "Reads",
             "description": "Number of reads covering the HLA",

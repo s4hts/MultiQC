@@ -29,8 +29,10 @@ class PolyATTrim:
             "id": "htstream_polyattrim_bargraph_" + index,
             "ylab": "Percentage of Total Basepairs",
             "cpswitch": False,
-            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"}, 
-                            {"name": "Raw Counts", "ylab": "Basepairs"}],
+            "data_labels": [
+                {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Raw Counts", "ylab": "Basepairs"},
+            ],
         }
 
         # Title
@@ -43,20 +45,22 @@ class PolyATTrim:
             )
             return html
 
-
         perc_data = {}
         read_data = {}
 
         # Construct data for multidataset bargraph
         for key in json:
 
-            perc_data[key] = {"Perc_R1_lost": json[key]["Pt_Perc_R1_lost"], 
-                              "Perc_R2_lost": json[key]["Pt_Perc_R2_lost"], 
-                              "Perc_SE_lost": json[key]["Pt_Perc_SE_lost"]}
-            read_data[key] = {"R1_lost": json[key]["Pt_R1_lost"],
-                              "R2_lost": json[key]["Pt_R2_lost"], 
-                              "SE_lost": json[key]["Pt_SE_lost"]}
-
+            perc_data[key] = {
+                "Perc_R1_lost": json[key]["Pt_Perc_R1_lost"],
+                "Perc_R2_lost": json[key]["Pt_Perc_R2_lost"],
+                "Perc_SE_lost": json[key]["Pt_Perc_SE_lost"],
+            }
+            read_data[key] = {
+                "R1_lost": json[key]["Pt_R1_lost"],
+                "R2_lost": json[key]["Pt_R2_lost"],
+                "SE_lost": json[key]["Pt_SE_lost"],
+            }
 
         # bargraph dictionary. Exact use of example in MultiQC docs.
         categories = [OrderedDict(), OrderedDict()]
@@ -74,7 +78,6 @@ class PolyATTrim:
 
         return html
 
-
     ########################
     # Main Function
     def execute(self, json, index):
@@ -89,10 +92,13 @@ class PolyATTrim:
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
 
-            r1_lost = json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
-            r2_lost = json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
+            r1_lost = (
+                json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
+            )
+            r2_lost = (
+                json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
+            )
             se_lost = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
-
 
             # try block to avoid zero division
             try:
@@ -114,7 +120,6 @@ class PolyATTrim:
                 log = logging.getLogger(__name__)
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
                 log.error(report)
-
 
             # Overview stats
             overview_dict[key] = {

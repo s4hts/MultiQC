@@ -250,11 +250,7 @@ class MultiqcModule(BaseMultiqcModule):
             "suffix": "%",
             "scale": "YlGn",
         }
-        config = {
-            "id": "quast_table",
-            "namespace": "QUAST",
-            "min": 0,
-        }
+        config = {"id": "quast_table", "namespace": "QUAST", "min": 0}
         return table.plot(self.quast_data, headers, config)
 
     def quast_contigs_barplot(self):

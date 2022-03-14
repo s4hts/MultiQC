@@ -19,7 +19,6 @@ class SeqScreener:
         self.info = "A simple sequence screening tool which uses a kmer lookup approach to identify reads from an unwanted source."
         self.type = "read_reducer"
 
-   
     # Bargraph Function
     def bargraph(self, json, reads_screened, index):
 
@@ -29,10 +28,12 @@ class SeqScreener:
             "id": "htstream_seqscreener_bargraph_" + index,
             "cpswitch": False,
             "ylab": "Percentage of Total Reads",
-            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Reads"}, 
-                            {"name": "Raw Counts", "ylab": "Reads"}],
+            "data_labels": [
+                {"name": "Percentage of Total", "ylab": "Percentage of Total Reads"},
+                {"name": "Raw Counts", "ylab": "Reads"},
+            ],
         }
-       
+
         html = ""
 
         # returns nothing if no reads were trimmed.
@@ -61,7 +62,6 @@ class SeqScreener:
 
         return html
 
-
     ########################
     # Main Function
     def execute(self, json, index):
@@ -74,9 +74,11 @@ class SeqScreener:
         for key in json.keys():
 
             try:
-                fract_reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"]["in"]
+                fract_reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"][
+                    "in"
+                ]
                 perc_hits = (pe_hits + se_hits) / json[key]["Fragment"]["in"]
-            
+
             except:
 
                 fract_reads_lost = 0

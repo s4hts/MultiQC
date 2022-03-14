@@ -496,10 +496,7 @@ class MultiqcModule(BaseMultiqcModule):
     def get_bar_data_from_counts(self, counts):
         bar_data = {}
         for key, value in counts.items():
-            bar_data[key] = {
-                "perfect": value["perfectIndex"],
-                "imperfect": value["total"] - value["perfectIndex"],
-            }
+            bar_data[key] = {"perfect": value["perfectIndex"], "imperfect": value["total"] - value["perfectIndex"]}
             if "undetermined" in value:
                 bar_data[key]["undetermined"] = value["undetermined"]
         return bar_data

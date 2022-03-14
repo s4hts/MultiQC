@@ -177,11 +177,7 @@ class MultiqcModule(BaseMultiqcModule):
 
     def add_stats_table(self):
         """Add a section with VEP General Statistics"""
-        table_config = {
-            "id": "vep-general-stats",
-            "namespace": "VEP",
-            "table_title": "VEP General Statistics",
-        }
+        table_config = {"id": "vep-general-stats", "namespace": "VEP", "table_title": "VEP General Statistics"}
         table_data = {s_name: self.vep_data[s_name]["General statistics"] for s_name in self.vep_data}
 
         # Build the header configs
@@ -199,11 +195,7 @@ class MultiqcModule(BaseMultiqcModule):
         table_cats = OrderedDict()
         color_list = ["Oranges", "Reds", "Blues", "Greens"]
         for order, header in enumerate(cat_names):
-            table_cats[header] = {
-                "name": header,
-                "format": "{:,.0f}",
-                "scale": color_list[order % 4],
-            }
+            table_cats[header] = {"name": header, "format": "{:,.0f}", "scale": color_list[order % 4]}
         # Column-specific customisation
         table_cats["Lines of input read"]["hidden"] = True
         table_cats["Variants processed"]["shared_key"] = "variants"
@@ -363,11 +355,7 @@ class MultiqcModule(BaseMultiqcModule):
         plot_cats = OrderedDict()
         htmlid = re.sub("\W+", "_", title).lower()
         plotid = "{}_plot".format(htmlid)
-        plot_config = {
-            "id": plotid,
-            "title": "VEP: {}".format(title),
-            "ylab": "Number of variants",
-        }
+        plot_config = {"id": plotid, "title": "VEP: {}".format(title), "ylab": "Number of variants"}
         if len(plot_data) == 0:
             return [plot_data, plot_cats, plot_config]
 

@@ -213,11 +213,7 @@ class TagDirReportMixin:
             "description": "Estimate of Peak Size",
             "format": "{:,.0f}",
         }
-        headers["tagsPerBP"] = {
-            "title": "tagsPerBP",
-            "description": "average tags Per basepair",
-            "format": "{:,.3f}",
-        }
+        headers["tagsPerBP"] = {"title": "tagsPerBP", "description": "average tags Per basepair", "format": "{:,.3f}"}
         headers["TagsPerPosition"] = {
             "title": "averageTagsPerPosition",
             "description": "Average Tags Per Position",

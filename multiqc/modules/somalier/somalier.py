@@ -322,11 +322,7 @@ class MultiqcModule(BaseMultiqcModule):
             "suffix": " X",
             "hidden": True,
         }
-        headers["ab_mean"] = {
-            "title": "Allele balance",
-            "description": "Mean allele balance",
-            "scale": "RdYlGn",
-        }
+        headers["ab_mean"] = {"title": "Allele balance", "description": "Mean allele balance", "scale": "RdYlGn"}
         headers["ab_std"] = {
             "title": "Allele balance std",
             "description": "Standard deviation of allele balance",
@@ -503,12 +499,7 @@ class MultiqcModule(BaseMultiqcModule):
                 name="Relatedness Heatmap",
                 anchor="somalier-relatedness-heatmap",
                 description="Heatmap displaying relatedness of sample pairs.",
-                plot=heatmap.plot(
-                    data=data,
-                    xcats=labels,
-                    ycats=labels,
-                    pconfig=pconfig,
-                ),
+                plot=heatmap.plot(data=data, xcats=labels, ycats=labels, pconfig=pconfig),
             )
 
     def somalier_het_check_plot(self):
@@ -621,11 +612,7 @@ class MultiqcModule(BaseMultiqcModule):
         # cycle over samples and add PC coordinates to data dict
         for s_name, d in self.somalier_data.items():
             if "PC1" in d and "PC2" in d:
-                data[s_name] = {
-                    "x": d["PC1"],
-                    "y": d["PC2"],
-                    "color": "rgba(0, 0, 0, 0.6)",
-                }
+                data[s_name] = {"x": d["PC1"], "y": d["PC2"], "color": "rgba(0, 0, 0, 0.6)"}
 
         # add background
         # N.B. this must be done after samples to have samples on top

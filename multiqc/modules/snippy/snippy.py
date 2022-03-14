@@ -31,22 +31,8 @@ class MultiqcModule(BaseMultiqcModule):
 
         self.snippy_data = {}
         self.snippy_core_data = {}
-        self.snippy_col = [
-            "Variant-COMPLEX",
-            "Variant-DEL",
-            "Variant-INS",
-            "Variant-SNP",
-            "VariantTotal",
-        ]
-        self.snippy_core_col = [
-            "LENGTH",
-            "ALIGNED",
-            "UNALIGNED",
-            "VARIANT",
-            "HET",
-            "MASKED",
-            "LOWCOV",
-        ]
+        self.snippy_col = ["Variant-COMPLEX", "Variant-DEL", "Variant-INS", "Variant-SNP", "VariantTotal"]
+        self.snippy_core_col = ["LENGTH", "ALIGNED", "UNALIGNED", "VARIANT", "HET", "MASKED", "LOWCOV"]
 
         # Parse the txt files from snippy
         for f in self.find_log_files("snippy/snippy"):
@@ -167,11 +153,7 @@ class MultiqcModule(BaseMultiqcModule):
                 bargraph_data[sample][stat] = self.snippy_data[sample][stat]
 
         # Config for the plot
-        pconfig = {
-            "id": "snippy_variants",
-            "title": "Snippy: Variants Counts",
-            "ylab": "# Variants",
-        }
+        pconfig = {"id": "snippy_variants", "title": "Snippy: Variants Counts", "ylab": "# Variants"}
 
         self.add_section(
             name="Snippy Variants",
@@ -197,11 +179,7 @@ class MultiqcModule(BaseMultiqcModule):
                 bargraph_data[sample]["ALIGNED"] = bargraph_data[sample]["ALIGNED"] - bargraph_data[sample]["VARIANT"]
 
         # Config for the plot
-        pconfig = {
-            "id": "snippy_core_alignment",
-            "title": "Snippy: Core Alignment Statistics",
-            "ylab": "# bp",
-        }
+        pconfig = {"id": "snippy_core_alignment", "title": "Snippy: Core Alignment Statistics", "ylab": "# bp"}
 
         self.add_section(
             name="Snippy-Core Alignment Statistics",

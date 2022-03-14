@@ -70,13 +70,7 @@ class MultiqcModule(BaseMultiqcModule):
             <a href=https://github.com/hartwigmedical/hmftools/tree/master/purity-ploidy-estimator#purity-file>
             documentation</a>.""",
             plot=table.plot(
-                data_by_sample,
-                headers,
-                {
-                    "id": "purple_summary",
-                    "namespace": "PURPLE",
-                    "title": "PURPLE summary",
-                },
+                data_by_sample, headers, {"id": "purple_summary", "namespace": "PURPLE", "title": "PURPLE summary"}
             ),
             helptext="""
             1. **QC status**. Can fail for the following 3 reasons:

@@ -215,15 +215,12 @@ class MultiqcModule(BaseMultiqcModule):
                     html = ""
 
                     if notes != "":
-                        html += '\n<div class="alert alert-info"> <strong>Notes: </strong>' + notes + '</div>'
-
+                        html += '\n<div class="alert alert-info"> <strong>Notes: </strong>' + notes + "</div>"
 
                     for title, section in section_dict.items():
 
                         if section != "" and title != "Overview":
                             html += section + "<br>\n"
-
-
 
                     # remove trailing space
                     html = html[:-5]
@@ -259,7 +256,7 @@ class MultiqcModule(BaseMultiqcModule):
 
             temp_list = section.split("_")
             name = (temp_list[1]) if temp_list[-1] == "1" else (temp_list[1] + " " + temp_list[-1])
-           
+
             try:
                 self.add_section(name=name, description=content["description"], content=content["html"])
 

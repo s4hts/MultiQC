@@ -99,9 +99,7 @@ def parse_reports(self):
             "ymin": 0,
             "yCeiling": 10,
             "tt_label": "<b>{point.x} %GC</b>: {point.y:.2f}",
-            "yPlotLines": [
-                {"value": 1, "color": "#999999", "width": 2, "dashStyle": "LongDash"},
-            ],
+            "yPlotLines": [{"value": 1, "color": "#999999", "width": 2, "dashStyle": "LongDash"}],
         }
         self.add_section(
             name="GC Coverage Bias",

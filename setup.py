@@ -66,9 +66,7 @@ setup(
         "spectra>=0.0.10",
     ],
     entry_points={
-        "console_scripts": [
-            "multiqc=multiqc.__main__:run_multiqc",
-        ],
+        "console_scripts": ["multiqc=multiqc.__main__:run_multiqc"],
         "multiqc.modules.v1": [
             "adapterRemoval = multiqc.modules.adapterRemoval:MultiqcModule",
             "afterqc = multiqc.modules.afterqc:MultiqcModule",

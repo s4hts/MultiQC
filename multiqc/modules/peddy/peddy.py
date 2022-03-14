@@ -165,17 +165,12 @@ class MultiqcModule(BaseMultiqcModule):
             "title": "Family ID",
             "hidden": True if all([v == family_ids[0] for v in family_ids]) else False,
         }
-        headers["ancestry-prediction"] = {
-            "title": "Ancestry",
-            "description": "Ancestry Prediction",
-        }
+        headers["ancestry-prediction"] = {"title": "Ancestry", "description": "Ancestry Prediction"}
         headers["ancestry-prob_het_check"] = {
             "title": "P(Ancestry)",
             "description": "Probability predicted ancestry is correct.",
         }
-        headers["sex_het_ratio"] = {
-            "title": "Sex / Het Ratio",
-        }
+        headers["sex_het_ratio"] = {"title": "Sex / Het Ratio"}
         headers["error_sex_check"] = {
             "title": "Correct Sex",
             "description": "Displays False if error in sample sex prediction",

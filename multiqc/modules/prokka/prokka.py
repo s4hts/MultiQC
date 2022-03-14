@@ -42,15 +42,8 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Add most important Prokka annotation stats to the general table
         headers = OrderedDict()
-        headers["organism"] = {
-            "title": "Organism",
-            "description": "Organism",
-        }
-        headers["contigs"] = {
-            "title": "Contigs",
-            "description": "Number of contigs",
-            "min": 0,
-        }
+        headers["organism"] = {"title": "Organism", "description": "Organism"}
+        headers["contigs"] = {"title": "Contigs", "description": "Number of contigs", "min": 0}
         headers["bases"] = {
             "title": "Bases",
             "description": "Number of bases",
@@ -58,12 +51,7 @@ class MultiqcModule(BaseMultiqcModule):
             "format": "{:i}%",
             "hidden": True,
         }
-        headers["CDS"] = {
-            "title": "CDS",
-            "description": "Number of CDS",
-            "min": 0,
-            "format": "{:i}%",
-        }
+        headers["CDS"] = {"title": "CDS", "description": "Number of CDS", "min": 0, "format": "{:i}%"}
         self.general_stats_addcols(self.prokka, headers)
 
         # User can set configuration attributes, 'prokka_table', and
@@ -145,45 +133,18 @@ class MultiqcModule(BaseMultiqcModule):
 
         # Specify the order of the different possible categories
         headers = OrderedDict()
-        headers["organism"] = {
-            "title": "Organism",
-            "description": "Organism name",
-        }
-        headers["contigs"] = {
-            "title": "# contigs",
-            "description": "Number of contigs in assembly",
-            "format": "{:i}",
-        }
+        headers["organism"] = {"title": "Organism", "description": "Organism name"}
+        headers["contigs"] = {"title": "# contigs", "description": "Number of contigs in assembly", "format": "{:i}"}
         headers["bases"] = {
             "title": "# bases",
             "description": "Number of nucleotide bases in assembly",
             "format": "{:i}",
         }
-        headers["CDS"] = {
-            "title": "# CDS",
-            "description": "Number of annotated CDS",
-            "format": "{:i}",
-        }
-        headers["rRNA"] = {
-            "title": "# rRNA",
-            "description": "Number of annotated rRNA",
-            "format": "{:i}",
-        }
-        headers["tRNA"] = {
-            "title": "# tRNA",
-            "description": "Number of annotated tRNA",
-            "format": "{:i}",
-        }
-        headers["tmRNA"] = {
-            "title": "# tmRNA",
-            "description": "Number of annotated tmRNA",
-            "format": "{:i}",
-        }
-        headers["misc_RNA"] = {
-            "title": "# misc RNA",
-            "description": "Number of annotated misc. RNA",
-            "format": "{:i}",
-        }
+        headers["CDS"] = {"title": "# CDS", "description": "Number of annotated CDS", "format": "{:i}"}
+        headers["rRNA"] = {"title": "# rRNA", "description": "Number of annotated rRNA", "format": "{:i}"}
+        headers["tRNA"] = {"title": "# tRNA", "description": "Number of annotated tRNA", "format": "{:i}"}
+        headers["tmRNA"] = {"title": "# tmRNA", "description": "Number of annotated tmRNA", "format": "{:i}"}
+        headers["misc_RNA"] = {"title": "# misc RNA", "description": "Number of annotated misc. RNA", "format": "{:i}"}
         headers["sig_peptide"] = {
             "title": "# sig_peptide",
             "description": "Number of annotated sig_peptide",
@@ -194,10 +155,7 @@ class MultiqcModule(BaseMultiqcModule):
             "description": "Number of annotated CRSIPR arrays",
             "format": "{:i}",
         }
-        table_config = {
-            "namespace": "prokka",
-            "min": 0,
-        }
+        table_config = {"namespace": "prokka", "min": 0}
 
         return table.plot(self.prokka, headers, table_config)
 

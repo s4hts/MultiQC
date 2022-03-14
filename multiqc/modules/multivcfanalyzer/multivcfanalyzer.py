@@ -273,9 +273,7 @@ class MultiqcModule(BaseMultiqcModule):
         cats["SNP Calls (het)"] = {"name": "SNP Calls (het)", "color": "#5ab4ac"}
         cats["refCall"] = {"name": "Reference Calls", "color": "#9ebcda"}
         cats["discardedVarCall"] = {"name": "Discarded SNP Call", "color": "#f7a35c"}
-        cats["filteredVarCall"] = {
-            "name": "Filtered SNP Call",
-        }
+        cats["filteredVarCall"] = {"name": "Filtered SNP Call"}
         cats["discardedRefCall"] = {"name": "Discarded Reference Call", "color": "#e34a33"}
         cats["unhandledGenotype"] = {"name": "Positions with an unknown Genotype Call", "color": "#252525"}
         cats["noCall"] = {"name": "Positions with No Call", "color": "#252525"}

@@ -14,14 +14,7 @@ def plot_idhist(samples, file_type, **plot_args):
     for item in sorted(chain(*[samples[sample]["data"].items() for sample in samples])):
         all_x.add(item[0])
 
-    columns_to_plot = {
-        "Reads": {
-            0: "Count",
-        },
-        "Bases": {
-            1: "Count",
-        },
-    }
+    columns_to_plot = {"Reads": {0: "Count"}, "Bases": {1: "Count"}}
 
     plot_data = []
     for column_type in columns_to_plot:
@@ -42,10 +35,7 @@ def plot_idhist(samples, file_type, **plot_args):
         "title": "BBTools: " + plot_args["plot_title"],
         "xlab": "Percent identity",
         "ylab": "Read count",
-        "data_labels": [
-            {"name": "Reads", "ylab": "Read count"},
-            {"name": "Bases", "ylab": "Number of bases"},
-        ],
+        "data_labels": [{"name": "Reads", "ylab": "Read count"}, {"name": "Bases", "ylab": "Number of bases"}],
     }
     plot_params.update(plot_args["plot_params"])
     plot = linegraph.plot(plot_data, plot_params)

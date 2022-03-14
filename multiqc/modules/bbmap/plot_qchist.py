@@ -30,11 +30,7 @@ def plot_qchist(samples, file_type, **plot_args):
     # Add a count of 0.1 to zero counts, to avoid broken series in log axis
     data = {s: {k: d + 0.1 if d == 0 else d for k, d in v.items()} for s, v in data.items()}
 
-    plot_params = {
-        "id": "bbmap-" + file_type + "_plot",
-        "title": "BBTools: " + plot_args["plot_title"],
-        "xmax": xmax,
-    }
+    plot_params = {"id": "bbmap-" + file_type + "_plot", "title": "BBTools: " + plot_args["plot_title"], "xmax": xmax}
     plot_params.update(plot_args["plot_params"])
     plot = linegraph.plot(data, plot_params)
 

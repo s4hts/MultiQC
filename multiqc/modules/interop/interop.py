@@ -342,10 +342,7 @@ class MultiqcModule(BaseMultiqcModule):
             "scale": "OrRd",
             "hidden": True,
         }
-        headers["Intensity C1"] = {
-            "title": "Intensity Cycle 1",
-            "description": "The intensity statistic at cycle 1.",
-        }
+        headers["Intensity C1"] = {"title": "Intensity Cycle 1", "description": "The intensity statistic at cycle 1."}
         headers["%>=Q30"] = {
             "title": "%>=Q30",
             "description": "The percentage of bases with a quality score of 30 or higher, respectively.",

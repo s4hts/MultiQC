@@ -149,12 +149,7 @@ def _parse_cli(line):
 def _get_table_headers(data):
     """Create the headers config"""
 
-    crosscheckfingerprints_table_cols = [
-        "RESULT",
-        "DATA_TYPE",
-        "LOD_THRESHOLD",
-        "LOD_SCORE",
-    ]
+    crosscheckfingerprints_table_cols = ["RESULT", "DATA_TYPE", "LOD_THRESHOLD", "LOD_SCORE"]
     crosscheckfingerprints_table_cols_hidden = [
         "LEFT_RUN_BARCODE",
         "LEFT_LANE",
@@ -180,15 +175,9 @@ def _get_table_headers(data):
 
     # Add the Tumor/Normal LOD scores if any pair had the tumor_awareness flag set
     if any(row["TUMOR_AWARENESS"] for row in data.values()):
-        crosscheckfingerprints_table_cols += [
-            "LOD_SCORE_TUMOR_NORMAL",
-            "LOD_SCORE_NORMAL_TUMOR",
-        ]
+        crosscheckfingerprints_table_cols += ["LOD_SCORE_TUMOR_NORMAL", "LOD_SCORE_NORMAL_TUMOR"]
     else:
-        crosscheckfingerprints_table_cols_hidden += [
-            "LOD_SCORE_TUMOR_NORMAL",
-            "LOD_SCORE_NORMAL_TUMOR",
-        ]
+        crosscheckfingerprints_table_cols_hidden += ["LOD_SCORE_TUMOR_NORMAL", "LOD_SCORE_NORMAL_TUMOR"]
 
     # Add Left and Right Sample names / groups, keeping it as minimal as possible
     sample_group_are_same = (
@@ -196,10 +185,7 @@ def _get_table_headers(data):
     )
 
     if all(sample_group_are_same(values) for values in data.values()):
-        crosscheckfingerprints_table_cols = [
-            "LEFT_SAMPLE",
-            "RIGHT_SAMPLE",
-        ] + crosscheckfingerprints_table_cols
+        crosscheckfingerprints_table_cols = ["LEFT_SAMPLE", "RIGHT_SAMPLE"] + crosscheckfingerprints_table_cols
         crosscheckfingerprints_table_cols_hidden += ["LEFT_GROUP_VALUE", "RIGHT_GROUP_VALUE"]
     else:
         crosscheckfingerprints_table_cols = [

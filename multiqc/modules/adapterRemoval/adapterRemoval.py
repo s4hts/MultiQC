@@ -307,18 +307,10 @@ class MultiqcModule(BaseMultiqcModule):
         }
 
         lineplot_data = [self.len_dist_plot_data["all"], self.len_dist_plot_data["mate1"]]
-        data_labels = [
-            {"name": "All", "ylab": "Count"},
-            {"name": "Mate1", "ylab": "Count"},
-        ]
+        data_labels = [{"name": "All", "ylab": "Count"}, {"name": "Mate1", "ylab": "Count"}]
         if self.__any_paired:
             lineplot_data.extend([self.len_dist_plot_data["mate2"], self.len_dist_plot_data["singleton"]])
-            data_labels.extend(
-                [
-                    {"name": "Mate2", "ylab": "Count"},
-                    {"name": "Singleton", "ylab": "Count"},
-                ]
-            )
+            data_labels.extend([{"name": "Mate2", "ylab": "Count"}, {"name": "Singleton", "ylab": "Count"}])
             if self.__any_collapsed:
                 lineplot_data.extend(
                     [self.len_dist_plot_data["collapsed"], self.len_dist_plot_data["collapsed_truncated"]]

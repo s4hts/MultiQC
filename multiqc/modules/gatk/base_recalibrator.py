@@ -146,10 +146,7 @@ class BaseRecalibratorMixin:
         data_labels = []
 
         # Loop through the different data types
-        for (
-            rt_type_name,
-            rt_type,
-        ) in recal_table_type._asdict().items():
+        for (rt_type_name, rt_type) in recal_table_type._asdict().items():
             # This table appears to be the correct one to use for reported vs empirical
             # https://github.com/broadinstitute/gatk/blob/853b53ec2a3ac2d90d7d82a6c8451e29a34692d2/src/main/resources/org/broadinstitute/hellbender/utils/recalibration/BQSR.R#L148
             sample_tables = self.gatk_base_recalibrator[rt_type]["recal_table_1"]

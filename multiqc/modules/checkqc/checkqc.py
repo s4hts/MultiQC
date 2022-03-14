@@ -137,9 +137,7 @@ class MultiqcModule(BaseMultiqcModule):
         warning, error = self._get_warning_error(data)
 
         cats = OrderedDict()
-        cats["read_num"] = {
-            "name": "Reads",
-        }
+        cats["read_num"] = {"name": "Reads"}
         if warning:
             cats["missing_warning"] = {"name": "Reads missing to reach threshold for QC warning", "color": "#ffc300"}
         if error:
@@ -208,9 +206,7 @@ class MultiqcModule(BaseMultiqcModule):
         warning, error = self._get_warning_error(data)
 
         cats = OrderedDict()
-        cats["lane_pf"] = {
-            "name": "Clusters passing filters",
-        }
+        cats["lane_pf"] = {"name": "Clusters passing filters"}
 
         if error:
             cats["missing_error"] = {"name": "Cluster PF missing to reach threshold for QC error", "color": "#f44336"}
@@ -279,9 +275,7 @@ class MultiqcModule(BaseMultiqcModule):
         warning, error = self._get_warning_error(data)
 
         cats = OrderedDict()
-        cats["percent_q30"] = {
-            "name": "%Q30",
-        }
+        cats["percent_q30"] = {"name": "%Q30"}
         if warning:
             cats["missing_warning"] = {"name": "%Q30 missing to reach threshold for QC warning", "color": "#ffc300"}
         if error:
@@ -348,9 +342,7 @@ class MultiqcModule(BaseMultiqcModule):
         warning, error = self._get_warning_error(data)
 
         cats = OrderedDict()
-        cats["threshold"] = {
-            "name": "Error rate part until threshold",
-        }
+        cats["threshold"] = {"name": "Error rate part until threshold"}
         if warning:
             cats["missing_warning"] = {"name": "Error rate part above threshold for QC warning", "color": "#ffc300"}
         if error:
@@ -429,9 +421,7 @@ class MultiqcModule(BaseMultiqcModule):
         warning, error = self._get_warning_error(data)
         cats = OrderedDict()
         cats["phix"] = {"name": r"% PhiX", "color": "#88a680"}
-        cats["threshold"] = {
-            "name": r"% undetermined indexes until threshold",
-        }
+        cats["threshold"] = {"name": r"% undetermined indexes until threshold"}
         if warning:
             cats["missing_warning"] = {
                 "name": r"% undetermined indexes above threshold for QC warning",

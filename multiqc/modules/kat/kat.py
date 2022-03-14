@@ -69,9 +69,7 @@ class MultiqcModule(BaseMultiqcModule):
             "suffix": "x",
         }
 
-        kat_config = {
-            "namespace": "KAT",
-        }
+        kat_config = {"namespace": "KAT"}
 
         # Basic Stats Table
         self.add_section(

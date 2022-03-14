@@ -59,15 +59,7 @@ click.rich_click.OPTION_GROUPS = {
                 "--file-list",
             ],
         },
-        {
-            "name": "Choosing modules to run",
-            "options": [
-                "--module",
-                "--exclude",
-                "--tag",
-                "--view-tags",
-            ],
-        },
+        {"name": "Choosing modules to run", "options": ["--module", "--exclude", "--tag", "--view-tags"]},
         {
             "name": "Sample handling",
             "options": [
@@ -117,7 +109,7 @@ click.rich_click.OPTION_GROUPS = {
                 "--help",
             ],
         },
-    ],
+    ]
 }
 
 
@@ -717,9 +709,7 @@ def run(
                     return rich.console.Measurement(panel_width, panel_width)
 
             console = rich.console.Console(
-                stderr=True,
-                force_terminal=util_functions.force_term_colors(),
-                color_system=None if no_ansi else "auto",
+                stderr=True, force_terminal=util_functions.force_term_colors(), color_system=None if no_ansi else "auto"
             )
             console.print(
                 rich.panel.Panel(

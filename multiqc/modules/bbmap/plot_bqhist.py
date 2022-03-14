@@ -62,12 +62,8 @@ def plot_bqhist(samples, file_type, **plot_args):
         "ylab": "Average quality score",
         "data_labels": [
             # {'name': 'Count histogram', 'ylab': 'Read count'},
-            {
-                "name": "Read 1",
-            },
-            {
-                "name": "Read 2",
-            },
+            {"name": "Read 1"},
+            {"name": "Read 2"},
         ],
     }
 

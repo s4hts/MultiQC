@@ -95,9 +95,7 @@ def parse_reports(self):
             See the [Picard Documentation](https://broadinstitute.github.io/picard/picard-metric-definitions.html#ExtractIlluminaBarcodes.BarcodeMetric) for details.
         """,
         plot=bargraph.plot(
-            [plot_data["per_lane"], plot_data["per_lane"], plot_data["per_lane"]],
-            plot_cats,
-            per_lane_plot_config,
+            [plot_data["per_lane"], plot_data["per_lane"], plot_data["per_lane"]], plot_cats, per_lane_plot_config
         ),
     )
 
@@ -109,9 +107,7 @@ def parse_reports(self):
             See the [Picard Documentation](https://broadinstitute.github.io/picard/picard-metric-definitions.html#ExtractIlluminaBarcodes.BarcodeMetric) for details.
         """,
         plot=bargraph.plot(
-            [plot_data["per_bc"], plot_data["per_bc"], plot_data["per_bc"]],
-            plot_cats,
-            per_barcode_plot_config,
+            [plot_data["per_bc"], plot_data["per_bc"], plot_data["per_bc"]], plot_cats, per_barcode_plot_config
         ),
     )
     # Return the number of detected samples to the parent module

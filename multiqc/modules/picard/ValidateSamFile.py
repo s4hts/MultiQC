@@ -346,8 +346,6 @@ def _generate_detailed_table(data):
                     "hidden": True,  # Hide by default; to unclutter things.
                 }
 
-    table_config = {
-        "table_title": "Picard: SAM/BAM File Validation",
-    }
+    table_config = {"table_title": "Picard: SAM/BAM File Validation"}
 
     return table.plot(data=data, headers=headers, pconfig=table_config)

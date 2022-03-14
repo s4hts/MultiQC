@@ -432,10 +432,7 @@ class MultiqcModule(BaseMultiqcModule):
             "scale": "OrRd",
             "modify": lambda x: float(x) * config.read_count_multiplier,
         }
-        pconfig = {
-            "id": "slamdunk_filtering_table",
-            "min": 0,
-        }
+        pconfig = {"id": "slamdunk_filtering_table", "min": 0}
 
         self.add_section(
             name="Filter statistics",
@@ -458,10 +455,7 @@ class MultiqcModule(BaseMultiqcModule):
             "tt_suffix": "%",
             "tt_percentages": False,
             "hide_zero_cats": False,
-            "data_labels": [
-                "Plus Strand +",
-                "Minus Strand -",
-            ],
+            "data_labels": ["Plus Strand +", "Minus Strand -"],
         }
 
         cats = [OrderedDict(), OrderedDict()]

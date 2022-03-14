@@ -51,11 +51,7 @@ def make_headers(parsed_metric_ids, metrics):
     own_tabl_headers = OrderedDict()
 
     for metric in metrics:
-        col = dict(
-            title=metric.title,
-            description=metric.descr,
-            min=0,
-        )
+        col = dict(title=metric.title, description=metric.descr, min=0)
 
         # choosing color based on metric namespace, guessing namespace by unit
         if metric.unit == "reads":
@@ -76,10 +72,7 @@ def make_headers(parsed_metric_ids, metrics):
         if metric.id + " pct" in parsed_metric_ids:
             # if % value is available, showing it instead of the number value; the number value will be hidden
             pct_col = dict(
-                col,
-                description=metric.descr.replace(", {}", "").replace("Number of ", "% of "),
-                max=100,
-                suffix="%",
+                col, description=metric.descr.replace(", {}", "").replace("Number of ", "% of "), max=100, suffix="%"
             )
             if metric.unit == "reads":
                 pct_col["scale"] = "RdYlGn"

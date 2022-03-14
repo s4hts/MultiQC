@@ -236,11 +236,7 @@ class MultiqcModule(BaseMultiqcModule):
             prefix_data[s_name] = {}
             for h in headers:
                 prefix_data[s_name][f"odgi_{h}"] = d[h]
-        tconfig = {
-            "id": "odgi_table",
-            "namespace": "ODGI",
-            "table_title": "ODGI Stats",
-        }
+        tconfig = {"id": "odgi_table", "namespace": "ODGI", "table_title": "ODGI Stats"}
         self.add_section(
             name="Detailed ODGI stats table.",
             anchor="extended_odgi_stats",

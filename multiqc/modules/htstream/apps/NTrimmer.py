@@ -19,7 +19,6 @@ class NTrimmer:
         self.info = "Trims reads to the longest subsequence that contains no N's."
         self.type = "bp_reducer"
 
-
     ########################
     # Table Function
     def bargraph(self, json, bps, index):
@@ -30,9 +29,11 @@ class NTrimmer:
             "id": "htstream_ntrimmer_bargraph_" + index,
             "ylab": "Basepairs",
             "cpswitch": False,
-            "data_labels": [{"name": "Read 1", "ylab": "Basepairs"}, 
-                            {"name": "Read 2", "ylab": "Basepairs"}, 
-                            {"name": "Single End", "ylab": "Basepairs"}],
+            "data_labels": [
+                {"name": "Read 1", "ylab": "Basepairs"},
+                {"name": "Read 2", "ylab": "Basepairs"},
+                {"name": "Single End", "ylab": "Basepairs"},
+            ],
         }
 
         # Header
@@ -93,13 +94,12 @@ class NTrimmer:
             )
             total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
-
             try:
                 fract_bp_lost = total_bp_lost / json[key]["Fragment"]["basepairs_in"]
 
             except:
                 fract_bp_lost = 0
-                
+
                 log = logging.getLogger(__name__)
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
                 log.error(report)
@@ -125,9 +125,6 @@ class NTrimmer:
             overall += total_r1 + total_r2 + total_se
 
         # section and figure function calls
-        section = {
-            "Trimmed Bps": self.bargraph(stats_json, overall, index),
-            "Overview": overview_dict,
-        }
+        section = {"Trimmed Bps": self.bargraph(stats_json, overall, index), "Overview": overview_dict}
 
         return section

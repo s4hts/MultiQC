@@ -78,10 +78,7 @@ file_types = {
             ),
         },
         "cols": odict["Name":str, "Reads":int, "ReadsPct" : lambda v: float(v.strip("%"))],
-        "extracols": odict[
-            "Bases":int,
-            "BasesPct":float,
-        ],
+        "extracols": odict["Bases":int, "BasesPct":float],
         "plot_func": None,  ## Plotting for 'stats' not implemented
         "plot_params": {},
     },
@@ -162,9 +159,7 @@ file_types = {
         "help_text": "",
         "cols": odict["Coverage":int, "numBases":int],
         "plot_func": plot_covhist,
-        "plot_params": {
-            "yLog": True,
-        },
+        "plot_params": {"yLog": True},
     },
     "covstats": {
         "title": "Coverage stats",
@@ -317,10 +312,7 @@ file_types = {
         "The plots show the observed count of each type of alignment by base quality score.",
         "help_text": "",
         "kvrows": ["Deviation", "DeviationSub"],
-        "kv_descriptions": {
-            "Deviation": ("", {}),
-            "DeviationSub": ("", {}),
-        },
+        "kv_descriptions": {"Deviation": ("", {}), "DeviationSub": ("", {})},
         "cols": odict[
             "Quality":int, "Match":int, "Sub":int, "Ins":int, "Del":int, "TrueQuality":float, "TrueQualitySub":float
         ],
@@ -369,12 +361,7 @@ file_types = {
         "descr": "Per-scaffold RPKM/FPKM counts (`rpkm`).",
         "help_text": "",
         "kvrows": ["File", "Reads", "Mapped", "RefSequences"],
-        "kv_descriptions": {
-            "File": ("", {}),
-            "Reads": ("", {}),
-            "Mapped": ("", {}),
-            "RefSequences": ("", {}),
-        },
+        "kv_descriptions": {"File": ("", {}), "Reads": ("", {}), "Mapped": ("", {}), "RefSequences": ("", {})},
         "cols": odict[
             "Name":str,
             "Length":int,

@@ -28,15 +28,19 @@ class LengthFilter:
             "id": "htstream_lengthfilter_bargraph_" + index,
             "cpswitch": False,
             "ylab": "Percentage of Total Reads",
-            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Reads"}, 
-                            {"name": "Raw Counts", "ylab": "Reads"}],
+            "data_labels": [
+                {"name": "Percentage of Total", "ylab": "Percentage of Total Reads"},
+                {"name": "Raw Counts", "ylab": "Reads"},
+            ],
         }
-       
+
         html = ""
 
         # returns nothing if no reads were trimmed.
         if reads_lost == 0:
-            html += '<div class="alert alert-info"> <strong>Notice:</strong> No reads were removed in any sample. </div>'
+            html += (
+                '<div class="alert alert-info"> <strong>Notice:</strong> No reads were removed in any sample. </div>'
+            )
             return html
 
         perc_data = {}
@@ -49,12 +53,12 @@ class LengthFilter:
             perc_r2 = (json[key]["Lf_R2_lost"] / json[key]["Lf_Total_Reads"]) * 100
             perc_se = (json[key]["Lf_SE_lost"] / json[key]["Lf_Total_Reads"]) * 100
 
-            perc_data[key] = {"Perc_R1": perc_r1,
-                              "Perc_R2": perc_r2,
-                              "Perc_SE": perc_se}
-            read_data[key] = {"Reads_R1": json[key]["Lf_R1_lost"],
-                              "Reads_R2": json[key]["Lf_R2_lost"],
-                              "Reads_SE": json[key]["Lf_SE_lost"]}
+            perc_data[key] = {"Perc_R1": perc_r1, "Perc_R2": perc_r2, "Perc_SE": perc_se}
+            read_data[key] = {
+                "Reads_R1": json[key]["Lf_R1_lost"],
+                "Reads_R2": json[key]["Lf_R2_lost"],
+                "Reads_SE": json[key]["Lf_SE_lost"],
+            }
 
         # Create categories for multidataset bargraph
         cats = [OrderedDict(), OrderedDict()]
@@ -69,7 +73,7 @@ class LengthFilter:
         html += bargraph.plot([perc_data, read_data], cats, config)
 
         return html
-        
+
     ########################
     # Main Function
     def execute(self, json, index):
@@ -86,7 +90,6 @@ class LengthFilter:
                 log = logging.getLogger(__name__)
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
                 log.error(report)
-
 
             reads_lost += json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]
 
@@ -105,9 +108,6 @@ class LengthFilter:
             }
 
         # sections and figure function calls
-        section = {
-            "Bargraph": self.bargraph(stats_json, reads_lost, index),
-            "Overview": overview_dict,
-        }
+        section = {"Bargraph": self.bargraph(stats_json, reads_lost, index), "Overview": overview_dict}
 
         return section

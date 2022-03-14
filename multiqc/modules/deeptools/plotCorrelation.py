@@ -29,10 +29,7 @@ class plotCorrelationMixin:
             # Data is in wrong format for writing to file
             # self.write_data_file(self.deeptools_plotCorrelationData, "deeptools_plot_corr")
 
-            config = {
-                "id": "deeptools_correlation_plot",
-                "title": "deeptools: Correlation Plot",
-            }
+            config = {"id": "deeptools_correlation_plot", "title": "deeptools: Correlation Plot"}
             data = []
             for s_name in samples:
                 try:

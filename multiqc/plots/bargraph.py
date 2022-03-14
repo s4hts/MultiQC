@@ -286,8 +286,7 @@ def highcharts_bargraph(plotdata, plotsamples=None, pconfig=None):
     html += """<div class="hc-plot-wrapper"{height}>
         <div id="{id}" class="hc-plot not_rendered hc-bar-plot"><small>loading..</small></div>
     </div></div>""".format(
-        id=pconfig["id"],
-        height=f' style="height:{pconfig["height"]}px"' if "height" in pconfig else "",
+        id=pconfig["id"], height=f' style="height:{pconfig["height"]}px"' if "height" in pconfig else ""
     )
 
     report.num_hc_plots += 1

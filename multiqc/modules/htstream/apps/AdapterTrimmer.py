@@ -102,11 +102,17 @@ class AdapterTrimmer:
                 fract_bp_lost = (json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]) / bp_in
                 perc_bp_lost = fract_bp_lost * 100
 
-                fract_pe_bp_trimmed = (json[key]["Paired_end"]["Read1"]["adapterBpTrim"] + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]) / bp_in 
-                fract_pe_reads_trimmed = (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"]) / frag_in,
-           
-                fract_se_bp_trimmed = json[key]["Single_end"]["adapterBpTrim"] / bp_in,
-                fract_se_reads_trimmed = son[key]["Single_end"]["adapterTrim"] / frag_in,
+                fract_pe_bp_trimmed = (
+                    json[key]["Paired_end"]["Read1"]["adapterBpTrim"]
+                    + json[key]["Paired_end"]["Read2"]["adapterBpTrim"]
+                ) / bp_in
+                fract_pe_reads_trimmed = (
+                    (json[key]["Paired_end"]["Read1"]["adapterTrim"] + json[key]["Paired_end"]["Read2"]["adapterTrim"])
+                    / frag_in,
+                )
+
+                fract_se_bp_trimmed = (json[key]["Single_end"]["adapterBpTrim"] / bp_in,)
+                fract_se_reads_trimmed = (son[key]["Single_end"]["adapterTrim"] / frag_in,)
 
             except:
                 fract_bp_lost = 0
@@ -114,14 +120,13 @@ class AdapterTrimmer:
 
                 fract_pe_bp_trimmed = 0
                 fract_pe_reads_trimmed = 0
-           
+
                 fract_se_bp_trimmed = 0
                 fract_se_reads_trimmed = 0
 
                 log = logging.getLogger(__name__)
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
                 log.error(report)
-
 
             # calculations for reads with adapters and bps trimmed
             adapter_reads = (
@@ -156,7 +161,7 @@ class AdapterTrimmer:
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_Bp_Lost":  fract_bp_lost,
+                "Fraction_Bp_Lost": fract_bp_lost,
                 "Fraction_PE_Bp_Trimmed": fract_pe_bp_trimmed,
                 "Fraction_PE_Read_Trimmed": fract_pe_reads_trimmed,
                 "Fraction_SE_Bp_Trimmed": fract_se_bp_trimmed,
@@ -173,9 +178,6 @@ class AdapterTrimmer:
             }
 
         # sections and figure function calls
-        section = {
-            "Table": self.table(stats_json, total, zeroes, index),
-            "Overview": overview_dict,
-        }
+        section = {"Table": self.table(stats_json, total, zeroes, index), "Overview": overview_dict}
 
         return section

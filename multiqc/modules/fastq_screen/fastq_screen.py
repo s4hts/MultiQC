@@ -205,8 +205,7 @@ class MultiqcModule(BaseMultiqcModule):
         html = """<div id={plot_id} class="fq_screen_plot hc-plot"></div>
         <script type="application/json" class="fq_screen_dict">{dict}</script>
         """.format(
-            plot_id=json.dumps(plot_id),
-            dict=json.dumps({"plot_id": plot_id, "data": data, "categories": categories}),
+            plot_id=json.dumps(plot_id), dict=json.dumps({"plot_id": plot_id, "data": data, "categories": categories})
         )
 
         html += """<script type="text/javascript">

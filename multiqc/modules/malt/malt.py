@@ -48,13 +48,7 @@ class MultiqcModule(BaseMultiqcModule):
     def parse_logs(self, f):
         """Parses a Malt log file"""
         reading = False
-        keys = [
-            "Total reads",
-            "Assig. Taxonomy",
-            "Num. of queries",
-            "Aligned queries",
-            "Num. alignments",
-        ]
+        keys = ["Total reads", "Assig. Taxonomy", "Num. of queries", "Aligned queries", "Num. alignments"]
         for line in f["f"]:
             line = line.rstrip()
             if line.startswith("+++++ Aligning file:") and reading == False:
@@ -97,11 +91,7 @@ class MultiqcModule(BaseMultiqcModule):
         cats = OrderedDict()
         cats["Total reads"] = {"name": "Mapped reads"}
         cats["Non mapped"] = {"name": "Non Mapped reads"}
-        config = {
-            "id": "malt-mappability-plot",
-            "title": "MALT: Metagenomic Mappability",
-            "ylab": "Read Counts",
-        }
+        config = {"id": "malt-mappability-plot", "title": "MALT: Metagenomic Mappability", "ylab": "Read Counts"}
         self.add_section(
             name="Metagenomic Mappability",
             anchor="malt-mappability",

@@ -29,8 +29,10 @@ class QWindowTrim:
             "id": "htstream_qwindowtrimmer_bargraph_1" + index,
             "ylab": "Percentage of Total Basepairs",
             "cpswitch": False,
-            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"}, 
-                            {"name": "Raw Counts", "ylab": "Basepairs"}],
+            "data_labels": [
+                {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Raw Counts", "ylab": "Basepairs"},
+            ],
         }
 
         # Title
@@ -43,20 +45,22 @@ class QWindowTrim:
             )
             return html
 
-
         perc_data = {}
         read_data = {}
 
         # Construct data for multidataset bargraph
         for key in json:
 
-            perc_data[key] = {"Perc_R1_lost": json[key]["Qt_Perc_R1_lost"], 
-                              "Perc_R2_lost": json[key]["Qt_Perc_R2_lost"], 
-                              "Perc_SE_lost": json[key]["Qt_Perc_SE_lost"]}
-            read_data[key] = {"R1_lost": json[key]["Qt_R1_lost"],
-                              "R2_lost": json[key]["Qt_R2_lost"], 
-                              "SE_lost": json[key]["Qt_SE_lost"]}
-
+            perc_data[key] = {
+                "Perc_R1_lost": json[key]["Qt_Perc_R1_lost"],
+                "Perc_R2_lost": json[key]["Qt_Perc_R2_lost"],
+                "Perc_SE_lost": json[key]["Qt_Perc_SE_lost"],
+            }
+            read_data[key] = {
+                "R1_lost": json[key]["Qt_R1_lost"],
+                "R2_lost": json[key]["Qt_R2_lost"],
+                "SE_lost": json[key]["Qt_SE_lost"],
+            }
 
         # bargraph dictionary. Exact use of example in MultiQC docs.
         categories = [OrderedDict(), OrderedDict()]
@@ -73,7 +77,6 @@ class QWindowTrim:
         html += bargraph.plot([perc_data, read_data], categories, config)
 
         return html
-
 
     ########################
     # Main Function
@@ -104,16 +107,14 @@ class QWindowTrim:
                     json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
                 )
 
-               
                 total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
 
-           
             bp_in = json[key]["Fragment"]["basepairs_in"]
 
             if bp_in != 0:
                 fract_r1_bp_left = json[key]["Paired_end"]["Read1"]["leftTrim"] / bp_in
                 fract_r1_bp_right = json[key]["Paired_end"]["Read1"]["rightTrim"] / bp_in
-                fract_r2_bp_left =  json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in
+                fract_r2_bp_left = json[key]["Paired_end"]["Read2"]["leftTrim"] / bp_in
                 fract_r2_bp_right = json[key]["Paired_end"]["Read2"]["rightTrim"] / bp_in
                 fract_se_bp_left = json[key]["Single_end"]["leftTrim"] / bp_in
                 fract_se_bp_right = json[key]["Single_end"]["rightTrim"] / bp_in
@@ -121,11 +122,11 @@ class QWindowTrim:
                 perc_r1_lost = (total_r1 / bp_in) * 100
                 perc_r2_lost = (total_r2 / bp_in) * 100
                 perc_se_lost = (total_se / bp_in) * 100
-            
+
             else:
                 fract_r1_bp_left = 0
                 fract_r1_bp_right = 0
-                fract_r2_bp_left =  0
+                fract_r2_bp_left = 0
                 fract_r2_bp_right = 0
                 fract_se_bp_left = 0
                 fract_se_bp_right = 0
@@ -138,12 +139,11 @@ class QWindowTrim:
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
                 log.error(report)
 
-
             # overview data
             overview_dict[key] = {
                 "Output_Reads": json[key]["Fragment"]["out"],
                 "Output_Bps": json[key]["Fragment"]["basepairs_out"],
-                "Fraction_R1_Bp_Trimmed_Left":  fract_r1_bp_left,
+                "Fraction_R1_Bp_Trimmed_Left": fract_r1_bp_left,
                 "Fraction_R1_Bp_Trimmed_Right": fract_r1_bp_right,
                 "Fraction_R2_Bp_Trimmed_Left": fract_r2_bp_left,
                 "Fraction_R2_Bp_Trimmed_Right": fract_r2_bp_right,
@@ -161,11 +161,7 @@ class QWindowTrim:
                 "Qt_SE_lost": total_se,
             }
 
-
         # sections and figure function calls
-        section = {
-            "Trimmed Composition": self.bargraph(stats_json, overall_trim, index),
-            "Overview": overview_dict,
-        }
+        section = {"Trimmed Composition": self.bargraph(stats_json, overall_trim, index), "Overview": overview_dict}
 
         return section

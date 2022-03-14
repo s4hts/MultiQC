@@ -31,7 +31,7 @@ class Primers:
             "name": "Primer Counts",
             "ylab": "Primer Combination Counts",
         }
-       
+
         html = ""
 
         data = {}
@@ -55,7 +55,6 @@ class Primers:
         html += bargraph.plot(data, cats, config)
 
         return html
-
 
     ########################
     # Main Function
@@ -87,14 +86,9 @@ class Primers:
                 "Fraction_Bp_Lost": fract_bp_lost,
             }
 
-            stats_json[key] = {
-                "Pr_Primer_Counts": json[key]["Fragment"]["primers_counts"]
-            }
+            stats_json[key] = {"Pr_Primer_Counts": json[key]["Fragment"]["primers_counts"]}
 
         # dictionary for sections and figure function calls
-        section = {
-            "Primer Counts": self.bargraph(stats_json, index),
-            "Overview": overview_dict,
-        }
+        section = {"Primer Counts": self.bargraph(stats_json, index), "Overview": overview_dict}
 
         return section

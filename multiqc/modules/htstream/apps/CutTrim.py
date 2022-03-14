@@ -28,10 +28,12 @@ class CutTrim:
             "id": "htstream_cuttrim_bargraph_" + index,
             "ylab": "Percentage of Total Basepairs",
             "cpswitch": False,
-            "data_labels": [{"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"}, 
-                            {"name": "Raw Counts", "ylab": "Basepairs"}],
+            "data_labels": [
+                {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Raw Counts", "ylab": "Basepairs"},
+            ],
         }
-       
+
         html = ""
 
         perc_data = {}
@@ -40,7 +42,10 @@ class CutTrim:
         # Construct data for multidataset bargraph
         for key in json:
 
-            perc_data[key] = {"Perc_Left_Trim": json[key]["Ct_%_Left_Trimmed"], "Perc_Left_Trimm": json[key]["Ct_%_Right_Trimmed"]}
+            perc_data[key] = {
+                "Perc_Left_Trim": json[key]["Ct_%_Left_Trimmed"],
+                "Perc_Left_Trimm": json[key]["Ct_%_Right_Trimmed"],
+            }
             read_data[key] = {"Left_Trim": json[key]["Ct_Left_Trimmed"], "Right_Trim": json[key]["Ct_Right_Trimmed"]}
 
         # Create categories for multidataset bargraph
@@ -67,14 +72,21 @@ class CutTrim:
         for key in json.keys():
 
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
-            left_bp_lost = json[key]["Paired_end"]["Read1"]["leftTrim"] + json[key]["Paired_end"]["Read2"]["leftTrim"] + json[key]["Single_end"]["leftTrim"]
-            right_bp_lost = json[key]["Paired_end"]["Read1"]["rightTrim"] + json[key]["Paired_end"]["Read2"]["rightTrim"] + json[key]["Single_end"]["rightTrim"]
-            
+            left_bp_lost = (
+                json[key]["Paired_end"]["Read1"]["leftTrim"]
+                + json[key]["Paired_end"]["Read2"]["leftTrim"]
+                + json[key]["Single_end"]["leftTrim"]
+            )
+            right_bp_lost = (
+                json[key]["Paired_end"]["Read1"]["rightTrim"]
+                + json[key]["Paired_end"]["Read2"]["rightTrim"]
+                + json[key]["Single_end"]["rightTrim"]
+            )
 
             try:
                 perc_left_bp_lost = (left_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
                 perc_right_bp_lost = (right_bp_lost / json[key]["Fragment"]["basepairs_in"]) * 100
-                fraction_bp_lost = (total_bp_lost / json[key]["Fragment"]["basepairs_in"])
+                fraction_bp_lost = total_bp_lost / json[key]["Fragment"]["basepairs_in"]
 
             except:
                 perc_left_bp_lost = 0
@@ -97,13 +109,10 @@ class CutTrim:
                 "Ct_%_Left_Trimmed": perc_left_bp_lost,
                 "Ct_%_Right_Trimmed": perc_right_bp_lost,
                 "Ct_Left_Trimmed": left_bp_lost,
-                "Ct_Right_Trimmed": right_bp_lost
+                "Ct_Right_Trimmed": right_bp_lost,
             }
 
         # sections and figure function calls
-        section = {
-            "Bargraph": self.bargraph(stats_json, index),
-            "Overview": overview_dict
-        }
+        section = {"Bargraph": self.bargraph(stats_json, index), "Overview": overview_dict}
 
         return section

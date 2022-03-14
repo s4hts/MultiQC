@@ -21,24 +21,12 @@ def plot_qahist(samples, file_type, **plot_args):
         all_x.add(item[0])
 
     columns_to_plot = {
-        "Match": {
-            0: "Match",
-        },
-        "Sub": {
-            1: "Sub",
-        },
-        "Ins": {
-            2: "Ins",
-        },
-        "Del": {
-            3: "Del",
-        },
-        "TrueQuality": {
-            4: "TrueQuality",
-        },
-        "TrueQualitySub": {
-            5: "TrueQualitySub",
-        },
+        "Match": {0: "Match"},
+        "Sub": {1: "Sub"},
+        "Ins": {2: "Ins"},
+        "Del": {3: "Del"},
+        "TrueQuality": {4: "TrueQuality"},
+        "TrueQualitySub": {5: "TrueQualitySub"},
     }
 
     plot_data = []
