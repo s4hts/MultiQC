@@ -182,12 +182,7 @@ def parse_reports(self):
             plot=table.plot(
                 data,
                 _get_table_headers(data),
-                {
-                    "id": "picard_hsmetrics_table",
-                    "namespace": "HsMetrics",
-                    "scale": "RdYlGn",
-                    "min": 0,
-                },
+                {"id": "picard_hsmetrics_table", "namespace": "HsMetrics", "scale": "RdYlGn", "min": 0},
             ),
         )
         tbases = _add_target_bases(data)
