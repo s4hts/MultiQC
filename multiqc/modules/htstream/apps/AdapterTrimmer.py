@@ -35,7 +35,7 @@ class AdapterTrimmer:
 
         # Some columns have SUPER small values, add raw counts instead of percentages
         if zeroes == False:
-            decimals = "{:,.2f}"
+            decimals = "{:,.3f}"
 
             headers["At_%_BP_Lost" + index] = {
                 "title": "% Bp Lost",
@@ -154,7 +154,7 @@ class AdapterTrimmer:
             total += avg_bp_trimmed
 
             # If percentages are small, use raw counts
-            if perc_bp_lost < 0.01 and zeroes == False:
+            if perc_bp_lost < 0.001 and zeroes == False:
                 zeroes = True
 
             # Overview stats

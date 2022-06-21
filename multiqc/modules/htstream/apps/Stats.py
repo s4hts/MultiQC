@@ -436,6 +436,7 @@ class Stats:
 
         return html
 
+
     ########################
     # Read Length Heatmaps
     def read_length(self, json, read):
@@ -445,23 +446,25 @@ class Stats:
         unique_id = str(random() % 1000)[5:]
 
         # config dictionary for heatmaps
-        heat_pconfig = {
+        line_config = {
             "id": "htstream_stats_read_lengths_" + read_code + "_" + unique_id,
-            "title": "HTStream:  Read Length Heatmap (" + read_code + ")",
-            "yTitle": "Sample",
-            "xTitle": "Length",
-            "square": False,
-            "datalabels": False,
-            "xcats_samples": False,
-            "max": 1.0,
-            "colstops": [[0, "#FFFFFF"], [0.3, "#F8D527"], [0.6, "#F8A627"], [1, "#E70808"]],
+            "title": "HTStream:  Read Length Linegraph (" + read_code + ")",
+            "yTitle": "Counts",
+            "xTitle": "Read Length",
         }
 
-        # Initialize useful lists
-        readlength_data = []
-        lengths = []
-        samples = []
-        max_length = 0
+
+        # if PE, cread multiple datasets
+        if read_code == "PE":
+            line_config['data_labels'] = [
+                                           {'name': 'Read 1', 'ylab': 'Counts', 'xlab': 'Read Lengths'},
+                                           {'name': 'Read 2', 'ylab': 'Counts', 'xlab': 'Read Lengths'}
+                                         ]
+            readlength_data = [{}, {}]
+
+        else:
+            readlength_data = {}
+
 
         # Are all reads from all samples uniform? Let's find out.
         uniform_dict = {}
@@ -475,9 +478,13 @@ class Stats:
                 if len(json[samp][read][0]) == 1:
                     uniform_dict[samp] = {"St_Read_Lengths_SE_" + unique_id: json[samp][read][0][0][0]}
 
-                # Get Read length data
-                read_lengths = json[samp][read][0]
-                total = json[samp]["St_SE_in"]
+                # create entry
+                readlength_data[samp] = {}
+
+                # populate x,y coords
+                for length in json[samp][read][0]:
+
+                    readlength_data[samp][length[0]] = length[1]
 
             else:
 
@@ -488,30 +495,14 @@ class Stats:
                         "St_Read_Lengths_R2_" + unique_id: json[samp][read][1][0][0],
                     }
 
-                # Get Read length data for R1 and R2
-                read_lengths = json[samp][read][0]
-                total = json[samp]["St_PE_in"]
-                r2 = [[read_lengths[-1][0] + x[0], x[1]] for x in json[samp][read][1]]
+                # iterate through R1 and R2 read length hists
+                for i in range(0, 2):
 
-                # concat reads
-                read_lengths += r2
+                    readlength_data[i][samp] = {} 
 
-            # check if max read length is longest, if not update length of lists
-            if max_length < read_lengths[-1][0]:
+                    for length in json[samp][read][i]:
+                        readlength_data[i][samp][length[0]] = length[1]
 
-                # update max
-                max_length = read_lengths[-1][0]
-
-            data = [0 for i in range(0, read_lengths[-1][0])]
-
-            # populate data
-            for lst in read_lengths:
-
-                data[lst[0] - 1] = lst[1] / total
-
-            # add data to lits
-            readlength_data.append(data)
-            samples.append(samp)
 
         # Title
         html = "<h4> Read Lengths: " + self.read_keys[read_code] + " </h4>"
@@ -551,11 +542,10 @@ class Stats:
 
         else:
 
-            # X Labels
-            lengths = [i for i in range(1, max_length + 1)]
+            
 
             # Construct heatmap
-            html += heatmap.plot(readlength_data, lengths, samples, heat_pconfig)
+            html += linegraph.plot(readlength_data, line_config)
 
             return html
 
