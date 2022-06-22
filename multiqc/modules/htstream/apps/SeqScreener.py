@@ -73,21 +73,6 @@ class SeqScreener:
 
         for key in json.keys():
 
-            try:
-                fract_reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"][
-                    "in"
-                ]
-                perc_hits = (pe_hits + se_hits) / json[key]["Fragment"]["in"]
-
-            except:
-
-                fract_reads_lost = 0
-                perc_hits = 0
-
-                log = logging.getLogger(__name__)
-                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
-                log.error(report)
-
             # Will fail if no PE data
             try:
                 pe_hits = json[key]["Paired_end"]["hits"]
@@ -105,6 +90,22 @@ class SeqScreener:
             except:
                 se_hits = 0
                 perc_se_hits = 0
+
+            # for overview section
+            try:
+                fract_reads_lost = (json[key]["Fragment"]["in"] - json[key]["Fragment"]["out"]) / json[key]["Fragment"][
+                    "in"
+                ]
+                perc_hits = (pe_hits + se_hits) / json[key]["Fragment"]["in"]
+
+            except:
+
+                fract_reads_lost = 0
+                perc_hits = 0
+
+                log = logging.getLogger(__name__)
+                report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
+                log.error(report)
 
             reads_screened += pe_hits + se_hits
 

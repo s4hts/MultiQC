@@ -28,7 +28,7 @@ class Overlapper:
         config = {
             "title": "HTStream: Overlap Composition Bargraph",
             "id": "htstream_overlapper_bargraph",
-            "ylab": "Samples",
+            "ylab": "Percentages",
             "cpswitch_c_active": False,
         }
 

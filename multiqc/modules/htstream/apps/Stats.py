@@ -436,7 +436,6 @@ class Stats:
 
         return html
 
-
     ########################
     # Read Length Heatmaps
     def read_length(self, json, read):
@@ -445,26 +444,24 @@ class Stats:
         read_code = self.read_keys[read]
         unique_id = str(random() % 1000)[5:]
 
-        # config dictionary for heatmaps
+        # config dictionary for linegraph
         line_config = {
             "id": "htstream_stats_read_lengths_" + read_code + "_" + unique_id,
-            "title": "HTStream:  Read Length Linegraph (" + read_code + ")",
-            "yTitle": "Counts",
-            "xTitle": "Read Length",
+            "title": "HTStream: Read Length Linegraph (" + read_code + ")",
+            "ylab": "Counts",
+            "xlab": "Read Length",
         }
-
 
         # if PE, cread multiple datasets
         if read_code == "PE":
-            line_config['data_labels'] = [
-                                           {'name': 'Read 1', 'ylab': 'Counts', 'xlab': 'Read Lengths'},
-                                           {'name': 'Read 2', 'ylab': 'Counts', 'xlab': 'Read Lengths'}
-                                         ]
+            line_config["data_labels"] = [
+                {"name": "Read 1", "ylab": "Counts", "xlab": "Read Lengths"},
+                {"name": "Read 2", "ylab": "Counts", "xlab": "Read Lengths"},
+            ]
             readlength_data = [{}, {}]
 
         else:
             readlength_data = {}
-
 
         # Are all reads from all samples uniform? Let's find out.
         uniform_dict = {}
@@ -498,11 +495,10 @@ class Stats:
                 # iterate through R1 and R2 read length hists
                 for i in range(0, 2):
 
-                    readlength_data[i][samp] = {} 
+                    readlength_data[i][samp] = {}
 
                     for length in json[samp][read][i]:
                         readlength_data[i][samp][length[0]] = length[1]
-
 
         # Title
         html = "<h4> Read Lengths: " + self.read_keys[read_code] + " </h4>"
@@ -541,8 +537,6 @@ class Stats:
             return html
 
         else:
-
-            
 
             # Construct heatmap
             html += linegraph.plot(readlength_data, line_config)

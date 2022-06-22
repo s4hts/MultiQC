@@ -27,12 +27,12 @@ class NTrimmer:
         config = {
             "title": "HTStream: NTrimmer Trimmed Basepairs Bargraph",
             "id": "htstream_ntrimmer_bargraph_" + index,
-            "ylab": "Basepairs",
+            "ylab": "Percentage of Total Basepairs",
             "cpswitch": False,
             "data_labels": [
-                {"name": "Read 1", "ylab": "Basepairs"},
-                {"name": "Read 2", "ylab": "Basepairs"},
-                {"name": "Single End", "ylab": "Basepairs"},
+                {"name": "Read 1", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Read 2", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Single End", "ylab": "Percentage of Total Basepairs"},
             ],
         }
 
@@ -59,12 +59,12 @@ class NTrimmer:
 
         # Create categores for multidatatset bragraphs
         cats = [OrderedDict(), OrderedDict(), OrderedDict()]
-        cats[0]["LT_R1"] = {"name": "R1 Left Trimmmed"}
-        cats[0]["RT_R1"] = {"name": "R1 Right Trimmmed"}
-        cats[1]["LT_R2"] = {"name": "R2 Left Trimmmed"}
-        cats[1]["RT_R2"] = {"name": "R2 Right Trimmmed"}
-        cats[2]["LT_SE"] = {"name": "SE Left Trimmmed"}
-        cats[2]["RT_SE"] = {"name": "SE Right Trimmmed"}
+        cats[0]["LT_R1"] = {"name": "Left Trimmmed"}
+        cats[0]["RT_R1"] = {"name": "Right Trimmmed"}
+        cats[1]["LT_R2"] = {"name": "Left Trimmmed"}
+        cats[1]["RT_R2"] = {"name": "Right Trimmmed"}
+        cats[2]["LT_SE"] = {"name": "Left Trimmmed"}
+        cats[2]["RT_SE"] = {"name": "Right Trimmmed"}
 
         # create bargraphs
         html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
@@ -83,6 +83,7 @@ class NTrimmer:
 
         for key in json.keys():
 
+            total_bp = json[key]["Fragment"]["basepairs_in"]
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
 
             total_r1 = (
@@ -113,12 +114,12 @@ class NTrimmer:
 
             # sample entry in stats dictionary
             stats_json[key] = {
-                "Nt_Left_Trimmed_R1": json[key]["Paired_end"]["Read1"]["leftTrim"],
-                "Nt_Right_Trimmed_R1": json[key]["Paired_end"]["Read1"]["rightTrim"],
-                "Nt_Left_Trimmed_R2": json[key]["Paired_end"]["Read2"]["leftTrim"],
-                "Nt_Right_Trimmed_R2": json[key]["Paired_end"]["Read2"]["rightTrim"],
-                "Nt_Left_Trimmed_SE": json[key]["Single_end"]["leftTrim"],
-                "Nt_Right_Trimmed_SE": json[key]["Single_end"]["rightTrim"],
+                "Nt_Left_Trimmed_R1": (json[key]["Paired_end"]["Read1"]["leftTrim"] / total_bp) * 100,
+                "Nt_Right_Trimmed_R1": (json[key]["Paired_end"]["Read1"]["rightTrim"] / total_bp) * 100,
+                "Nt_Left_Trimmed_R2": (json[key]["Paired_end"]["Read2"]["leftTrim"] / total_bp) * 100,
+                "Nt_Right_Trimmed_R2": (json[key]["Paired_end"]["Read2"]["rightTrim"] / total_bp) * 100,
+                "Nt_Left_Trimmed_SE": (json[key]["Single_end"]["leftTrim"] / total_bp) * 100,
+                "Nt_Right_Trimmed_SE": (json[key]["Single_end"]["rightTrim"] / total_bp) * 100,
             }
 
             # accumulatr totals

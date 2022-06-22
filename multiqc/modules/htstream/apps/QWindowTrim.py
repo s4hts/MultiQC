@@ -19,62 +19,114 @@ class QWindowTrim:
         self.info = "Uses a sliding window approach to remove the low quality ends of reads."
         self.type = "bp_reducer"
 
-    ########################
-    # Bargraphs Function
-    def bargraph(self, json, bps_trimmed, index):
+    # ########################
+    # # Bargraphs Function
+    # def bargraph(self, json, bps_trimmed, index):
 
-        # configuration dictionary for bar graph
+    #     # configuration dictionary for bar graph
+    #     config = {
+    #         "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
+    #         "id": "htstream_qwindowtrimmer_bargraph_" + index,
+    #         "ylab": "Percentage of Total Basepairs",
+    #         "cpswitch": False,
+    #         "data_labels": [
+    #             {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
+    #             {"name": "Raw Counts", "ylab": "Basepairs"},
+    #         ],
+    #     }
+
+    #     # Title
+    #     html = ""
+
+    #     # if no overlaps at all are present, return nothing
+    #     if bps_trimmed == 0:
+    #         html += (
+    #             '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
+    #         )
+    #         return html
+
+    #     perc_data = {}
+    #     read_data = {}
+
+    #     # Construct data for multidataset bargraph
+    #     for key in json:
+
+    #         perc_data[key] = {
+    #             "Perc_R1_lost": json[key]["Qt_Perc_R1_lost"],
+    #             "Perc_R2_lost": json[key]["Qt_Perc_R2_lost"],
+    #             "Perc_SE_lost": json[key]["Qt_Perc_SE_lost"],
+    #         }
+    #         read_data[key] = {
+    #             "R1_lost": json[key]["Qt_R1_lost"],
+    #             "R2_lost": json[key]["Qt_R2_lost"],
+    #             "SE_lost": json[key]["Qt_SE_lost"],
+    #         }
+
+    #     # bargraph dictionary. Exact use of example in MultiQC docs.
+    #     categories = [OrderedDict(), OrderedDict()]
+
+    #     # Colors for sections
+    #     categories[0]["Perc_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+    #     categories[0]["Perc_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+    #     categories[0]["Perc_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+    #     categories[1]["R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
+    #     categories[1]["R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
+    #     categories[1]["SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+
+    #     # Create bargrpah
+    #     html += bargraph.plot([perc_data, read_data], categories, config)
+
+    #     return html
+
+    ########################
+    # Table Function
+    def bargraph(self, json, bps, index):
+
+        # config dict for bar graph
         config = {
-            "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
-            "id": "htstream_qwindowtrimmer_bargraph_1" + index,
+            "title": "HTStream: QWindowTrim Trimmed Basepairs Bargraph",
+            "id": "htstream_qwindowtrim_bargraph_" + index,
             "ylab": "Percentage of Total Basepairs",
             "cpswitch": False,
             "data_labels": [
-                {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
-                {"name": "Raw Counts", "ylab": "Basepairs"},
+                {"name": "Read 1", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Read 2", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Single End", "ylab": "Percentage of Total Basepairs"},
             ],
         }
 
-        # Title
+        # Header
         html = ""
 
-        # if no overlaps at all are present, return nothing
-        if bps_trimmed == 0:
-            html += (
-                '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
-            )
+        # returns nothing if no reads were trimmed.
+        if bps == 0:
+            html = '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'
             return html
 
-        perc_data = {}
-        read_data = {}
+        r1_data = {}
+        r2_data = {}
+        se_data = {}
 
-        # Construct data for multidataset bargraph
+        # Create dictionaries for multidataset bargraphs
         for key in json:
 
-            perc_data[key] = {
-                "Perc_R1_lost": json[key]["Qt_Perc_R1_lost"],
-                "Perc_R2_lost": json[key]["Qt_Perc_R2_lost"],
-                "Perc_SE_lost": json[key]["Qt_Perc_SE_lost"],
-            }
-            read_data[key] = {
-                "R1_lost": json[key]["Qt_R1_lost"],
-                "R2_lost": json[key]["Qt_R2_lost"],
-                "SE_lost": json[key]["Qt_SE_lost"],
-            }
+            r1_data[key] = {"LT_R1": json[key]["Qt_Left_Trimmed_R1"], "RT_R1": json[key]["Qt_Right_Trimmed_R1"]}
 
-        # bargraph dictionary. Exact use of example in MultiQC docs.
-        categories = [OrderedDict(), OrderedDict()]
+            r2_data[key] = {"LT_R2": json[key]["Qt_Left_Trimmed_R2"], "RT_R2": json[key]["Qt_Right_Trimmed_R2"]}
 
-        # Colors for sections
-        categories[0]["Perc_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
-        categories[0]["Perc_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
-        categories[0]["Perc_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
-        categories[1]["R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
-        categories[1]["R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
-        categories[1]["SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
+            se_data[key] = {"LT_SE": json[key]["Qt_Left_Trimmed_SE"], "RT_SE": json[key]["Qt_Right_Trimmed_SE"]}
 
-        # Create bargrpah
-        html += bargraph.plot([perc_data, read_data], categories, config)
+        # Create categores for multidatatset bragraphs
+        cats = [OrderedDict(), OrderedDict(), OrderedDict()]
+        cats[0]["LT_R1"] = {"name": "Left Trimmmed"}
+        cats[0]["RT_R1"] = {"name": "Right Trimmmed"}
+        cats[1]["LT_R2"] = {"name": "Left Trimmmed"}
+        cats[1]["RT_R2"] = {"name": "Right Trimmmed"}
+        cats[2]["LT_SE"] = {"name": "Left Trimmmed"}
+        cats[2]["RT_SE"] = {"name": "Right Trimmmed"}
+
+        # create bargraphs
+        html += bargraph.plot([r1_data, r2_data, se_data], cats, config)
 
         return html
 
@@ -92,23 +144,6 @@ class QWindowTrim:
             total_bp_lost = json[key]["Fragment"]["basepairs_in"] - json[key]["Fragment"]["basepairs_out"]
             overall_trim += total_bp_lost
 
-            # If no bps lost, prevent zero division
-            if total_bp_lost == 0:
-                total_r1 = 0
-                total_r2 = 0
-                total_se = 0
-                total_pe = 0
-
-            else:
-                total_r1 = (
-                    json[key]["Paired_end"]["Read1"]["basepairs_in"] - json[key]["Paired_end"]["Read1"]["basepairs_out"]
-                )
-                total_r2 = (
-                    json[key]["Paired_end"]["Read2"]["basepairs_in"] - json[key]["Paired_end"]["Read2"]["basepairs_out"]
-                )
-
-                total_se = json[key]["Single_end"]["basepairs_in"] - json[key]["Single_end"]["basepairs_out"]
-
             bp_in = json[key]["Fragment"]["basepairs_in"]
 
             if bp_in != 0:
@@ -119,10 +154,6 @@ class QWindowTrim:
                 fract_se_bp_left = json[key]["Single_end"]["leftTrim"] / bp_in
                 fract_se_bp_right = json[key]["Single_end"]["rightTrim"] / bp_in
 
-                perc_r1_lost = (total_r1 / bp_in) * 100
-                perc_r2_lost = (total_r2 / bp_in) * 100
-                perc_se_lost = (total_se / bp_in) * 100
-
             else:
                 fract_r1_bp_left = 0
                 fract_r1_bp_right = 0
@@ -130,10 +161,6 @@ class QWindowTrim:
                 fract_r2_bp_right = 0
                 fract_se_bp_left = 0
                 fract_se_bp_right = 0
-
-                perc_r1_lost = 0
-                perc_r2_lost = 0
-                perc_se_lost = 0
 
                 log = logging.getLogger(__name__)
                 report = "HTStream: Zero Reads or Basepairs Reported for " + key + "."
@@ -153,12 +180,12 @@ class QWindowTrim:
 
             # sample dictionary entry
             stats_json[key] = {
-                "Qt_Perc_R1_lost": perc_r1_lost,
-                "Qt_Perc_R2_lost": perc_r2_lost,
-                "Qt_Perc_SE_lost": perc_se_lost,
-                "Qt_R1_lost": total_r1,
-                "Qt_R2_lost": total_r2,
-                "Qt_SE_lost": total_se,
+                "Qt_Left_Trimmed_R1": fract_r1_bp_left * 100,
+                "Qt_Right_Trimmed_R1": fract_r1_bp_right * 100,
+                "Qt_Left_Trimmed_R2": fract_r2_bp_left * 100,
+                "Qt_Right_Trimmed_R2": fract_r2_bp_right * 100,
+                "Qt_Left_Trimmed_SE": fract_se_bp_left * 100,
+                "Qt_Right_Trimmed_SE": fract_se_bp_right * 100,
             }
 
         # sections and figure function calls
