@@ -48,6 +48,7 @@ class Stats:
             "format": "{:,.2f}",
             "suffix": "%",
             "scale": "Greens",
+            'hidden': True
         }
         headers["St_SE_Fraction" + index] = {
             "title": "% SE",
@@ -56,6 +57,7 @@ class Stats:
             "format": "{:,.2f}",
             "suffix": "%",
             "scale": "RdPu",
+            'hidden': True 
         }
         headers["St_R1_Q30" + index] = {
             "title": "% R1 Q30",
@@ -266,19 +268,6 @@ class Stats:
             "colors": {},
         }
 
-        # config dictionary for heatmaps
-        heat_pconfig = {
-            "title": "HTStream: Quality by Cycle (" + read_code + ")",
-            "yTitle": "Q Score",
-            "xTitle": "Cycle",
-            "square": False,
-            "datalabels": False,
-            "xcats_samples": False,
-            "ycats_samples": False,
-            "max": 1.0,
-            "colstops": [[0, "#FFFFFF"], [0.3, "#1DC802"], [0.6, "#F3F943"], [1, "#E70808"]],
-        }
-
         # If paired end, we need to add midpoint line
         if read_code == "PE":
 
@@ -298,17 +287,11 @@ class Stats:
 
         # Line Data, Button List, and Boolean
         line_data = {}
-        first = True
-        button_list = []
 
         for key in json.keys():
 
             # create dictionary for line graph. Again, format is {x: y}
             line_data[key] = {}
-
-            key_id = str(random() % 1000)[5:10]
-            # creates unique heatmap id that can be queired later by js.
-            heat_pconfig["id"] = "htstream_stats_qbc_heat_" + read_code + "_" + key_id + "_" + unique_id
 
             # If PE, we wanna concat quality by cycle data
             if read_code == "PE":
@@ -331,19 +314,16 @@ class Stats:
                     ],
                 }
 
-            # creates x and y axis labels for heatmap (categorical)
-            x_lab = [str(int(x)) for x in json[key][read]["col_names"]]
+           
             y_lab = json[key][read]["row_names"][::-1]  # reverse orientation makes it easier to cycle through
 
             # Data list
             data = []
 
             # create variables for range functions in loops. Represents shape of data
-            quality_scores = json[key][read]["shape"][0]
+            # quality_scores = json[key][read]["shape"][0]
             cycles = json[key][read]["shape"][-1]
 
-            # temp total list
-            total = []
 
             # iterates through positions, creates a list of the sum of scores at each position to be used
             # 	to calculated frequency for heatmap. Also, calculates avg. Q score for linegraph.
@@ -354,7 +334,6 @@ class Stats:
             for pos in range(cycles):
                 temp = [score_list[pos] for score_list in json[key][read]["data"]]
                 temp_sum = sum(temp)
-                total.append(temp_sum)
 
                 # multiples count at poistion by Q Score.
                 total_score = sum([(int(p) * int(s)) for p, s in zip(temp, y_lab[::-1])])
@@ -378,38 +357,6 @@ class Stats:
             else:
                 line_config["colors"][key] = "#78D578"
 
-            # populates data dictionaries for heatmap
-            for score in range(quality_scores - 1, -1, -1):
-
-                # create empty list for data. The format is a little strange, each list represents a position
-                # 	the value inside of it is the score at that position divided by the total score for that position
-                # 	giving a frequency.
-                data.append([])
-
-                for pos in range(cycles):
-                    data[-1].append(json[key][read]["data"][score][pos] / total[pos])
-
-            # if this is the first sample process, lucky them, they get to be shown first and marked as active.
-            # 	This step is necessary otherwise, the plot div is not initialized. The additional calls to the
-            # 	heatmap function are simply to add the data to the internal jsons used by MultiQC.
-            if first == True:
-                active = "active"  # button is default active
-                first = False  # shuts off first gat
-                heatmap_html = heatmap.plot(data, x_lab, y_lab, heat_pconfig)
-
-            else:
-                active = ""  # button is default off
-                heatmap.plot(data, x_lab, y_lab, heat_pconfig)
-
-            # html div attributes and text
-            name = key
-            pid = heat_pconfig["id"] + "_btn"
-
-            button_list.append(
-                '<button class="btn btn-default btn-sm {a}" onclick="htstream_div_switch(this)" id="{pid}">{n}</button>\n'.format(
-                    a=active, pid=pid, n=name
-                )
-            )
 
         # section head
         header_html = "<h4> Quality by Cycle: " + self.read_keys[read_code] + "</h4>"
@@ -417,24 +364,12 @@ class Stats:
 							  Sample is colored red if less than 60% of bps have mean score of at least Q30, 
 							  orange if between 60% and 80%, and green otherwise.</p>"""
 
-        # Button ID
-        btn_label_1 = "Mean Quality"
-        btn_label_2 = "Quality by Cycle"
-
-        # Plot IDs
-        line_1_id = "htstream_qbc_line_{r}_{u}".format(r=read_code, u=unique_id)
-        line_2_id = "htstream_qbc_heat_{r}_{u}".format(r=read_code, u=unique_id)
 
         # HTML of plots
-        line_plot = linegraph.plot(line_data, line_config)
-        heatmap_plot = htstream_utils.multi_heatmap_html(button_list, heatmap_html)
-
-        # Construct multiplot div
-        html = htstream_utils.multi_plot_html(
-            header_html, btn_label_1, btn_label_2, line_1_id, line_2_id, line_plot, heatmap_plot, exempt=False
-        )
-
+        html = header_html + linegraph.plot(line_data, line_config)
+        
         return html
+        
 
     ########################
     # Read Length Heatmaps
@@ -447,7 +382,7 @@ class Stats:
         # config dictionary for linegraph
         line_config = {
             "id": "htstream_stats_read_lengths_" + read_code + "_" + unique_id,
-            "title": "HTStream: Read Length Linegraph (" + read_code + ")",
+            "title": "HTStream: Rcp ead Length Linegraph (" + read_code + ")",
             "ylab": "Counts",
             "xlab": "Read Length",
         }
