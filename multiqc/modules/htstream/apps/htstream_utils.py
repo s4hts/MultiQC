@@ -136,48 +136,6 @@ def multi_plot_html(header, btn_1, btn_2, id_1, id_2, graph_1, graph_2, exempt=T
 
 
 ###################################
-# Multi Head Map Html
-def multi_heatmap_html(button_list, heatmap):
-
-    # The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
-    heatmap_html = '<div class="btn-group hc_switch_group" style="margin-bottom: 20px; margin-top: 10px;">\n'
-
-    # Add buttons
-    for buttons in button_list:
-        heatmap_html += buttons
-
-    heatmap_html += "</div>\n\n"
-    heatmap_html += heatmap
-
-    return heatmap_html
-
-
-###################################
-# Primers heatmap html formatter, very similar to above function
-def primers_heatmap_html(unique_id, button_list, heatmap):
-
-    # header
-    wrapper_html = "<h4> Primers: Primer Counts </h4>"
-    wrapper_html += """<div class="mqc_hcplot_plotgroup">"""
-
-    # The heatmaps of this section occur on a per sample basis, meaning we need another subset of buttons to switch between the samples
-    heatmap_html = '<div class="btn-group hc_switch_group">\n'
-
-    # Buttons
-    for buttons in button_list:
-        heatmap_html += buttons
-
-    heatmap_html += "</div>\n\n<br></br>\n\n"
-    heatmap_html += heatmap
-
-    # heatmap div
-    wrapper_html += '<div id="htstream_heat_primers_{u}" class="htstream_fadein">'.format(u=unique_id)
-    wrapper_html += heatmap_html + "</div></div>"
-
-    return wrapper_html
-
-
-###################################
 # scale overview linegraph plot
 def normalize(data, samples_list, stats_order):
 
