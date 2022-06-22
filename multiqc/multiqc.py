@@ -459,7 +459,6 @@ def run(
 
     plugin_hooks.mqc_trigger("execution_start")
 
-    logger.debug("Command     : {}".format(" ".join(sys.argv)))
     logger.debug("Working dir : {}".format(os.getcwd()))
     if make_pdf:
         logger.info("--pdf specified. Using non-interactive HTML template.")
