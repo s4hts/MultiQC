@@ -241,10 +241,8 @@ class MultiqcModule(BaseMultiqcModule):
             try:
                 app = globals()["OverviewStats"]()
 
-                description = "General statistics from the HTStream pipeline."
-                html, stats_data = app.execute(self.overview_stats, self.app_order)
-
-                self.write_data_file(stats_data, "htstream_raw_overview_data")
+                description = "Plots reduction of reads and basepairs across the preprocessing pipeline."
+                html = app.execute(self.overview_stats, self.app_order)
 
                 self.add_section(name="Processing Overview", description=description, content=html)
 
