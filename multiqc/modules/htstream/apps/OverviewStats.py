@@ -9,7 +9,6 @@ from multiqc.plots import table, linegraph, scatter
 
 
 class OverviewStats:
-
     def read_and_basepair_reduction(self, json, app_list):
 
         line_config = {
@@ -67,9 +66,8 @@ class OverviewStats:
 
         return html
 
-   
     def execute(self, json, app_list):
 
         reduction_html = self.read_and_basepair_reduction(json, app_list)
-       
+
         return reduction_html

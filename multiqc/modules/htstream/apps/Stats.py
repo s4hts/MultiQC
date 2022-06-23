@@ -48,7 +48,7 @@ class Stats:
             "format": "{:,.2f}",
             "suffix": "%",
             "scale": "Greens",
-            'hidden': True
+            "hidden": True,
         }
         headers["St_SE_Fraction" + index] = {
             "title": "% SE",
@@ -57,7 +57,7 @@ class Stats:
             "format": "{:,.2f}",
             "suffix": "%",
             "scale": "RdPu",
-            'hidden': True 
+            "hidden": True,
         }
         headers["St_R1_Q30" + index] = {
             "title": "% R1 Q30",
@@ -112,10 +112,10 @@ class Stats:
 
         # Multi Sample Line Config, it's called entropy (even though its not)
         config = {
-            "id": "htstream_stats_entropy_" + read + "_" + unique_id,
+            "id": "htstream_stats_distance_" + read + "_" + unique_id,
             "title": "HTStream: Base by Cycle (" + read_code + ")",
             "smooth_points_sumcounts": False,
-            "ylab": "Avg. Difference from 25%",
+            "ylab": "Deviation from 25%",
             "xlab": "Cycle",
             "categories": True,
             "tt_decimals": "{:,.2f}",
@@ -226,15 +226,15 @@ class Stats:
 
         # HTML for plots
         header_html = "<h4> Base by Cycle: " + self.read_keys[read_code] + "</h4>"
-        header_html += """<p> Provides a measure of the uniformity of a distribution. The higher the average is at a certain position,
+        header_html += """<p> Provides a measure of the uniformity of a distribution. The higher the average deviation from 25\% is,
 							the more unequal the base pair composition. N's are excluded from this calculation. </p>"""
 
         # Button labels
-        btn_label_1 = "Avg. Diff. from  25%"
+        btn_label_1 = "Deviation from 25%"
         btn_label_2 = "Base by Cycle"
 
         # Line IDs
-        line_1_id = "htstream_stats_entropy_{r}_{b}".format(r=read_code, b=unique_id)
+        line_1_id = "htstream_stats_distance_{r}_{b}".format(r=read_code, b=unique_id)
         line_2_id = "htstream_stats_base_line_{r}_{b}".format(r=read_code, b=unique_id)
 
         # Actual graphs
@@ -314,7 +314,6 @@ class Stats:
                     ],
                 }
 
-           
             y_lab = json[key][read]["row_names"][::-1]  # reverse orientation makes it easier to cycle through
 
             # Data list
@@ -323,7 +322,6 @@ class Stats:
             # create variables for range functions in loops. Represents shape of data
             # quality_scores = json[key][read]["shape"][0]
             cycles = json[key][read]["shape"][-1]
-
 
             # iterates through positions, creates a list of the sum of scores at each position to be used
             # 	to calculated frequency for heatmap. Also, calculates avg. Q score for linegraph.
@@ -357,19 +355,16 @@ class Stats:
             else:
                 line_config["colors"][key] = "#78D578"
 
-
         # section head
         header_html = "<h4> Quality by Cycle: " + self.read_keys[read_code] + "</h4>"
         header_html += """<p> Mean quality score for each position along the read. 
 							  Sample is colored red if less than 60% of bps have mean score of at least Q30, 
 							  orange if between 60% and 80%, and green otherwise.</p>"""
 
-
         # HTML of plots
         html = header_html + linegraph.plot(line_data, line_config)
-        
+
         return html
-        
 
     ########################
     # Read Length Heatmaps

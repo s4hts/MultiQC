@@ -23,45 +23,52 @@ class AdapterTrimmer:
 
     ########################
     # Table Function
-    def table(self, json, total, index):
+    def bargraph(self, json, bps, index):
 
-        # Table constructor. Just like the MultiQC docs.
-
-        # If total is zero, no need for a plot
-        if total == 0:
-            return ""
-
-        headers = OrderedDict()
-
-        decimals = "{:,.2f}"
-
-        headers["At_%_BP_Lost" + index] = {
-            "title": "% Bp Lost",
-            "namespace": "Bp Lost",
-            "description": "Percentage of Input bps (SE and PE) trimmed.",
-            "scale": "RdPu",
-            "suffix": "%",
-            "format": decimals,
-        }
-        headers["At_%_Adapters" + index] = {
-            "title": "% Adapters",
-            "namespace": "Adapters",
-            "description": "Percentage of Reads (SE and PE) with an Adapter",
-            "scale": "Blues",
-            "suffix": "%",
-            "format": decimals,
+        # config dict for bar graph
+        config = {
+            "title": "HTStream: AdapterTrimmer Trimmed Basepairs Bargraph",
+            "id": "htstream_adaptertrimmer_bargraph_" + index,
+            "ylab": "Percentage of Total Basepairs",
+            "cpswitch": False,
+            "data_labels": [
+                {"name": "Basepairs Lost", "ylab": "Percentage of Total Basepairs"},
+                {"name": "Reads with Adapters", "ylab": "Percentage of Total Reads"},
+                {"name": "Average Number of Basepairs Trimmed", "ylab": "Basepairs"},
+            ],
         }
 
-        # More columns
-        headers["At_Avg_BP_Trimmed" + index] = {
-            "title": "Avg. Bps Trimmed",
-            "namespace": "Avg. Bps Trimmed",
-            "description": "Average Number of basepairs trimmed from trimmed reads",
-            "format": "{:,.2f}",
-            "scale": "Oranges",
-        }
+        # Header
+        html = ""
 
-        return table.plot(json, headers)
+        # returns nothing if no reads were trimmed.
+        if bps == 0:
+            html = '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from any sample. </div>'
+            return html
+
+        perc_data = {}
+        read_data = {}
+        bp_data = {}
+
+        # Create dictionaries for multidataset bargraphs
+        for key in json:
+
+            perc_data[key] = {"Perc_bp_lost": json[key]["At_%_BP_Lost" + index]}
+
+            read_data[key] = {"Perc_adapters": json[key]["At_%_Adapters" + index]}
+
+            bp_data[key] = {"Avg_adapter": json[key]["At_Avg_BP_Trimmed" + index]}
+
+        # Create categories for multidataset bargraph
+        cats = [OrderedDict(), OrderedDict(), OrderedDict()]
+        cats[0]["Perc_bp_lost"] = {"name": "Percentage"}
+        cats[1]["Perc_adapters"] = {"name": "Percentage"}
+        cats[2]["Avg_adapter"] = {"name": "Basepairs"}
+
+        # create bargraphs
+        html += bargraph.plot([perc_data, read_data, bp_data], cats, config)
+
+        return html
 
     ########################
     # Main Function
@@ -152,12 +159,10 @@ class AdapterTrimmer:
             stats_json[key] = {
                 "At_%_BP_Lost" + index: perc_bp_lost,
                 "At_%_Adapters" + index: perc_adapters,
-                "At_BP_Lost" + index: bp_trimmed,
-                "At_Adapters" + index: adapter_reads,
                 "At_Avg_BP_Trimmed" + index: avg_bp_trimmed,
             }
 
         # sections and figure function calls
-        section = {"Table": self.table(stats_json, total, index), "Overview": overview_dict}
+        section = {"Bargraph": self.bargraph(stats_json, total, index), "Overview": overview_dict}
 
         return section

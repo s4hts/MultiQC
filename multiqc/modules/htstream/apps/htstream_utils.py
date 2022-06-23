@@ -133,5 +133,3 @@ def multi_plot_html(header, btn_1, btn_2, id_1, id_2, graph_1, graph_2, exempt=T
     wrapper_html += graph_2 + "</div>"
 
     return wrapper_html
-
-
