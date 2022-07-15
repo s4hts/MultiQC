@@ -19,7 +19,6 @@ class QWindowTrim:
         self.info = "Uses a sliding window approach to remove the low quality ends of reads."
         self.type = "bp_reducer"
 
-
     ########################
     # Table Function
     def bargraph(self, json, bps, index):
