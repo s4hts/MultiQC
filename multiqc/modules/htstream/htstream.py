@@ -261,3 +261,5 @@ class MultiqcModule(BaseMultiqcModule):
             except:
                 msg = "Report Section for " + section + " Failed."
                 log.warning(msg)
+
+        self.write_data_file(self.data, "multiqc_htstream")
