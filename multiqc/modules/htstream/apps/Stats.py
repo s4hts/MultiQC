@@ -226,7 +226,7 @@ class Stats:
 
         # HTML for plots
         header_html = "<h4> Base by Cycle: " + self.read_keys[read_code] + "</h4>"
-        header_html += """<p> Provides a measure of the uniformity of a distribution. The higher the average deviation from 25\% is,
+        header_html += """<p> Provides a measure of the uniformity of a distribution. The higher the average deviation from 25% is,
 							the more unequal the base pair composition. N's are excluded from this calculation. </p>"""
 
         # Button labels
@@ -243,7 +243,7 @@ class Stats:
 
         # Construct multiplot div
         html = htstream_utils.multi_plot_html(
-            header_html, btn_label_1, btn_label_2, line_1_id, line_2_id, line_1, line_2
+            header_html, list(line_data.keys()), btn_label_1, btn_label_2, line_1_id, line_2_id, line_1, line_2
         )
 
         return html

@@ -31,3 +31,19 @@
     opacity: 1;
   }
 }
+
+/* Dropdown Content (Hidden by Default) */
+.hts-btn {
+  background-color: transparent;
+  border: none;
+  box-shadow: 0px 0px;
+  z-index: 1;
+}
+
+.hts-btn a:hover {background-color: #a4a3a3;}
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}

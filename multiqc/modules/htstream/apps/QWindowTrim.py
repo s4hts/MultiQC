@@ -19,64 +19,6 @@ class QWindowTrim:
         self.info = "Uses a sliding window approach to remove the low quality ends of reads."
         self.type = "bp_reducer"
 
-    # ########################
-    # # Bargraphs Function
-    # def bargraph(self, json, bps_trimmed, index):
-
-    #     # configuration dictionary for bar graph
-    #     config = {
-    #         "title": "HTStream: Read Composition of Bps Trimmed Bargraph",
-    #         "id": "htstream_qwindowtrimmer_bargraph_" + index,
-    #         "ylab": "Percentage of Total Basepairs",
-    #         "cpswitch": False,
-    #         "data_labels": [
-    #             {"name": "Percentage of Total", "ylab": "Percentage of Total Basepairs"},
-    #             {"name": "Raw Counts", "ylab": "Basepairs"},
-    #         ],
-    #     }
-
-    #     # Title
-    #     html = ""
-
-    #     # if no overlaps at all are present, return nothing
-    #     if bps_trimmed == 0:
-    #         html += (
-    #             '<div class="alert alert-info"> <strong>Notice:</strong> No basepairs were trimmed from samples. </div>'
-    #         )
-    #         return html
-
-    #     perc_data = {}
-    #     read_data = {}
-
-    #     # Construct data for multidataset bargraph
-    #     for key in json:
-
-    #         perc_data[key] = {
-    #             "Perc_R1_lost": json[key]["Qt_Perc_R1_lost"],
-    #             "Perc_R2_lost": json[key]["Qt_Perc_R2_lost"],
-    #             "Perc_SE_lost": json[key]["Qt_Perc_SE_lost"],
-    #         }
-    #         read_data[key] = {
-    #             "R1_lost": json[key]["Qt_R1_lost"],
-    #             "R2_lost": json[key]["Qt_R2_lost"],
-    #             "SE_lost": json[key]["Qt_SE_lost"],
-    #         }
-
-    #     # bargraph dictionary. Exact use of example in MultiQC docs.
-    #     categories = [OrderedDict(), OrderedDict()]
-
-    #     # Colors for sections
-    #     categories[0]["Perc_R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
-    #     categories[0]["Perc_R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
-    #     categories[0]["Perc_SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
-    #     categories[1]["R1_lost"] = {"name": "Read 1", "color": "#779BCC"}
-    #     categories[1]["R2_lost"] = {"name": "Read 2", "color": "#C3C3C3"}
-    #     categories[1]["SE_lost"] = {"name": "Single End", "color": "#D1ADC3"}
-
-    #     # Create bargrpah
-    #     html += bargraph.plot([perc_data, read_data], categories, config)
-
-    #     return html
 
     ########################
     # Table Function
