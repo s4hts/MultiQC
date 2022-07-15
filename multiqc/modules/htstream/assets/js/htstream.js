@@ -151,13 +151,11 @@ function htstream_plot_switch(ele, target) {
   plot_graph(plot_div.attr("id"));
 }
 
-
 ////////////////////////
 // Button click action for base by cycle graphs
 function hts_btn_click(ele) {
-  
   // change value in button
-  const unique_id = ele.id.split('_').pop()
+  const unique_id = ele.id.split("_").pop();
   const dropdown_id = "htstream_stats_dropdown_" + unique_id;
   const dropdown = document.getElementById(dropdown_id);
   dropdown.innerHTML = ele.innerText + ' <span class="caret"></span>';
@@ -167,13 +165,11 @@ function hts_btn_click(ele) {
 
   // iterate through and click appropriate button
   for (var i = 0; i < children.length; i++) {
-      
-      var child = children[i];
+    var child = children[i];
 
-      if (child.innerText == ele.innerText) {
-        child.click();
-      }
-      
+    if (child.innerText == ele.innerText) {
+      child.click();
+    }
   }
 }
 

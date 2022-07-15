@@ -40,10 +40,12 @@
   z-index: 1;
 }
 
-.hts-btn a:hover {background-color: #a4a3a3;}
+.hts-btn a:hover {
+  background-color: #a4a3a3;
+}
 
 .scrollable-menu {
-    height: auto;
-    max-height: 200px;
-    overflow-x: hidden;
+  height: auto;
+  max-height: 200px;
+  overflow-x: hidden;
 }
