@@ -49,6 +49,6 @@ script-src 'self'
 
     'sha256-NXm6btt3SaSrMpn3ubq276L3yuxUtGJ8i6ds0Wa8GTA=' # htstream.js
     'sha256-YoXv5K0Vpadh7T+MnhLHukLGAHYNJK0qJrPkasaQa8k=' # // Functions//////////////////////////////////////////////////// Button Status S
-    
+
     'unsafe-eval'
 ;
