@@ -49,24 +49,20 @@ class LengthFilter:
         # Construct data for multidataset bargraph
         for key in json:
 
-            perc_r1 = (json[key]["Lf_R1_lost"] / json[key]["Lf_Total_Reads"]) * 100
-            perc_r2 = (json[key]["Lf_R2_lost"] / json[key]["Lf_Total_Reads"]) * 100
+            perc_pe = (json[key]["Lf_PE_lost"] / json[key]["Lf_Total_Reads"]) * 100
             perc_se = (json[key]["Lf_SE_lost"] / json[key]["Lf_Total_Reads"]) * 100
 
-            perc_data[key] = {"Perc_R1": perc_r1, "Perc_R2": perc_r2, "Perc_SE": perc_se}
+            perc_data[key] = {"Perc_PE": perc_pe, "Perc_SE": perc_se}
             read_data[key] = {
-                "Reads_R1": json[key]["Lf_R1_lost"],
-                "Reads_R2": json[key]["Lf_R2_lost"],
+                "Reads_PE": json[key]["Lf_PE_lost"],
                 "Reads_SE": json[key]["Lf_SE_lost"],
             }
 
         # Create categories for multidataset bargraph
         cats = [OrderedDict(), OrderedDict()]
-        cats[0]["Perc_R1"] = {"name": "Read 1"}
-        cats[0]["Perc_R2"] = {"name": "Read 2"}
+        cats[0]["Perc_PE"] = {"name": "Paired End"}
         cats[0]["Perc_SE"] = {"name": "Single End"}
-        cats[1]["Reads_R1"] = {"name": "Read 1"}
-        cats[1]["Reads_R2"] = {"name": "Read 2"}
+        cats[1]["Reads_PE"] = {"name": "Paired End"}
         cats[1]["Reads_SE"] = {"name": "Single End"}
 
         # Create bargraph
@@ -102,8 +98,7 @@ class LengthFilter:
             # sample entry for stats dictionary
             stats_json[key] = {
                 "Lf_Total_Reads": json[key]["Fragment"]["in"],
-                "Lf_R1_lost": json[key]["Paired_end"]["Read1"]["discarded"],
-                "Lf_R2_lost": json[key]["Paired_end"]["Read2"]["discarded"],
+                "Lf_PE_lost": json[key]["Paired_end"]["discarded"],
                 "Lf_SE_lost": json[key]["Single_end"]["discarded"],
             }
 
